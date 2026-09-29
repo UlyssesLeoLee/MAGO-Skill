@@ -14,7 +14,13 @@ Use this skill when the user explicitly invokes `/git-cleanup` in Hermes or `$gi
 
 - Hermes: `/git-cleanup [--apply] [--help]`
 - Codex: `$git-cleanup [--apply] [--help]`
-- Cleanup is preview-only by default. `--apply` permits safe local cleanup after rechecking each candidate. `--help` prints section **5. GitCleanup** in `../../references/commands.md` and stops without repository inspection. Reject unknown options and show the usage.
+- `--apply`: Recheck each safe local candidate, then apply cleanup only where every safety condition still holds. It does not permit deleting remote branches.
+- `--help`: Show this inline usage and argument description, then stop without inspecting or changing the repository.
+- Default: Preview cleanup candidates only; no deletion.
+
+Examples: `/git-cleanup`, `$git-cleanup --apply`, `$git-cleanup --help`.
+
+If `--help` is present, even with other arguments, answer from the inline Usage section above and stop before any tool call, file read, or repository inspection. For an unknown option, explain the error, show this help, and stop. Read the linked files below only for a normal invocation.
 
 Resolve these files relative to this file and follow their instructions:
 

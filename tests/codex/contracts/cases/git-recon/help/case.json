@@ -1,0 +1,36 @@
+{
+  "id": "git-recon/help",
+  "skill": "git-recon",
+  "feature": "Help returns usage before repository inspection",
+  "invocations": {
+    "codex": "$git-recon --help"
+  },
+  "test_object": {
+    "repository": "absent",
+    "arguments": [
+      "--help"
+    ]
+  },
+  "expected": [
+    "Shows syntax, argument descriptions, defaults, and examples.",
+    "Does not inspect or mutate a repository."
+  ],
+  "checks": [
+    {
+      "file": "skills/git-recon/SKILL.md",
+      "contains": [
+        "- Codex: `$git-recon [--remote] [--help]`",
+        "`--help`:",
+        "Examples:"
+      ]
+    },
+    {
+      "file": "references/commands.md",
+      "contains": [
+        "All five commands accept `--help`",
+        "## 1. GitRecon",
+        "/GitRecon --help"
+      ]
+    }
+  ]
+}

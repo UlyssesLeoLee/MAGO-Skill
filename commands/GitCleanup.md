@@ -4,9 +4,19 @@ argument-hint: "[--apply] [--help]"
 disable-model-invocation: true
 ---
 
-Run the Multi-Agent Git Orchestrator command `/GitCleanup $ARGUMENTS`.
+Handle `--help` first, even if other arguments are present. Answer solely from the inline help below, then stop before any tool call, file read, skill load, or repository inspection. For an unknown option, explain the error, show this help, and stop.
 
-If `--help` is present, print the usage, argument descriptions, and examples from section **5. GitCleanup** in `references/commands.md`, then stop without loading the orchestrator skill or inspecting the repository. If an unknown option is supplied, explain the error and show the same help.
+## Inline help
+
+Usage: `/GitCleanup [--apply] [--help]`
+
+- `--apply`: Recheck each safe local candidate, then apply cleanup only where every safety condition still holds. It does not permit deleting remote branches.
+- `--help`: Show this help and stop without inspecting or changing the repository.
+- Default: Preview cleanup candidates only; no deletion.
+
+Examples: `/GitCleanup`, `/GitCleanup --apply`, `/GitCleanup --help`.
+
+For a normal invocation, run the Multi-Agent Git Orchestrator command `/GitCleanup $ARGUMENTS`.
 
 1. Load the orchestrator skill with the Skill tool. Use whichever name the skill listing shows: `MAGO-Skill` (GitHub clone directory) or `multi-agent-git-orchestrator` (frontmatter name). If neither is listed, tell the user the skill is not installed, then continue read-only only: report observations, but do not mutate branches, worktrees, refs, or history.
 2. Execute `/GitCleanup` exactly as defined in the skill's **Explicit Command Interface** and `references/commands.md`.

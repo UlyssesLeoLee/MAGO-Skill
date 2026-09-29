@@ -14,7 +14,14 @@ Use this skill when the user explicitly invokes `/git-recommend` in Hermes or `$
 
 - Hermes: `/git-recommend [goal] [--remote] [--help]`
 - Codex: `$git-recommend [goal] [--remote] [--help]`
-- `goal` is optional natural-language text. `--help` prints section **3. GitRecommend** in `../../references/commands.md` and stops without repository inspection. Treat `--remote` as an option only when it is a standalone argument; reject other unknown options and show the usage.
+- `[goal]`: Optional natural-language question or desired outcome; omit it for general next-step recommendations.
+- `--remote`: Refresh remote-tracking refs before recommending; it does not change branches, worktrees, or commit history.
+- `--help`: Show this inline usage and argument description, then stop without inspecting the repository.
+- Default: Advisory recommendations using a fresh local reconnaissance snapshot; no remote refresh.
+
+Examples: `/git-recommend`, `$git-recommend 哪些分支应该先合并 --remote`, `$git-recommend --help`.
+
+If `--help` is present, even with other arguments, answer from the inline Usage section above and stop before any tool call, file read, or repository inspection. Treat `--remote` as an option only when it is a standalone argument; for an unknown option, explain the error, show this help, and stop. Read the linked files below only for a normal invocation.
 
 Resolve these files relative to this file and follow their instructions:
 

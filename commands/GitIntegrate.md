@@ -4,9 +4,20 @@ argument-hint: "<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help
 disable-model-invocation: true
 ---
 
-Run the Multi-Agent Git Orchestrator command `/GitIntegrate $ARGUMENTS`.
+Handle `--help` first, even if other arguments are present. Answer solely from the inline help below, then stop before any tool call, file read, skill load, or repository inspection. If the target is missing, or `--strategy` has a missing or unsupported value, show this help and ask for the required value before proceeding. For an unknown option, explain the error, show this help, and stop.
 
-If `--help` is present, print the usage, argument descriptions, and examples from section **4. GitIntegrate** in `references/commands.md`, then stop without loading the orchestrator skill or inspecting the repository. If the target is missing, or `--strategy` has a missing or unsupported value, show the usage and ask for a valid value before proceeding. If an unknown option is supplied, explain the error and show the help.
+## Inline help
+
+Usage: `/GitIntegrate <lane-or-branch> [--strategy auto|merge|squash|cherry-pick] [--help]`
+
+- `<lane-or-branch>`: Required source lane or branch to integrate.
+- `--strategy <value>`: Optional integration strategy. `auto` follows repository policy and reviewed acceptance shape (default); `merge` preserves accepted lane commits; `squash` delivers the lane as one commit when allowed; `cherry-pick` uses only accepted, dependency-safe commits.
+- `--help`: Show this help and stop without inspecting or changing the repository.
+- Default: Strategy `auto`; integration proceeds only after review, dependency, freshness, protection, and repository-policy gates pass.
+
+Examples: `/GitIntegrate agent/auth`, `/GitIntegrate agent/auth --strategy squash`, `/GitIntegrate --help`.
+
+For a normal invocation, run the Multi-Agent Git Orchestrator command `/GitIntegrate $ARGUMENTS`.
 
 1. Load the orchestrator skill with the Skill tool. Use whichever name the skill listing shows: `MAGO-Skill` (GitHub clone directory) or `multi-agent-git-orchestrator` (frontmatter name). If neither is listed, tell the user the skill is not installed, then continue read-only only: report observations, but do not mutate branches, worktrees, refs, or history.
 2. Execute `/GitIntegrate` exactly as defined in the skill's **Explicit Command Interface** and `references/commands.md`.

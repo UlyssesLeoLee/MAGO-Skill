@@ -14,7 +14,13 @@ Use this skill when the user explicitly invokes `/git-recon` in Hermes or `$git-
 
 - Hermes: `/git-recon [--remote] [--help]`
 - Codex: `$git-recon [--remote] [--help]`
-- `--help` prints the usage and examples from section **1. GitRecon** in `../../references/commands.md`, then stops without inspecting the repository. Reject unknown options and show the same help.
+- `--remote`: Refresh remote-tracking refs before classifying the repository; it does not change branches, worktrees, or commit history.
+- `--help`: Show this inline usage and argument description, then stop without inspecting the repository.
+- Default: Read-only snapshot using existing local refs; no remote refresh.
+
+Examples: `/git-recon --remote`, `$git-recon --remote`, `$git-recon --help`.
+
+If `--help` is present, even with other arguments, answer from the inline Usage section above and stop before any tool call, file read, or repository inspection. For an unknown option, explain the error, show the same help, and stop. Read the linked files below only for a normal invocation.
 
 Resolve these files relative to this file and follow their instructions:
 
