@@ -1,0 +1,20 @@
+{
+  "id": "codex/trace-tool-detection",
+  "skill": "codex-test-harness",
+  "feature": "Help tests detect every current Codex CLI tool-event type",
+  "invocations": {
+    "codex": "codex exec --json --ephemeral"
+  },
+  "test_object": {
+    "jsonl_item_types": [
+      "command_execution",
+      "file_change",
+      "mcp_tool_call",
+      "collab_tool_call",
+      "web_search"
+    ]
+  },
+  "expected": [
+    "The harness records all current tool/action item types so --help can assert there was no repository access."
+  ]
+}

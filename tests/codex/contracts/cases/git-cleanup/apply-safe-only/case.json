@@ -1,0 +1,44 @@
+{
+  "id": "git-cleanup/apply-safe-only",
+  "skill": "git-cleanup",
+  "feature": "Apply rechecks and removes only safe local candidates",
+  "invocations": {
+    "codex": "$git-cleanup --apply"
+  },
+  "test_object": {
+    "candidates": [
+      {
+        "branch": "agent/done",
+        "state": "SAFE_CANDIDATE"
+      },
+      {
+        "branch": "agent/dirty",
+        "state": "BLOCKED_DIRTY"
+      }
+    ],
+    "apply": true,
+    "remote_delete": false
+  },
+  "expected": [
+    "Rechecks candidate state immediately before mutation.",
+    "Leaves dirty, unique-work, dependent, and remote branches untouched."
+  ],
+  "checks": [
+    {
+      "file": "references/commands.md",
+      "contains": [
+        "Re-check each candidate immediately before mutation.",
+        "do not use `git branch -D` by default",
+        "do not delete dirty worktrees",
+        "do not treat remote deletion as implied by local cleanup"
+      ]
+    },
+    {
+      "file": "skills/git-cleanup/SKILL.md",
+      "contains": [
+        "delete only when the explicit command includes `--apply`",
+        "Never delete remote branches unless explicitly asked"
+      ]
+    }
+  ]
+}

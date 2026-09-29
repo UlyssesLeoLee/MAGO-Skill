@@ -1,0 +1,6 @@
+{
+  "id": "git-recon/remote-refresh",
+  "fixture": "remote",
+  "args": "--remote",
+  "assertion": "remote"
+}

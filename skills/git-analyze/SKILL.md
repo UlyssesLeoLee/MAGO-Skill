@@ -14,7 +14,14 @@ Use this skill when the user explicitly invokes `/git-analyze` in Hermes or `$gi
 
 - Hermes: `/git-analyze <branch|worktree> [--remote] [--help]`
 - Codex: `$git-analyze <branch|worktree> [--remote] [--help]`
-- The target is required. `--help` prints section **2. GitAnalyze** in `../../references/commands.md` and stops without repository inspection. If the target is missing, ask for it; reject unknown options and show the usage.
+- `<branch|worktree>`: Required branch name or worktree path to analyze.
+- `--remote`: Refresh remote-tracking refs before analysis; it does not change branches, worktrees, or commit history.
+- `--help`: Show this inline usage and argument description, then stop without inspecting the repository.
+- Default: Read-only analysis using existing local refs; no remote refresh.
+
+Examples: `/git-analyze feature/auth`, `$git-analyze feature/auth --remote`, `$git-analyze --help`.
+
+If `--help` is present, even with other arguments, answer from the inline Usage section above and stop before any tool call, file read, or repository inspection. If the target is missing, ask for it and show this help; for an unknown option, explain the error and show this help. Do not inspect the repository in either error case. Read the linked files below only for a normal invocation.
 
 Resolve these files relative to this file and follow their instructions:
 
