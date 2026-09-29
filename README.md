@@ -1,4 +1,4 @@
-# Multi-Agent Git Orchestrator
+# Multi-Agent Git Orchestrator Skills
 
 > **让多个 AI Agent 安全地并行开发同一个 Git 仓库。**
 
