@@ -1,0 +1,6 @@
+{
+  "answer": "I’ll check the checkout’s local instructions and skill entrypoint, then run the requested help command without modifying the repository.\nThe shell is blocked by the checkout’s read-only execution sandbox. I’ll inspect the project-local skill through the available graph/tooling paths and invoke its documented help entrypoint if accessible.\nI couldn’t invoke `$git-recon --help`: the shell process was rejected by the checkout’s read-only sandbox, and there’s no callable GitRecon skill tool available here. I haven’t modified the checkout.",
+  "tool_calls": [],
+  "structured_trace": true,
+  "preview_answer": ""
+}

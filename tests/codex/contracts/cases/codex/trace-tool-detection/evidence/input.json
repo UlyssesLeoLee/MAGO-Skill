@@ -1,0 +1,9 @@
+{
+  "jsonl_item_types": [
+    "command_execution",
+    "file_change",
+    "mcp_tool_call",
+    "collab_tool_call",
+    "web_search"
+  ]
+}

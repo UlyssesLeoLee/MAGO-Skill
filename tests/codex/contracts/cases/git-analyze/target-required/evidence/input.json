@@ -1,0 +1,8 @@
+{
+  "target": "agent/auth",
+  "repo_state": {
+    "ahead": 2,
+    "behind": 1,
+    "dirty": false
+  }
+}

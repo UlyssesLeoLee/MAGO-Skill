@@ -1,0 +1,14 @@
+{
+  "case": "codex/trace-tool-detection",
+  "skill": "codex-test-harness",
+  "feature": "Help tests detect every current Codex CLI tool-event type",
+  "passed": true,
+  "scope": "source-contract; AI host runtime is not invoked",
+  "checks": [
+    {
+      "file": "tests/codex/run_host_cases.py",
+      "passed": true,
+      "missing": []
+    }
+  ]
+}

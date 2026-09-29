@@ -1,0 +1,56 @@
+{
+  "kind": "cleanup",
+  "checks": [
+    {
+      "name": "main and local origin exist",
+      "passed": true
+    },
+    {
+      "name": "bare origin exists",
+      "passed": true
+    },
+    {
+      "name": "safe, dirty, unique, dependent candidates exist",
+      "passed": true
+    },
+    {
+      "name": "done is merged and unique is not",
+      "passed": true
+    }
+  ],
+  "initial_state": {
+    "git_repository": true,
+    "refs": {
+      "refs/heads/agent/dependent": "f9c815539399356b3f94e704607ed4a291dff303",
+      "refs/heads/agent/dirty": "bb5844dbdfc74275ffeff83d085e29a6731e8805",
+      "refs/heads/agent/done": "1a1e7ae4c3273b787edd7a1e14e53dce58210f70",
+      "refs/heads/agent/unique": "4157555f7bcdc7023228c2031e5119c61de4f8a6",
+      "refs/heads/main": "bb5844dbdfc74275ffeff83d085e29a6731e8805",
+      "refs/remotes/origin/main": "ccab8ed8da23cc7066cce2dfb8464b9c8b58fb48"
+    },
+    "worktrees": {
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-gnh8bu4b\\repo": {
+        "head": "bb5844dbdfc74275ffeff83d085e29a6731e8805",
+        "branch": "main",
+        "status": ""
+      },
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-gnh8bu4b\\dirty-worktree": {
+        "head": "bb5844dbdfc74275ffeff83d085e29a6731e8805",
+        "branch": "agent/dirty",
+        "status": "M README.md"
+      }
+    },
+    "files": {
+      "repo/done.txt": "6e771ec43b9576cd03199c04c4a23e9f7f18246ebf8085c5ae7f656396ad5dbb",
+      "repo/README.md": "5bd17a4a66c4126008a147278511f1fb55774b443fa32bf571a0ffd5a8efc073",
+      "dirty-worktree/done.txt": "6e771ec43b9576cd03199c04c4a23e9f7f18246ebf8085c5ae7f656396ad5dbb",
+      "dirty-worktree/README.md": "3f8c0cdfcc274eedc3fdbc41958967fae71e3a2087439eebcbd40ee3e32a85b2"
+    },
+    "bare_refs": {
+      "refs/heads/main": "ccab8ed8da23cc7066cce2dfb8464b9c8b58fb48"
+    }
+  },
+  "skill": null,
+  "skill_path": null,
+  "skill_source_sha256": null
+}

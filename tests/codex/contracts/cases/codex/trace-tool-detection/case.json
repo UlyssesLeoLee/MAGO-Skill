@@ -16,5 +16,18 @@
   },
   "expected": [
     "The harness records all current tool/action item types so --help can assert there was no repository access."
+  ],
+  "checks": [
+    {
+      "file": "tests/codex/run_host_cases.py",
+      "contains": [
+        "\"command_execution\"",
+        "\"file_change\"",
+        "\"mcp_tool_call\"",
+        "\"collab_tool_call\"",
+        "\"web_search\"",
+        "if item.get(\"type\") in tool_item_types:"
+      ]
+    }
   ]
 }

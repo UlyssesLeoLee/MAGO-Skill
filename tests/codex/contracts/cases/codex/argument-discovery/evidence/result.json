@@ -1,0 +1,59 @@
+{
+  "case": "codex/argument-discovery",
+  "skill": "all",
+  "feature": "Codex exposes all five skills with compact usage hints",
+  "passed": true,
+  "scope": "source-contract; AI host runtime is not invoked",
+  "checks": [
+    {
+      "file": "skills/git-recon/SKILL.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-recon/agents/openai.yaml",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-analyze/SKILL.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-analyze/agents/openai.yaml",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-recommend/SKILL.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-recommend/agents/openai.yaml",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-integrate/SKILL.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-integrate/agents/openai.yaml",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-cleanup/SKILL.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-cleanup/agents/openai.yaml",
+      "passed": true,
+      "missing": []
+    }
+  ]
+}

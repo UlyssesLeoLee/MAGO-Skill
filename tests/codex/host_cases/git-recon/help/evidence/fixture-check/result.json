@@ -1,0 +1,15 @@
+{
+  "case": "git-recon/help",
+  "status": "PASS",
+  "scope": "fixture setup only; no AI host invoked",
+  "checks": [
+    {
+      "name": "empty Git repository",
+      "passed": true
+    },
+    {
+      "name": "workspace is empty",
+      "passed": true
+    }
+  ]
+}
