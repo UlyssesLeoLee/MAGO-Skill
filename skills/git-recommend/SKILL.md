@@ -1,14 +1,20 @@
 ---
 name: git-recommend
-description: "基于仓库真实状态推荐 Git 操作与多 Agent 下一步。"
-version: 1.0.0
-author: Multi-Agent Git Orchestrator
+description: "给出 Git 建议；/git-recommend [goal] [--remote] [--help]."
 license: MIT
+metadata:
+  short-description: "Git 建议；$git-recommend [goal] [--remote] [--help]."
 ---
 
 # GitRecommend
 
 Use this skill when the user explicitly invokes `/git-recommend` in Hermes or `$git-recommend` in Codex. Treat any text following the selected skill name as the command arguments.
+
+## Usage
+
+- Hermes: `/git-recommend [goal] [--remote] [--help]`
+- Codex: `$git-recommend [goal] [--remote] [--help]`
+- `goal` is optional natural-language text. `--help` prints section **3. GitRecommend** in `../../references/commands.md` and stops without repository inspection. Treat `--remote` as an option only when it is a standalone argument; reject other unknown options and show the usage.
 
 Resolve these files relative to this file and follow their instructions:
 

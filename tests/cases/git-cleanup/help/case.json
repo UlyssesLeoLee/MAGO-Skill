@@ -1,0 +1,36 @@
+{
+  "id": "git-cleanup/help",
+  "skill": "git-cleanup",
+  "feature": "Help explains apply is opt-in",
+  "invocations": {
+    "claude": "/GitCleanup --help",
+    "hermes": "/git-cleanup --help",
+    "codex": "$git-cleanup --help"
+  },
+  "test_object": {
+    "repository": "absent",
+    "arguments": [
+      "--help"
+    ]
+  },
+  "expected": [
+    "Shows preview as default and apply as an explicit option without repository inspection."
+  ],
+  "checks": [
+    {
+      "file": "commands/GitCleanup.md",
+      "contains": [
+        "argument-hint: \"[--apply] [--help]\"",
+        "stop without loading the orchestrator skill or inspecting the repository"
+      ]
+    },
+    {
+      "file": "references/commands.md",
+      "contains": [
+        "`--apply` | No",
+        "Without it, only show a preview.",
+        "/GitCleanup --help"
+      ]
+    }
+  ]
+}

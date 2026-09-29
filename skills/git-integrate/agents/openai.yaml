@@ -1,3 +1,3 @@
 interface:
   display_name: "git-integrate"
-  short_description: "检查 review、依赖和状态新鲜度后再集成指定分支或 lane"
+  short_description: "集成目标；$git-integrate TARGET [--strategy] [--help]"

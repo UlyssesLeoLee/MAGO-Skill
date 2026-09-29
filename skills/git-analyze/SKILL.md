@@ -1,14 +1,20 @@
 ---
 name: git-analyze
-description: "深入分析指定分支或 worktree，并评估集成与历史改写风险。"
-version: 1.0.0
-author: Multi-Agent Git Orchestrator
+description: "分析目标；/git-analyze TARGET [--remote] [--help]."
 license: MIT
+metadata:
+  short-description: "分析目标；$git-analyze TARGET [--remote] [--help]."
 ---
 
 # GitAnalyze
 
 Use this skill when the user explicitly invokes `/git-analyze` in Hermes or `$git-analyze` in Codex. Treat any text following the selected skill name as the command arguments.
+
+## Usage
+
+- Hermes: `/git-analyze <branch|worktree> [--remote] [--help]`
+- Codex: `$git-analyze <branch|worktree> [--remote] [--help]`
+- The target is required. `--help` prints section **2. GitAnalyze** in `../../references/commands.md` and stops without repository inspection. If the target is missing, ask for it; reject unknown options and show the usage.
 
 Resolve these files relative to this file and follow their instructions:
 

@@ -1,9 +1,11 @@
 ---
 description: 调查当前 Git 仓库整体状态（branch / worktree / HEAD / ahead-behind / dirty / 风险）
-argument-hint: "[--remote]"
+argument-hint: "[--remote] [--help]"
 ---
 
 Run the Multi-Agent Git Orchestrator command `/GitRecon $ARGUMENTS`.
+
+If `--help` is present, print the usage, argument descriptions, and examples from section **1. GitRecon** in `references/commands.md`, then stop without loading the orchestrator skill or inspecting the repository. If an unknown option is supplied, explain the error and show the same help.
 
 1. Load the orchestrator skill with the Skill tool. Use whichever name the skill listing shows: `MAGO-Skill` (GitHub clone directory) or `multi-agent-git-orchestrator` (frontmatter name). If neither is listed, tell the user the skill is not installed, then continue read-only only: report observations, but do not mutate branches, worktrees, refs, or history.
 2. Execute `/GitRecon` exactly as defined in the skill's **Explicit Command Interface** and `references/commands.md`.

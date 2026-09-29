@@ -1,0 +1,36 @@
+{
+  "id": "git-integrate/help",
+  "skill": "git-integrate",
+  "feature": "Help lists strategy choices and never performs integration",
+  "invocations": {
+    "claude": "/GitIntegrate --help",
+    "hermes": "/git-integrate --help",
+    "codex": "$git-integrate --help"
+  },
+  "test_object": {
+    "repository": "absent",
+    "arguments": [
+      "--help"
+    ]
+  },
+  "expected": [
+    "Lists required source target, allowed strategies, default, and safety gates without repository inspection."
+  ],
+  "checks": [
+    {
+      "file": "commands/GitIntegrate.md",
+      "contains": [
+        "argument-hint: \"<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]\"",
+        "stop without loading the orchestrator skill or inspecting the repository"
+      ]
+    },
+    {
+      "file": "references/commands.md",
+      "contains": [
+        "--strategy <value>",
+        "Defaults to `auto`.",
+        "/GitIntegrate --help"
+      ]
+    }
+  ]
+}

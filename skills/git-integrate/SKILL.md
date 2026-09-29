@@ -1,14 +1,20 @@
 ---
 name: git-integrate
-description: "检查门禁后集成指定 Agent lane 或分支。"
-version: 1.0.0
-author: Multi-Agent Git Orchestrator
+description: "集成目标；/git-integrate TARGET [--strategy] [--help]."
 license: MIT
+metadata:
+  short-description: "集成目标；$git-integrate TARGET [--strategy] [--help]."
 ---
 
 # GitIntegrate
 
 Use this skill when the user explicitly invokes `/git-integrate` in Hermes or `$git-integrate` in Codex. Treat any text following the selected skill name as the command arguments.
+
+## Usage
+
+- Hermes: `/git-integrate <lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]`
+- Codex: `$git-integrate <lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]`
+- The source target is required; `--strategy` defaults to `auto`. `--help` prints section **4. GitIntegrate** in `../../references/commands.md` and stops without repository inspection. If the target or strategy value is missing or invalid, show the usage and do not integrate.
 
 Resolve these files relative to this file and follow their instructions:
 

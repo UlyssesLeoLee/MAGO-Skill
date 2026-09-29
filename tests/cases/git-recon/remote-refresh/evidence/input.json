@@ -1,0 +1,11 @@
+{
+  "remote_ref_state": "stale",
+  "allowed_changes": [
+    "remote-tracking refs"
+  ],
+  "forbidden_changes": [
+    "branches",
+    "worktrees",
+    "commit history"
+  ]
+}

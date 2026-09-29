@@ -1,0 +1,12 @@
+{
+  "hosts": [
+    "claude",
+    "hermes",
+    "codex"
+  ],
+  "expected_ui": {
+    "claude": "native argument hint",
+    "hermes": "skill description and --help",
+    "codex": "short description and --help"
+  }
+}
