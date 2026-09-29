@@ -1,5 +1,3 @@
-<img width="1254" height="1254" alt="Magos" src="https://github.com/user-attachments/assets/201ea860-003e-4f18-8925-8f86b090fd9b" />
-
 # Multi-Agent Git Orchestrator
 
 > **让多个 AI Agent 安全地并行开发同一个 Git 仓库。**
@@ -14,6 +12,7 @@
 - 哪些 Commit 适合 Cherry-pick
 - 哪些分支已经可以安全清理
 - 如何避免多个 Agent 同时破坏 `main`
+<img width="1254" height="1254" alt="MAGOS2" src="https://github.com/user-attachments/assets/4d450361-25b5-4d35-90d8-d5656bd496cb" />
 
 ---
 
