@@ -287,6 +287,8 @@ Mutate only when needed.
 ```text
 multi-agent-git-orchestrator/
 ├── SKILL.md
+├── commands/                  # Claude Code command prompts
+├── skills/                    # Codex / Hermes command adapters
 └── references/
     ├── commands.md
     ├── reconnaissance.md
@@ -298,7 +300,7 @@ multi-agent-git-orchestrator/
 
 Skill 可以通过语义自动触发。
 
-### 启用 Slash Command（Claude Code）
+### Claude Code：启用 Slash Command
 
 Claude Code 只会为每个 Skill 注册**一个**以 Skill 名命名的斜杠命令，`/GitRecon` 等五个命令需要额外安装 `commands/` 下的命令文件：
 
@@ -332,6 +334,57 @@ New-Item -ItemType Directory -Force "$HOME\.claude\commands"; Copy-Item commands
 /GitIntegrate <lane-or-branch>
 /GitCleanup
 ```
+
+五个命令的跨宿主名称和说明：
+
+| 命令 | Claude Code | Hermes | Codex | 说明 |
+|---|---|---|---|---|
+| GitRecon | `/GitRecon` | `/git-recon` | `$git-recon` | 检查仓库 branch / worktree 状态并生成快照 |
+| GitAnalyze | `/GitAnalyze` | `/git-analyze` | `$git-analyze` | 分析指定目标的差异、依赖和操作风险 |
+| GitRecommend | `/GitRecommend` | `/git-recommend` | `$git-recommend` | 根据当前状态建议 Git 与多 Agent 下一步 |
+| GitIntegrate | `/GitIntegrate` | `/git-integrate` | `$git-integrate` | 通过安全门禁后集成指定 lane 或 branch |
+| GitCleanup | `/GitCleanup` | `/git-cleanup` | `$git-cleanup` | 默认预览可清理项；`--apply` 才允许删除 |
+
+### Codex：启用命令 Skill
+
+Codex 的自定义入口是 Skill 选择器（`$`），不是任意命名的 `/Git...` Slash Command。仓库的 `skills/` 为每个命令提供一个独立 Skill，`agents/openai.yaml` 中的简短说明会显示在 Codex 的 Skill 列表里。
+
+将仓库内容放在用户级 Codex skills 目录下的 `MAGOS` 子目录中。Windows PowerShell：
+
+```powershell
+$codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $HOME ".codex" }
+$codexPackage = Join-Path $codexHome "skills\MAGOS"
+New-Item -ItemType Directory -Force $codexPackage | Out-Null
+Copy-Item -Path .\SKILL.md, .\commands, .\references, .\skills -Destination $codexPackage -Recurse -Force
+```
+
+macOS / Linux：
+
+```bash
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills/MAGOS"
+cp -R SKILL.md commands references skills "${CODEX_HOME:-$HOME/.codex}/skills/MAGOS/"
+```
+
+重新启动 Codex 后，输入 `$` 选择命令 Skill，或直接调用 `$git-recon`、`$git-analyze`、`$git-recommend`、`$git-integrate`、`$git-cleanup`。`/skills` 可打开 Skill 浏览入口。每个命令在列表中都带有简短说明。
+
+### Hermes：启用 Slash Skill
+
+Hermes 会把已安装的每个 Skill 自动注册成一个 Slash Command，并将 `SKILL.md` 的 `description` 用作命令说明。Windows PowerShell：
+
+```powershell
+$hermesSkills = Join-Path $HOME ".hermes\skills\multi-agent-git-orchestrator"
+New-Item -ItemType Directory -Force $hermesSkills | Out-Null
+Copy-Item -Path .\SKILL.md, .\commands, .\references, .\skills -Destination $hermesSkills -Recurse -Force
+```
+
+macOS / Linux：
+
+```bash
+mkdir -p "$HOME/.hermes/skills/multi-agent-git-orchestrator"
+cp -R SKILL.md commands references skills "$HOME/.hermes/skills/multi-agent-git-orchestrator/"
+```
+
+重新启动 Hermes 后，可运行 `hermes skills list` 查看各命令说明，并调用 `/git-recon`、`/git-analyze`、`/git-recommend`、`/git-integrate` 或 `/git-cleanup`。参数直接跟在命令后面，例如 `/git-analyze main --remote`。
 
 如果宿主不支持自定义 Slash Command，也可以直接输入：
 

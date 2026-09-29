@@ -47,7 +47,19 @@ Do **not** activate merely because Git is mentioned. Pure conceptual questions s
 
 ## Explicit Command Interface
 
-Treat the following names as explicit invocation intents. Canonical display names use `/Git...`. If the host supports custom slash commands, expose/map them directly; otherwise, the same name without the leading `/` MUST be interpreted equivalently. Explicit invocation selects the command mode but does not bypass safety gates.
+Treat the following names as explicit invocation intents. The canonical command names are `/Git...`; host-native skill adapters may map them to another selector. Explicit invocation selects the command mode but does not bypass safety gates.
+
+### Host Invocation Names
+
+| Canonical command | Claude Code | Hermes | Codex |
+|---|---|---|---|
+| `/GitRecon` | `/GitRecon` | `/git-recon` | `$git-recon` |
+| `/GitAnalyze` | `/GitAnalyze` | `/git-analyze` | `$git-analyze` |
+| `/GitRecommend` | `/GitRecommend` | `/git-recommend` | `$git-recommend` |
+| `/GitIntegrate` | `/GitIntegrate` | `/git-integrate` | `$git-integrate` |
+| `/GitCleanup` | `/GitCleanup` | `/git-cleanup` | `$git-cleanup` |
+
+Claude Code reads the command Markdown files in `commands/`. Hermes reads the five Agent Skills in `skills/` as slash commands. Codex reads the same skill files as individually selectable skills; invoke them with `$name` (or open `/skills` to browse). Codex does not register arbitrary custom `/Git...` slash commands. Each adapter keeps its own display name and description while following the canonical command contract below.
 
 | Command | 中文调用说明 | Default effect |
 |---|---|---|
