@@ -298,6 +298,31 @@ multi-agent-git-orchestrator/
 
 Skill 可以通过语义自动触发。
 
+### 启用 Slash Command（Claude Code）
+
+Claude Code 只会为每个 Skill 注册**一个**以 Skill 名命名的斜杠命令，`/GitRecon` 等五个命令需要额外安装 `commands/` 下的命令文件：
+
+```text
+commands/
+├── GitRecon.md
+├── GitAnalyze.md
+├── GitRecommend.md
+├── GitIntegrate.md
+└── GitCleanup.md
+```
+
+在本仓库根目录执行，复制到用户级命令目录（所有项目可用）；也可以复制到某个项目的 `.claude/commands/`（仅该项目可用）。注意不要放进 Skill 目录内部，那里的文件不会被识别为命令：
+
+```bash
+mkdir -p ~/.claude/commands && cp commands/Git*.md ~/.claude/commands/
+```
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME\.claude\commands"; Copy-Item commands\Git*.md "$HOME\.claude\commands\"
+```
+
+安装后**重新开启会话**，输入 `/Git` 即可看到五个命令。
+
 也可以显式调用：
 
 ```text
