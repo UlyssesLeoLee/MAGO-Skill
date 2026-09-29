@@ -1,3 +1,5 @@
+<img width="1254" height="1254" alt="Magos" src="https://github.com/user-attachments/assets/201ea860-003e-4f18-8925-8f86b090fd9b" />
+
 # Multi-Agent Git Orchestrator
 
 > **让多个 AI Agent 安全地并行开发同一个 Git 仓库。**
