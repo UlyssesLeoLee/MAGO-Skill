@@ -1,8 +1,5 @@
 {
   "files": {
-    ".serena/.gitignore": "441f89b8bba2252c9f7797ebc2fca741b760712e1c8261a7ad5c282175dd52f2",
-    ".serena/project.local.yml": "ef276846aadfe759d8c0bad4df62e49d0b4e5bd8a18a08238510ad7d3ba30416",
-    ".serena/project.yml": "866c843006a00acdcbb1d673cf4c6bd4a5d78ca017a808a9b97203885fd7f7af",
     ".agents/references/commands.md": "57869a7ce69c12e2215d33fdca25addccc71f9387eeee8eea237eebb43d45215",
     ".agents/references/decision-matrix.md": "954ffefa9c018e25d0b88987c8bed5f07739b148c8aa254b9a9cde41e6ffe141",
     ".agents/references/design-rationale.md": "9b5baf5107530fe275b304002fd37a24072510aebc140908d5702bda2e9f49bd",

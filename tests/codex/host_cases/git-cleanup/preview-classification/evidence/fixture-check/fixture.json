@@ -21,21 +21,21 @@
   "initial_state": {
     "git_repository": true,
     "refs": {
-      "refs/heads/agent/dependent": "f9c815539399356b3f94e704607ed4a291dff303",
-      "refs/heads/agent/dirty": "bb5844dbdfc74275ffeff83d085e29a6731e8805",
-      "refs/heads/agent/done": "1a1e7ae4c3273b787edd7a1e14e53dce58210f70",
-      "refs/heads/agent/unique": "4157555f7bcdc7023228c2031e5119c61de4f8a6",
-      "refs/heads/main": "bb5844dbdfc74275ffeff83d085e29a6731e8805",
-      "refs/remotes/origin/main": "ccab8ed8da23cc7066cce2dfb8464b9c8b58fb48"
+      "refs/heads/agent/dependent": "bb2121f63028ed0c92957196af019e65580596b4",
+      "refs/heads/agent/dirty": "90a6af3fd61072984a386c0070736737c0e5cc5c",
+      "refs/heads/agent/done": "066c872b7d88a35850064dcd4d707e39474fb819",
+      "refs/heads/agent/unique": "667d68b5742fb5dafab9c3a96a7d2c890cc8ee25",
+      "refs/heads/main": "90a6af3fd61072984a386c0070736737c0e5cc5c",
+      "refs/remotes/origin/main": "d34ab65fa2c3bcc8ac904a2e06743abaee591af6"
     },
     "worktrees": {
-      "E:\\MAGOS\\tests\\codex\\.magos-accept-gnh8bu4b\\repo": {
-        "head": "bb5844dbdfc74275ffeff83d085e29a6731e8805",
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-6y5to2_i\\repo": {
+        "head": "90a6af3fd61072984a386c0070736737c0e5cc5c",
         "branch": "main",
         "status": ""
       },
-      "E:\\MAGOS\\tests\\codex\\.magos-accept-gnh8bu4b\\dirty-worktree": {
-        "head": "bb5844dbdfc74275ffeff83d085e29a6731e8805",
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-6y5to2_i\\dirty-worktree": {
+        "head": "90a6af3fd61072984a386c0070736737c0e5cc5c",
         "branch": "agent/dirty",
         "status": "M README.md"
       }
@@ -47,7 +47,7 @@
       "dirty-worktree/README.md": "3f8c0cdfcc274eedc3fdbc41958967fae71e3a2087439eebcbd40ee3e32a85b2"
     },
     "bare_refs": {
-      "refs/heads/main": "ccab8ed8da23cc7066cce2dfb8464b9c8b58fb48"
+      "refs/heads/main": "d34ab65fa2c3bcc8ac904a2e06743abaee591af6"
     }
   },
   "skill": null,

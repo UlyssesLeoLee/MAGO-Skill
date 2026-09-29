@@ -5,5 +5,12 @@
     "mcp_tool_call",
     "collab_tool_call",
     "web_search"
+  ],
+  "host_runtime_error_markers": [
+    "helper_unknown_error",
+    "setup refresh had errors"
+  ],
+  "ignored_host_metadata": [
+    ".serena"
   ]
 }

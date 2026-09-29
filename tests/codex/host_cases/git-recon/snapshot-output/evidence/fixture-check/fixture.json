@@ -21,18 +21,18 @@
   "initial_state": {
     "git_repository": true,
     "refs": {
-      "refs/heads/agent/auth": "9709d1473b7993002b2b1acb2e7607d88fccb46b",
-      "refs/heads/main": "e7073d24727699147aab9d08bd07f5e7789fdc6c",
-      "refs/remotes/origin/main": "e7073d24727699147aab9d08bd07f5e7789fdc6c"
+      "refs/heads/agent/auth": "4b494d87cbceaf715cdb0213f189a10bfe16d4fc",
+      "refs/heads/main": "5dc874911b382ac57a2cc8bf818a19c721aa377e",
+      "refs/remotes/origin/main": "5dc874911b382ac57a2cc8bf818a19c721aa377e"
     },
     "worktrees": {
-      "E:\\MAGOS\\tests\\codex\\.magos-accept-kli97j_g\\repo": {
-        "head": "e7073d24727699147aab9d08bd07f5e7789fdc6c",
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-xhny85yd\\repo": {
+        "head": "5dc874911b382ac57a2cc8bf818a19c721aa377e",
         "branch": "main",
         "status": ""
       },
-      "E:\\MAGOS\\tests\\codex\\.magos-accept-kli97j_g\\auth-worktree": {
-        "head": "9709d1473b7993002b2b1acb2e7607d88fccb46b",
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-xhny85yd\\auth-worktree": {
+        "head": "4b494d87cbceaf715cdb0213f189a10bfe16d4fc",
         "branch": "agent/auth",
         "status": "M feature.txt"
       }
@@ -43,7 +43,7 @@
       "auth-worktree/README.md": "5bd17a4a66c4126008a147278511f1fb55774b443fa32bf571a0ffd5a8efc073"
     },
     "bare_refs": {
-      "refs/heads/main": "e7073d24727699147aab9d08bd07f5e7789fdc6c"
+      "refs/heads/main": "5dc874911b382ac57a2cc8bf818a19c721aa377e"
     }
   },
   "skill": null,

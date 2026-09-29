@@ -25,18 +25,18 @@
   "initial_state": {
     "git_repository": true,
     "refs": {
-      "refs/heads/agent/auth": "04345cb3bc00f8f5d09482a18ed82d1dd6647ba8",
-      "refs/heads/main": "2cc37f904e6869f16406a6be3ea8684a98a89427",
-      "refs/remotes/origin/main": "2cc37f904e6869f16406a6be3ea8684a98a89427"
+      "refs/heads/agent/auth": "43a3ae198f81f47ad8daf9e326271f6464ee0bb8",
+      "refs/heads/main": "79d7e1cd214f35bbafb7bd6278702da03d2fcaca",
+      "refs/remotes/origin/main": "79d7e1cd214f35bbafb7bd6278702da03d2fcaca"
     },
     "worktrees": {
-      "E:\\MAGOS\\tests\\codex\\.magos-accept-zmeahzif\\repo": {
-        "head": "2cc37f904e6869f16406a6be3ea8684a98a89427",
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-yvq58566\\repo": {
+        "head": "79d7e1cd214f35bbafb7bd6278702da03d2fcaca",
         "branch": "main",
         "status": ""
       },
-      "E:\\MAGOS\\tests\\codex\\.magos-accept-zmeahzif\\auth-worktree": {
-        "head": "04345cb3bc00f8f5d09482a18ed82d1dd6647ba8",
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-yvq58566\\auth-worktree": {
+        "head": "43a3ae198f81f47ad8daf9e326271f6464ee0bb8",
         "branch": "agent/auth",
         "status": "M feature.txt"
       }
@@ -47,7 +47,7 @@
       "auth-worktree/README.md": "5bd17a4a66c4126008a147278511f1fb55774b443fa32bf571a0ffd5a8efc073"
     },
     "bare_refs": {
-      "refs/heads/main": "216cd8102db0a18bc9763a7a89d645c01b14fca7"
+      "refs/heads/main": "aa50e60c95432b574cbca9c39c539281aaa7da4e"
     }
   },
   "skill": null,

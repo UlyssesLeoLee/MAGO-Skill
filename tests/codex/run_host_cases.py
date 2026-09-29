@@ -13,10 +13,13 @@ CREATE
   (x:Function {name:'extract_response', type:'function'}),
   (i:Function {name:'invoke_host', type:'function'}),
   (e:Function {name:'evaluate', type:'function'}),
+  (hg:Function {name:'has_git_command', type:'function'}),
   (r:Function {name:'run_case', type:'function'}),
   (m:Function {name:'main', type:'function'}),
   (run:Function {name:'subprocess.run', type:'function'}),
   (dump:Function {name:'json.dumps', type:'function'}),
+  (json_loads:Function {name:'json.loads', type:'function'}),
+  (regex_search:Function {name:'re.search', type:'function'}),
   (write:Function {name:'Path.write_text', type:'function'}),
   (read:Function {name:'Path.read_text', type:'function'}),
   (mkdir:Function {name:'Path.mkdir', type:'function'}),
@@ -30,11 +33,13 @@ CREATE
   (f)-[:CONTAINS]->(g), (f)-[:CONTAINS]->(w), (f)-[:CONTAINS]->(s),
   (f)-[:CONTAINS]->(p), (f)-[:CONTAINS]->(project_skill), (f)-[:CONTAINS]->(v), (f)-[:CONTAINS]->(c),
   (f)-[:CONTAINS]->(x), (f)-[:CONTAINS]->(i), (f)-[:CONTAINS]->(e),
+  (f)-[:CONTAINS]->(hg), (f)-[:CONTAINS]->(json_loads), (f)-[:CONTAINS]->(regex_search),
   (f)-[:CONTAINS]->(r), (f)-[:CONTAINS]->(m),
   (g)-[:CALLS]->(run), (w)-[:CALLS]->(dump), (w)-[:CALLS]->(write),
   (s)-[:CALLS]->(g), (s)-[:CALLS]->(as_posix), (p)-[:CALLS]->(g), (p)-[:CALLS]->(mkdir),
   (v)-[:CALLS]->(s), (v)-[:CALLS]->(g), (c)-[:CALLS]->(which),
-  (x)-[:CALLS]->(read), (i)-[:CALLS]->(run), (e)-[:CALLS]->(g),
+  (x)-[:CALLS]->(read), (x)-[:CALLS]->(json_loads), (i)-[:CALLS]->(run), (e)-[:CALLS]->(g),
+  (e)-[:CALLS]->(hg), (hg)-[:CALLS]->(json_loads), (hg)-[:CALLS]->(regex_search),
   (x)-[:USES]->(tool_types),
   (r)-[:CALLS]->(p), (r)-[:CALLS]->(project_skill), (r)-[:CALLS]->(v), (r)-[:CALLS]->(s),
   (r)-[:CALLS]->(c), (r)-[:CALLS]->(i), (r)-[:CALLS]->(x),
@@ -79,6 +84,7 @@ RUNTIME_ERROR = re.compile(
     r"(?i)(insufficient.?(?:credit|balance)|usage limit|rate limit|quota|"
     r"authentication|not logged in|login required|api.?key|billing|"
     r"CreateProcessAsUserW|sandbox.*(?:denied|failed)|permission denied|"
+    r"helper_unknown_error|setup refresh had errors|"
     r"access is denied|interrupted.update|auto.recover.*install|"
     r"could not.*(?:connect|resolve)|model.*unavailable|provider.*error)"
 )
@@ -116,7 +122,8 @@ def snapshot(fixture: dict) -> dict:
     if fixture["kind"] == "empty":
         files = {}
         for path in root.rglob("*"):
-            if path.is_file() and ".git" not in path.relative_to(root).parts:
+            relative_parts = path.relative_to(root).parts
+            if path.is_file() and ".git" not in relative_parts and ".serena" not in relative_parts:
                 files[path.relative_to(root).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
         return {"files": files, "git_repository": (root / ".git").exists()}
     refs = {}
@@ -325,6 +332,18 @@ def extract_response(stdout: str) -> tuple[str, list[str], bool]:
     return "\n".join(messages).strip(), tool_calls, parsed_any
 
 
+def has_git_command(tool_calls: list[str]) -> bool:
+    for tool_call in tool_calls:
+        try:
+            item = json.loads(tool_call)
+        except json.JSONDecodeError:
+            continue
+        command = item.get("command") if isinstance(item, dict) else None
+        if isinstance(command, str) and re.search(r"(?i)\bgit(?:\.exe)?\s", command):
+            return True
+    return False
+
+
 def invoke_host(command: list[str], cwd: Path, base: Path, timeout: int) -> dict:
     started = datetime.now(timezone.utc).isoformat()
     environment = os.environ.copy()
@@ -369,7 +388,7 @@ def evaluate(spec: dict, fixture: dict, before: dict, after: dict,
         add("usage describes command option", option in text)
         add("repository state remains unchanged", before == after)
         add("structured trace permits inspection check", trace)
-        add("no tool call", not tool_calls)
+        add("no Git command", not has_git_command(tool_calls))
     elif assertion == "recon":
         add("reports main and agent/auth", "main" in text and "agent/auth" in text)
         add("reports dirty state", has_any("dirty", "未提交", "脏", "修改"))

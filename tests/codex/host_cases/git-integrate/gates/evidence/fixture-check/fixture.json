@@ -17,13 +17,13 @@
   "initial_state": {
     "git_repository": true,
     "refs": {
-      "refs/heads/agent/auth": "1716310d4c6ef468471acda8baaf95c6cc9334db",
-      "refs/heads/main": "c802c29100817126148530cfb2742d8f33d9990b",
-      "refs/remotes/origin/main": "c802c29100817126148530cfb2742d8f33d9990b"
+      "refs/heads/agent/auth": "afa1218d2cad6823b5cbb0d81151c0d87b8819b3",
+      "refs/heads/main": "440a7370ab15ce701e0051de33bd89e92e1a40f9",
+      "refs/remotes/origin/main": "440a7370ab15ce701e0051de33bd89e92e1a40f9"
     },
     "worktrees": {
-      "E:\\MAGOS\\tests\\codex\\.magos-accept-eb93qbkn\\repo": {
-        "head": "c802c29100817126148530cfb2742d8f33d9990b",
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-whll1ccc\\repo": {
+        "head": "440a7370ab15ce701e0051de33bd89e92e1a40f9",
         "branch": "main",
         "status": ""
       }
@@ -32,7 +32,7 @@
       "repo/README.md": "5bd17a4a66c4126008a147278511f1fb55774b443fa32bf571a0ffd5a8efc073"
     },
     "bare_refs": {
-      "refs/heads/main": "c802c29100817126148530cfb2742d8f33d9990b"
+      "refs/heads/main": "440a7370ab15ce701e0051de33bd89e92e1a40f9"
     }
   },
   "skill": null,

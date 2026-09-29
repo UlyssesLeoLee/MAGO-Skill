@@ -2,6 +2,6 @@
   "case": "git-recon/help",
   "status": "UNVERIFIED",
   "scope": "host runtime",
-  "reason": "host runtime/auth/model/sandbox error",
+  "reason": "Codex elevated Windows sandbox setup failed before skill execution: helper_unknown_error: setup refresh had errors",
   "returncode": 0
 }

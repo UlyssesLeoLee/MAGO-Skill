@@ -1,7 +1,7 @@
 {
   "case": "codex/trace-tool-detection",
   "skill": "codex-test-harness",
-  "feature": "Help tests detect every current Codex CLI tool-event type",
+  "feature": "Help tests distinguish safe skill discovery from Git commands and classify host setup errors",
   "passed": true,
   "scope": "source-contract; AI host runtime is not invoked",
   "checks": [

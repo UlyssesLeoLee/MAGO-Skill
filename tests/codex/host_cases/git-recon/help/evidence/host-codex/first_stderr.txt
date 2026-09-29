@@ -1,6 +1,7 @@
 Reading additional input from stdin...
-2026-09-29T22:21:28.749832Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/
-2026-09-29T22:21:28.749931Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/
-2026-09-29T22:21:28.771192Z  WARN codex_core::shell_snapshot: Failed to create shell snapshot for powershell: Shell snapshot not supported yet for PowerShell
-2026-09-29T22:21:47.030972Z  WARN codex_rmcp_client::stdio_server_launcher: Failed to read MCP server stderr (uvx): stream did not contain valid UTF-8
-2026-09-29T22:22:01.885084Z ERROR codex_core::tools::router: error=exec_command failed: CreateProcess { message: "Rejected(\"Failed to create unified exec process: CreateProcessAsUserW failed: 5 (拒绝访问。) | cwd=E:\\\\MAGOS\\\\tests\\\\codex\\\\.magos-accept-m6hu3rtf\\\\empty | cmd=\\\"C:\\\\Program Files\\\\WindowsApps\\\\Microsoft.PowerShell_7.6.6.0_x64__8wekyb3d8bbwe\\\\pwsh.exe\\\" -Command \\\"try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}\\nrtk proxy Get-ChildItem -Force -Recurse .agents | Select-Object FullName,Length; rtk proxy Get-ChildItem -LiteralPath 'C:\\\\Users\\\\leo19\\\\.codex\\\\skills' -Directory | Select-Object Name,FullName; rtk proxy Get-ChildItem -LiteralPath 'C:\\\\Users\\\\leo19\\\\.codex\\\\plugins\\\\cache\\\\openai-curated-remote' -Directory | Select-Object Name,FullName\\\" | env_u16_len=8192 | si_flags=256 | creation_flags=525312\")" }
+2026-09-29T22:34:44.320521Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/
+2026-09-29T22:34:44.320566Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/
+2026-09-29T22:34:44.333165Z  WARN codex_core::shell_snapshot: Failed to create shell snapshot for powershell: Shell snapshot not supported yet for PowerShell
+2026-09-29T22:34:58.704475Z  WARN codex_rmcp_client::stdio_server_launcher: Failed to read MCP server stderr (uvx): stream did not contain valid UTF-8
+2026-09-29T22:35:15.163956Z ERROR codex_core::tools::router: error=exec_command failed: CreateProcess { message: "Rejected(\"Failed to create unified exec process: helper_unknown_error: setup refresh had errors\")" }
+2026-09-29T22:35:22.003316Z ERROR codex_core::tools::router: error=exec_command failed: CreateProcess { message: "Rejected(\"Failed to create unified exec process: helper_unknown_error: setup refresh had errors\")" }
