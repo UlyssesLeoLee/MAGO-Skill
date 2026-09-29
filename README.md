@@ -1,0 +1,359 @@
+# Multi-Agent Git Orchestrator
+
+> **让多个 AI Agent 安全地并行开发同一个 Git 仓库。**
+
+`Multi-Agent Git Orchestrator` 是一个面向 Claude Code、Codex、Cursor、OpenCode 等 Coding Agent 的 Git Workflow Skill。
+
+它会主动调查当前仓库的 **Branch / Worktree / Commit / Ahead-Behind / Dependency** 状态，并帮助 Agent 决定：
+
+- 哪些任务可以并行
+- 哪些 Worktree 可以复用
+- 哪些 Branch 应该 Rebase / Merge
+- 哪些 Commit 适合 Cherry-pick
+- 哪些分支已经可以安全清理
+- 如何避免多个 Agent 同时破坏 `main`
+
+---
+
+## Why?
+
+多 Agent 开发很容易变成：
+
+```text
+Agent A ─┐
+Agent B ─┼── 同一个目录 ── 冲突 / 覆盖 / 历史混乱
+Agent C ─┘
+```
+
+本 Skill 将其变成：
+
+```mermaid
+flowchart LR
+    M["main"] --> A["Agent A<br/>Branch + Worktree"]
+    M --> B["Agent B<br/>Branch + Worktree"]
+    M --> C["Agent C<br/>Branch + Worktree"]
+
+    A --> R["Review / Validation"]
+    B --> R
+    C --> R
+
+    R --> Q["Merge Queue"]
+    Q --> M2["main"]
+```
+
+核心原则：
+
+> **One Agent Lane = One Branch + One Worktree**
+
+---
+
+## 核心能力
+
+| 能力 | 说明 |
+|---|---|
+| Repository Recon | 主动调查 Branch / Worktree / HEAD / Dirty / Ahead-Behind |
+| Dependency DAG | 判断 Agent 任务之间的依赖关系 |
+| Worktree Isolation | 避免多个 Agent 修改同一个 Checkout |
+| Rewrite Safety | 判断什么时候可以 Rebase，什么时候禁止重写历史 |
+| Selective Integration | Merge / Squash / Cherry-pick 按实际情况选择 |
+| Freshness Gate | 防止 Review 后 `main` 已变化却继续错误集成 |
+| Merge Queue | 串行写入共享集成分支 |
+| Safe Cleanup | 安全识别已完成 Branch / Worktree |
+| Safe Rollback | 私有历史用 Reset，共享历史优先 Revert |
+
+---
+
+## 五个核心命令
+
+### `/GitRecon`
+
+查看整个仓库当前状态。
+
+```text
+/GitRecon
+```
+
+调查：
+
+```text
+Worktrees
+Branches
+HEAD
+Dirty / Untracked
+Ahead / Behind
+Detached
+Remote tracking
+Merge candidates
+Risk
+```
+
+默认 **只读**。
+
+---
+
+### `/GitAnalyze`
+
+深入分析指定 Branch 或 Worktree。
+
+```text
+/GitAnalyze agent/auth
+```
+
+例如判断：
+
+```text
+agent/auth
+
+Ahead:     3
+Behind:    2
+State:     DIVERGED
+Depends:   agent/core
+Rewrite:   FROZEN
+
+Recommendation:
+不要直接 rebase
+建议同步 integration branch 后重新验证
+```
+
+---
+
+### `/GitRecommend`
+
+根据仓库真实状态给出下一步建议。
+
+```text
+/GitRecommend 下一步怎么安排 3 个 Agent
+```
+
+Agent 会先调查，再回答：
+
+```text
+Agent A → 可以继续并行
+Agent B → 与 A 文件高度重叠，建议串行
+Agent C → 依赖 A，等待 A 完成
+
+agent/old-ui → cleanup candidate
+agent/auth   → rewrite frozen
+```
+
+---
+
+### `/GitIntegrate`
+
+安全集成一个 Agent 的成果。
+
+```text
+/GitIntegrate agent/auth
+```
+
+流程：
+
+```mermaid
+flowchart TD
+    A["Agent Lane"] --> B["Refresh"]
+    B --> C["Validation"]
+    C --> D["Review"]
+    D --> E["Freshness Check"]
+    E --> F{"接受范围"}
+    F -->|"全部"| G["Merge / Squash"]
+    F -->|"部分"| H["Cherry-pick"]
+    G --> I["Validate main"]
+    H --> I
+```
+
+不会因为 Agent 说一句 **“Done”** 就直接进入 `main`。
+
+---
+
+### `/GitCleanup`
+
+寻找可安全清理的 Branch / Worktree。
+
+```text
+/GitCleanup
+```
+
+默认只显示：
+
+```text
+Cleanup Candidates
+```
+
+真正执行：
+
+```text
+/GitCleanup --apply
+```
+
+只有满足以下条件才允许进入清理候选：
+
+```text
+✓ 已完整集成
+✓ Worktree clean
+✓ 无活动 Owner
+✓ 无下游依赖
+✓ 无独有未保存成果
+```
+
+---
+
+## 多 Agent 生命周期
+
+```mermaid
+stateDiagram-v2
+    [*] --> PLANNED
+    PLANNED --> ACTIVE
+    ACTIVE --> READY
+    READY --> APPROVED
+    APPROVED --> INTEGRATING
+    INTEGRATING --> INTEGRATED
+
+    READY --> BLOCKED
+    READY --> REJECTED
+```
+
+每条 Agent Lane 都记录：
+
+```text
+Task
+Owner
+Branch
+Worktree
+Base Branch
+Base SHA
+Current HEAD
+Dependencies
+Validation Evidence
+Integration Decision
+```
+
+---
+
+## Git 操作决策
+
+```text
+整个 Agent 成果都要
+        ↓
+      Merge
+
+只要部分 Commit
+        ↓
+   Cherry-pick
+
+Agent 私有分支落后 main
+        ↓
+  Rewrite-safe?
+    ↓       ↓
+   YES      NO
+ Rebase    Merge target into lane
+
+私有历史走错
+        ↓
+      Reset
+
+已经进入共享历史后出错
+        ↓
+      Revert
+```
+
+---
+
+## 安全原则
+
+```text
+Observe first.
+Advise second.
+Mutate only when needed.
+```
+
+本 Skill 默认禁止：
+
+- 多个 Agent 同时修改同一个 Checkout
+- 未调查仓库就给出具体 Branch / Worktree 建议
+- 随意 Rebase 已被其他 Agent 依赖的 Branch
+- 对共享历史执行 destructive reset
+- 默认 Force Push
+- 未检查依赖就 Cherry-pick
+- Review 已过期仍然继续 Integration
+- 仅因为 Branch 很旧就判断可以删除
+
+---
+
+## 安装
+
+将目录放入支持 Agent Skills 的 Skills 路径：
+
+```text
+multi-agent-git-orchestrator/
+├── SKILL.md
+└── references/
+    ├── commands.md
+    ├── reconnaissance.md
+    ├── decision-matrix.md
+    ├── handoff-and-state.md
+    ├── design-rationale.md
+    └── pressure-tests.md
+```
+
+Skill 可以通过语义自动触发。
+
+也可以显式调用：
+
+```text
+/GitRecon
+/GitAnalyze <branch>
+/GitRecommend [goal]
+/GitIntegrate <lane-or-branch>
+/GitCleanup
+```
+
+如果宿主不支持自定义 Slash Command，也可以直接输入：
+
+```text
+GitRecon
+GitAnalyze agent/auth
+GitRecommend
+```
+
+---
+
+## 适用场景
+
+特别适合：
+
+- Claude Code / Codex / Cursor 多 Agent 开发
+- Git Worktree 并行开发
+- AI 自动任务拆分
+- 大量 Agent Branch 管理
+- Human-in-the-loop Review
+- Agent Worktree 可视化
+- 自动 Merge Queue
+- AI 生成代码的选择性集成
+
+---
+
+## Philosophy
+
+Git 不只是版本管理工具。
+
+在多 Agent 软件工程中，它还可以成为：
+
+```text
+Isolation Layer
++
+Dependency Graph
++
+Review Boundary
++
+Integration Protocol
++
+Rollback System
+```
+
+**让 Agent 可以大胆开发，让主分支保持可控。**
+
+---
+
+## License
+
+Apache-2.0
