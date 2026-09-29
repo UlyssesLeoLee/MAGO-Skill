@@ -1,0 +1,38 @@
+{
+  "id": "git-recon/help",
+  "skill": "git-recon",
+  "feature": "Help returns usage before repository inspection",
+  "invocations": {
+    "claude": "/GitRecon --help",
+    "hermes": "/git-recon --help",
+    "codex": "$git-recon --help"
+  },
+  "test_object": {
+    "repository": "absent",
+    "arguments": [
+      "--help"
+    ]
+  },
+  "expected": [
+    "Shows syntax, argument descriptions, defaults, and examples.",
+    "Does not inspect or mutate a repository."
+  ],
+  "checks": [
+    {
+      "file": "commands/GitRecon.md",
+      "contains": [
+        "argument-hint: \"[--remote] [--help]\"",
+        "If `--help` is present",
+        "stop without loading the orchestrator skill or inspecting the repository"
+      ]
+    },
+    {
+      "file": "references/commands.md",
+      "contains": [
+        "All five commands accept `--help`",
+        "## 1. GitRecon",
+        "/GitRecon --help"
+      ]
+    }
+  ]
+}

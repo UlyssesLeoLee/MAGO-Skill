@@ -1,14 +1,20 @@
 ---
 name: git-recon
-description: "调查当前仓库的分支与 worktree 状态并生成风险快照。"
-version: 1.0.0
-author: Multi-Agent Git Orchestrator
+description: "查看仓库状态；/git-recon [--remote] [--help]."
 license: MIT
+metadata:
+  short-description: "查看仓库状态；$git-recon [--remote] [--help]."
 ---
 
 # GitRecon
 
 Use this skill when the user explicitly invokes `/git-recon` in Hermes or `$git-recon` in Codex. Treat any text following the selected skill name as the command arguments.
+
+## Usage
+
+- Hermes: `/git-recon [--remote] [--help]`
+- Codex: `$git-recon [--remote] [--help]`
+- `--help` prints the usage and examples from section **1. GitRecon** in `../../references/commands.md`, then stops without inspecting the repository. Reject unknown options and show the same help.
 
 Resolve these files relative to this file and follow their instructions:
 

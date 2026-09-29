@@ -1,0 +1,37 @@
+{
+  "id": "git-analyze/help",
+  "skill": "git-analyze",
+  "feature": "Help documents target and remote options",
+  "invocations": {
+    "claude": "/GitAnalyze --help",
+    "hermes": "/git-analyze --help",
+    "codex": "$git-analyze --help"
+  },
+  "test_object": {
+    "repository": "absent",
+    "arguments": [
+      "--help"
+    ]
+  },
+  "expected": [
+    "Shows required target, optional remote refresh, and examples without repository inspection."
+  ],
+  "checks": [
+    {
+      "file": "commands/GitAnalyze.md",
+      "contains": [
+        "argument-hint: \"<branch|worktree> [--remote] [--help]\"",
+        "If `--help` is present",
+        "If the target is missing, ask for it"
+      ]
+    },
+    {
+      "file": "references/commands.md",
+      "contains": [
+        "<target>` | Yes",
+        "Branch name or worktree path to analyze.",
+        "/GitAnalyze --help"
+      ]
+    }
+  ]
+}

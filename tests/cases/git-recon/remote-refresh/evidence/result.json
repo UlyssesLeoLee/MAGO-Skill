@@ -1,0 +1,19 @@
+{
+  "case": "git-recon/remote-refresh",
+  "skill": "git-recon",
+  "feature": "Remote refresh remains limited to remote-tracking refs",
+  "passed": true,
+  "scope": "source-contract; AI host runtime is not invoked",
+  "checks": [
+    {
+      "file": "commands/GitRecon.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "references/commands.md",
+      "passed": true,
+      "missing": []
+    }
+  ]
+}

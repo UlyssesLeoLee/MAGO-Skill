@@ -1,3 +1,3 @@
 interface:
   display_name: "git-analyze"
-  short_description: "分析指定分支或 worktree 的差异、依赖和 merge/rewrite 安全风险"
+  short_description: "分析目标；$git-analyze TARGET [--remote] [--help]"

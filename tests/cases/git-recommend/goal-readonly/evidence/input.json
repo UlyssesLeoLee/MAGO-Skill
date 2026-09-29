@@ -1,0 +1,16 @@
+{
+  "goal": "哪些分支可以先集成",
+  "repo_state": {
+    "branches": [
+      "main",
+      "agent/core",
+      "agent/ui"
+    ],
+    "dependencies": [
+      [
+        "agent/ui",
+        "agent/core"
+      ]
+    ]
+  }
+}

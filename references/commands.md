@@ -4,6 +4,14 @@ This reference defines the command-layer behavior for `multi-agent-git-orchestra
 
 These are **semantic command intents**. Canonical names use a leading `/`. A host may expose them as slash commands, palette actions, prompt aliases, or plain-text invocations. If slash commands are unsupported, accept the same name without `/`. The behavior must remain the same.
 
+## Argument and Help Behavior
+
+All five commands accept `--help`. When it is present, show that command's usage, argument descriptions, defaults, and examples, then stop before inspecting or changing a repository. `--help` takes precedence over other arguments.
+
+Recognize only the options listed for each command. For an unknown option or a required option value that is missing or invalid, explain the issue and show the relevant usage without executing the command. If a required positional target is missing, ask the user for it. Host adapters should preserve the supplied argument text and route `--help` to this reference.
+
+Host entry points are Claude Code `/GitRecon`, Hermes `/git-recon`, and Codex `$git-recon` (use the corresponding command name for the other four). Append the same arguments after the host-specific entry point.
+
 ## 1. GitRecon
 
 ### Invocation
@@ -11,7 +19,17 @@ These are **semantic command intents**. Canonical names use a leading `/`. A hos
 ```text
 /GitRecon
 /GitRecon --remote
+/GitRecon --help
 ```
+
+### Arguments
+
+| Argument | Required | Description |
+|---|---:|---|
+| `--remote` | No | Refresh remote-tracking refs before classification. It does not change branches, worktrees, or commit history. |
+| `--help` | No | Show this command's usage and stop without inspecting the repository. |
+
+Examples: `/GitRecon --remote`, `/GitRecon --help`.
 
 ### 中文描述
 
@@ -47,7 +65,18 @@ Repository Snapshot
 /GitAnalyze <branch>
 /GitAnalyze <worktree-path>
 /GitAnalyze <target> --remote
+/GitAnalyze --help
 ```
+
+### Arguments
+
+| Argument | Required | Description |
+|---|---:|---|
+| `<target>` | Yes | Branch name or worktree path to analyze. |
+| `--remote` | No | Refresh remote-tracking refs before analysis. It does not change branches, worktrees, or commit history. |
+| `--help` | No | Show this command's usage and stop without inspecting the repository. |
+
+Examples: `/GitAnalyze feature/auth`, `/GitAnalyze feature/auth --remote`, `/GitAnalyze --help`.
 
 ### 中文描述
 
@@ -86,7 +115,18 @@ Recommendation
 /GitRecommend
 /GitRecommend <goal>
 /GitRecommend <goal> --remote
+/GitRecommend --help
 ```
+
+### Arguments
+
+| Argument | Required | Description |
+|---|---:|---|
+| `[goal]` | No | Natural-language question or desired outcome. Omit it for general next-step recommendations. |
+| `--remote` | No | Refresh remote-tracking refs before making recommendations. It does not change branches, worktrees, or commit history. |
+| `--help` | No | Show this command's usage and stop without inspecting the repository. |
+
+Examples: `/GitRecommend`, `/GitRecommend 哪些分支可以先集成`, `/GitRecommend --remote`, `/GitRecommend --help`.
 
 Example goals:
 
@@ -128,7 +168,18 @@ Blocked/unknown items
 /GitIntegrate <lane-or-branch> --strategy merge
 /GitIntegrate <lane-or-branch> --strategy squash
 /GitIntegrate <lane-or-branch> --strategy cherry-pick
+/GitIntegrate --help
 ```
+
+### Arguments
+
+| Argument | Required | Description |
+|---|---:|---|
+| `<lane-or-branch>` | Yes | Source lane or branch to integrate. |
+| `--strategy <value>` | No | Integration strategy: `auto`, `merge`, `squash`, or `cherry-pick`. Defaults to `auto`. |
+| `--help` | No | Show this command's usage and stop without inspecting or changing the repository. |
+
+Examples: `/GitIntegrate agent/auth`, `/GitIntegrate agent/auth --strategy squash`, `/GitIntegrate --help`.
 
 ### 中文描述
 
@@ -169,7 +220,17 @@ Never convert this command into force-push, destructive reset, or blind conflict
 ```text
 /GitCleanup
 /GitCleanup --apply
+/GitCleanup --help
 ```
+
+### Arguments
+
+| Argument | Required | Description |
+|---|---:|---|
+| `--apply` | No | Apply safe local cleanup candidates after rechecking their state. Without it, only show a preview. |
+| `--help` | No | Show this command's usage and stop without inspecting or changing the repository. |
+
+Examples: `/GitCleanup`, `/GitCleanup --apply`, `/GitCleanup --help`.
 
 ### 中文描述
 

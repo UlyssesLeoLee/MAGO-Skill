@@ -345,6 +345,22 @@ New-Item -ItemType Directory -Force "$HOME\.claude\commands"; Copy-Item commands
 | GitIntegrate | `/GitIntegrate` | `/git-integrate` | `$git-integrate` | 通过安全门禁后集成指定 lane 或 branch |
 | GitCleanup | `/GitCleanup` | `/git-cleanup` | `$git-cleanup` | 默认预览可清理项；`--apply` 才允许删除 |
 
+### 参数提示与帮助
+
+Claude Code 会在命令补全中显示 `commands/` 文件里的 `argument-hint`，例如 `/GitAnalyze <branch|worktree> [--remote] [--help]`。Codex 的 Skill 列表和 Hermes 的 Slash Command 说明会尽量带上简短用法；选中后可用 `--help` 查看完整参数说明和示例。`--help` 只显示说明，不检查或修改仓库。
+
+```text
+Claude Code: /GitIntegrate agent/auth --strategy squash
+Hermes:      /git-integrate agent/auth --strategy squash
+Codex:       $git-integrate agent/auth --strategy squash
+
+Claude help: /GitIntegrate --help
+Hermes help: /git-integrate --help
+Codex help:  $git-integrate --help
+```
+
+Run the repository's command-contract cases with `python tests/run_cases.py`. Each case retains its input and result under `tests/cases/<skill>/<case>/evidence/`; these checks do not launch an AI host.
+
 ### Codex：启用命令 Skill
 
 Codex 的自定义入口是 Skill 选择器（`$`），不是任意命名的 `/Git...` Slash Command。仓库的 `skills/` 为每个命令提供一个独立 Skill，`agents/openai.yaml` 中的简短说明会显示在 Codex 的 Skill 列表里。
@@ -365,7 +381,7 @@ mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills/MAGOS"
 cp -R SKILL.md commands references skills "${CODEX_HOME:-$HOME/.codex}/skills/MAGOS/"
 ```
 
-重新启动 Codex 后，输入 `$` 选择命令 Skill，或直接调用 `$git-recon`、`$git-analyze`、`$git-recommend`、`$git-integrate`、`$git-cleanup`。`/skills` 可打开 Skill 浏览入口。每个命令在列表中都带有简短说明。
+重新启动 Codex 后，输入 `$` 选择命令 Skill，或直接调用 `$git-recon`、`$git-analyze`、`$git-recommend`、`$git-integrate`、`$git-cleanup`。`/skills` 可打开 Skill 浏览入口。每个命令在列表中的简短说明会尽量包含用法；调用时加 `--help` 可查看完整参数说明。
 
 ### Hermes：启用 Slash Skill
 
@@ -384,7 +400,7 @@ mkdir -p "$HOME/.hermes/skills/multi-agent-git-orchestrator"
 cp -R SKILL.md commands references skills "$HOME/.hermes/skills/multi-agent-git-orchestrator/"
 ```
 
-重新启动 Hermes 后，可运行 `hermes skills list` 查看各命令说明，并调用 `/git-recon`、`/git-analyze`、`/git-recommend`、`/git-integrate` 或 `/git-cleanup`。参数直接跟在命令后面，例如 `/git-analyze main --remote`。
+重新启动 Hermes 后，可运行 `hermes skills list` 查看各命令说明，并调用 `/git-recon`、`/git-analyze`、`/git-recommend`、`/git-integrate` 或 `/git-cleanup`。命令说明会尽量包含用法；参数直接跟在命令后面，例如 `/git-analyze main --remote`，也可用 `/git-analyze --help` 查看完整说明。
 
 如果宿主不支持自定义 Slash Command，也可以直接输入：
 

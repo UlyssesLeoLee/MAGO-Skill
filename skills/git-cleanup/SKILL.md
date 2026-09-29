@@ -1,14 +1,20 @@
 ---
 name: git-cleanup
-description: "检查可安全清理的 branch 与 worktree，默认只预览候选。"
-version: 1.0.0
-author: Multi-Agent Git Orchestrator
+description: "预览清理；/git-cleanup [--apply] [--help]."
 license: MIT
+metadata:
+  short-description: "预览清理；$git-cleanup [--apply] [--help]."
 ---
 
 # GitCleanup
 
 Use this skill when the user explicitly invokes `/git-cleanup` in Hermes or `$git-cleanup` in Codex. Treat any text following the selected skill name as the command arguments.
+
+## Usage
+
+- Hermes: `/git-cleanup [--apply] [--help]`
+- Codex: `$git-cleanup [--apply] [--help]`
+- Cleanup is preview-only by default. `--apply` permits safe local cleanup after rechecking each candidate. `--help` prints section **5. GitCleanup** in `../../references/commands.md` and stops without repository inspection. Reject unknown options and show the usage.
 
 Resolve these files relative to this file and follow their instructions:
 
