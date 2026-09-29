@@ -1,0 +1,3 @@
+interface:
+  display_name: "git-recommend"
+  short_description: "依据仓库状态建议 Git 操作、Agent 分工和下一步集成方案"
