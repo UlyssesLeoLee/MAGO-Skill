@@ -447,7 +447,7 @@ def run_case(spec: dict, options: argparse.Namespace) -> dict:
     evidence = case_dir / "evidence" / ("fixture-check" if options.fixture_check else f"host-{options.host}")
     evidence.mkdir(parents=True, exist_ok=True)
     write_json(case_dir / "host_case.json", spec)
-    with tempfile.TemporaryDirectory(prefix="magos-accept-") as temporary:
+    with tempfile.TemporaryDirectory(prefix=".magos-accept-", dir=TESTS) as temporary:
         fixture = prepare_fixture(Path(temporary), spec["fixture"])
         if not options.fixture_check:
             provision_codex_skill(fixture, spec["id"].split("/")[0])
