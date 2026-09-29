@@ -527,9 +527,11 @@ def run_case(spec: dict, options: argparse.Namespace) -> dict:
         write_json(evidence / "observed.json", {"answer": answer, "tool_calls": calls,
                                                "structured_trace": trace, "preview_answer": preview})
         error_text = first["stdout"] + "\n" + first["stderr"] + "\n" + last["stdout"] + "\n" + last["stderr"]
-        if first["timed_out"] or last["timed_out"] or first["returncode"] != 0 or last["returncode"] != 0 or not answer:
+        runtime_error = RUNTIME_ERROR.search(error_text)
+        if first["timed_out"] or last["timed_out"] or runtime_error or \
+                first["returncode"] != 0 or last["returncode"] != 0 or not answer:
             reason = "host timed out" if first["timed_out"] or last["timed_out"] else (
-                "host runtime/auth/model/sandbox error" if RUNTIME_ERROR.search(error_text) else
+                "host runtime/auth/model/sandbox error" if runtime_error else
                 "host did not return a usable agent response")
             result = {"case": spec["id"], "status": "UNVERIFIED", "scope": "host runtime", "reason": reason,
                       "returncode": last["returncode"]}
