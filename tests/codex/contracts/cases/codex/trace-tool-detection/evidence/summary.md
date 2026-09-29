@@ -7,7 +7,7 @@
 ## Expected behavior
 
 - The harness records current tool/action item types and distinguishes read-only skill discovery from Git commands.
-- The harness ignores generated .serena metadata when checking fixture state and classifies helper setup errors as UNVERIFIED.
+- The harness ignores generated .serena metadata throughout fixture snapshots and classifies helper setup errors as UNVERIFIED.
 
 ## Contract checks
 

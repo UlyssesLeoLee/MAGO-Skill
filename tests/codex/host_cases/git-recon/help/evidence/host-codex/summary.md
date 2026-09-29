@@ -1,8 +1,8 @@
 # git-recon/help — codex
 
-Status: **UNVERIFIED**
-Scope: host runtime
+Status: **PASS**
+Scope: actual host CLI invocation and disposable Git state
 
-Reason: Codex elevated Windows sandbox setup failed before skill execution (`helper_unknown_error: setup refresh had errors`).
+Reason: See assertions in result.json
 
 Evidence: invocation.json, first_stdout.txt, first_stderr.txt, before.json, after.json, observed.json.

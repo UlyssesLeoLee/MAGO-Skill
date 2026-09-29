@@ -1,0 +1,7 @@
+{
+  "case": "git-analyze/target-required",
+  "status": "UNVERIFIED",
+  "scope": "host runtime",
+  "reason": "host runtime/auth/model/sandbox error",
+  "returncode": 0
+}

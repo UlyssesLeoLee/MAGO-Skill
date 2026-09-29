@@ -1,7 +1,27 @@
 {
   "case": "git-recon/help",
-  "status": "UNVERIFIED",
-  "scope": "host runtime",
-  "reason": "Codex elevated Windows sandbox setup failed before skill execution: helper_unknown_error: setup refresh had errors",
-  "returncode": 0
+  "status": "PASS",
+  "scope": "actual host CLI invocation and disposable Git state",
+  "assertions": [
+    {
+      "name": "usage includes --help",
+      "passed": true
+    },
+    {
+      "name": "usage describes command option",
+      "passed": true
+    },
+    {
+      "name": "repository state remains unchanged",
+      "passed": true
+    },
+    {
+      "name": "structured trace permits inspection check",
+      "passed": true
+    },
+    {
+      "name": "no Git command",
+      "passed": true
+    }
+  ]
 }

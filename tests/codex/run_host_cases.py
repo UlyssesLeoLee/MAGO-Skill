@@ -65,6 +65,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -85,6 +86,7 @@ RUNTIME_ERROR = re.compile(
     r"authentication|not logged in|login required|api.?key|billing|"
     r"CreateProcessAsUserW|sandbox.*(?:denied|failed)|permission denied|"
     r"helper_unknown_error|setup refresh had errors|"
+    r"orchestrator_helper_exit_nonzero|setup helper exited with status|"
     r"access is denied|interrupted.update|auto.recover.*install|"
     r"could not.*(?:connect|resolve)|model.*unavailable|provider.*error)"
 )
@@ -94,7 +96,7 @@ def git(directory: Path, *args: str, check: bool = True) -> str:
     completed = subprocess.run(
         ["git", "-C", str(directory), *args],
         text=True, encoding="utf-8", errors="replace", capture_output=True,
-        timeout=30, check=False,
+        timeout=120, check=False,
     )
     if check and completed.returncode:
         raise RuntimeError(f"git {' '.join(args)}: {completed.stderr.strip()}")
@@ -105,7 +107,7 @@ def is_ancestor(directory: Path, ancestor: str, descendant: str) -> bool:
     completed = subprocess.run(
         ["git", "-C", str(directory), "merge-base", "--is-ancestor", ancestor, descendant],
         text=True, encoding="utf-8", errors="replace", capture_output=True,
-        timeout=30, check=False,
+        timeout=120, check=False,
     )
     if completed.returncode not in (0, 1):
         raise RuntimeError(f"git merge-base failed: {completed.stderr.strip()}")
@@ -144,7 +146,8 @@ def snapshot(fixture: dict) -> dict:
     for worktree_path in worktrees:
         base = Path(worktree_path)
         for path in base.rglob("*"):
-            if path.is_file() and ".git" not in path.relative_to(base).parts:
+            relative_parts = path.relative_to(base).parts
+            if path.is_file() and ".git" not in relative_parts and ".serena" not in relative_parts:
                 files[f"{base.name}/{path.relative_to(base).as_posix()}"] = hashlib.sha256(path.read_bytes()).hexdigest()
     bare_refs = {}
     if fixture.get("remote"):
@@ -292,7 +295,8 @@ def host_command(cwd: Path, prompt: str, options: argparse.Namespace) -> list[st
         return None
     command = [executable, "exec", "--json", "--ephemeral",
                "-C", str(cwd), "-s", options.codex_sandbox,
-               "-c", 'model_reasoning_effort="low"']
+               "-c", 'model_reasoning_effort="low"',
+               "-c", "mcp_servers.serena.enabled=false"]
     if options.model:
         command += ["-m", options.model]
     return command + [prompt]
@@ -467,7 +471,20 @@ def run_case(spec: dict, options: argparse.Namespace) -> dict:
     evidence.mkdir(parents=True, exist_ok=True)
     write_json(case_dir / "host_case.json", spec)
     with tempfile.TemporaryDirectory(prefix=".magos-accept-", dir=TESTS) as temporary:
-        fixture = prepare_fixture(Path(temporary), spec["fixture"])
+        try:
+            fixture = prepare_fixture(Path(temporary), spec["fixture"])
+        except Exception as error:
+            result = {"case": spec["id"], "status": "UNVERIFIED", "scope": "fixture setup",
+                      "reason": f"{type(error).__name__}: {error}"}
+            write_json(evidence / "result.json", result)
+            (evidence / "harness_error.txt").write_text(traceback.format_exc(), encoding="utf-8")
+            (evidence / "summary.md").write_text(
+                f"# {spec['id']} — {options.host}\n\nStatus: **UNVERIFIED**\n"
+                f"Scope: fixture setup\n\nReason: {result['reason']}\n\n"
+                "Evidence: harness_error.txt records the fixture initialization exception.\n",
+                encoding="utf-8",
+            )
+            return result
         if not options.fixture_check:
             provision_codex_skill(fixture, spec["id"].split("/")[0])
         before = snapshot(fixture)
@@ -592,9 +609,26 @@ def main() -> int:
                 fixture_specs.append(spec)
                 seen_fixtures.add(spec["fixture"])
         selected = fixture_specs
-    results = [run_case(spec, options) for spec in selected]
-    for result in results:
-        print(f"{result['status']:10} {result['case']}")
+    results = []
+    for spec in selected:
+        try:
+            result = run_case(spec, options)
+        except Exception as error:
+            evidence = CASES / spec["id"] / "evidence" / (
+                "fixture-check" if options.fixture_check else f"host-{options.host}")
+            evidence.mkdir(parents=True, exist_ok=True)
+            result = {"case": spec["id"], "status": "UNVERIFIED", "scope": "test harness",
+                      "reason": f"{type(error).__name__}: {error}"}
+            write_json(evidence / "result.json", result)
+            (evidence / "harness_error.txt").write_text(traceback.format_exc(), encoding="utf-8")
+            (evidence / "summary.md").write_text(
+                f"# {spec['id']} — {options.host}\n\nStatus: **UNVERIFIED**\n"
+                f"Scope: test harness\n\nReason: {result['reason']}\n\n"
+                "Evidence: harness_error.txt records the test harness exception.\n",
+                encoding="utf-8",
+            )
+        results.append(result)
+        print(f"{result['status']:10} {result['case']}", flush=True)
     counts = {status: sum(item["status"] == status for item in results)
               for status in ("PASS", "FAIL", "UNVERIFIED")}
     label = "fixture setups" if options.fixture_check else "Codex host cases"

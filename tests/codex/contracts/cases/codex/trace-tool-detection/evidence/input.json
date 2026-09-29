@@ -8,7 +8,9 @@
   ],
   "host_runtime_error_markers": [
     "helper_unknown_error",
-    "setup refresh had errors"
+    "setup refresh had errors",
+    "orchestrator_helper_exit_nonzero",
+    "setup helper exited with status"
   ],
   "ignored_host_metadata": [
     ".serena"
