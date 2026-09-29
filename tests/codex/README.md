@@ -1,6 +1,6 @@
 # Codex skill tests
 
-All test cases for this repository are collected here. Runtime tests invoke the installed Codex CLI against disposable Git repositories under the system temporary directory. They never run integration or cleanup against this repository.
+All test cases for this repository are collected here. Runtime tests invoke the installed Codex CLI against disposable Git repositories under `tests/codex`; the fixtures are removed after each case. Integration and cleanup never run against this repository.
 
 For each runtime case, the runner copies that skill and its referenced documents from the active test checkout into the fixture's project-local `.agents/skills` root, records the copied-source hash, and leaves the user's `.codex/develop_codex` worktree untouched.
 
