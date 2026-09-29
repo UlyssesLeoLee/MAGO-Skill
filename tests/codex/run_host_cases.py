@@ -23,6 +23,7 @@ CREATE
   (copytree:Function {name:'shutil.copytree', type:'function'}),
   (rglob:Function {name:'Path.rglob', type:'function'}),
   (read_bytes:Function {name:'Path.read_bytes', type:'function'}),
+  (as_posix:Function {name:'Path.as_posix', type:'function'}),
   (sha256:Function {name:'hashlib.sha256', type:'function'}),
   (which:Function {name:'shutil.which', type:'function'}),
   (temp:Function {name:'tempfile.TemporaryDirectory', type:'function'}),
@@ -31,7 +32,7 @@ CREATE
   (f)-[:CONTAINS]->(x), (f)-[:CONTAINS]->(i), (f)-[:CONTAINS]->(e),
   (f)-[:CONTAINS]->(r), (f)-[:CONTAINS]->(m),
   (g)-[:CALLS]->(run), (w)-[:CALLS]->(dump), (w)-[:CALLS]->(write),
-  (s)-[:CALLS]->(g), (p)-[:CALLS]->(g), (p)-[:CALLS]->(mkdir),
+  (s)-[:CALLS]->(g), (s)-[:CALLS]->(as_posix), (p)-[:CALLS]->(g), (p)-[:CALLS]->(mkdir),
   (v)-[:CALLS]->(s), (v)-[:CALLS]->(g), (c)-[:CALLS]->(which),
   (x)-[:CALLS]->(read), (i)-[:CALLS]->(run), (e)-[:CALLS]->(g),
   (x)-[:USES]->(tool_types),
@@ -116,7 +117,7 @@ def snapshot(fixture: dict) -> dict:
         files = {}
         for path in root.rglob("*"):
             if path.is_file() and ".git" not in path.relative_to(root).parts:
-                files[str(path.relative_to(root))] = hashlib.sha256(path.read_bytes()).hexdigest()
+                files[path.relative_to(root).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
         return {"files": files, "git_repository": (root / ".git").exists()}
     refs = {}
     for line in git(root, "for-each-ref", "--format=%(refname) %(objectname)").splitlines():
@@ -137,7 +138,7 @@ def snapshot(fixture: dict) -> dict:
         base = Path(worktree_path)
         for path in base.rglob("*"):
             if path.is_file() and ".git" not in path.relative_to(base).parts:
-                files[f"{base.name}/{path.relative_to(base)}"] = hashlib.sha256(path.read_bytes()).hexdigest()
+                files[f"{base.name}/{path.relative_to(base).as_posix()}"] = hashlib.sha256(path.read_bytes()).hexdigest()
     bare_refs = {}
     if fixture.get("remote"):
         for line in git(fixture["remote"], "for-each-ref", "--format=%(refname) %(objectname)").splitlines():
