@@ -25,21 +25,21 @@
   "initial_state": {
     "git_repository": true,
     "refs": {
-      "refs/heads/agent/dependent": "d4ec3e936726ad41a87d9ab69c43f3469d555931",
-      "refs/heads/agent/dirty": "34ff0e1bc9e31df7bebb315fc6aa718a13f85f70",
-      "refs/heads/agent/done": "6d074ab9137854b5f842013ee9875b82ad496ec9",
-      "refs/heads/agent/unique": "0061984d200228c3ad32335fbdc87a8fb9c50575",
-      "refs/heads/main": "34ff0e1bc9e31df7bebb315fc6aa718a13f85f70",
-      "refs/remotes/origin/main": "9065cf72cf0892418fe511ebea37d16ab16cb3ed"
+      "refs/heads/agent/dependent": "2d2ff33346340d7746959dc13dfd319ae88cec7c",
+      "refs/heads/agent/dirty": "862084a1a6520ed2c42ff338e81f0cd537cdb1e8",
+      "refs/heads/agent/done": "bb9314a3deab6f5ff8c7e00e4a7a7bf9618f5b3e",
+      "refs/heads/agent/unique": "bd19260ceaea5a6460caeb636b459abd61bd96b3",
+      "refs/heads/main": "862084a1a6520ed2c42ff338e81f0cd537cdb1e8",
+      "refs/remotes/origin/main": "37fd87f6df6c9438311368eeca07acc7a8781848"
     },
     "worktrees": {
-      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-rr9i226n\\repo": {
-        "head": "34ff0e1bc9e31df7bebb315fc6aa718a13f85f70",
+      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-6o8wxr7v\\repo": {
+        "head": "862084a1a6520ed2c42ff338e81f0cd537cdb1e8",
         "branch": "main",
         "status": ""
       },
-      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-rr9i226n\\dirty-worktree": {
-        "head": "34ff0e1bc9e31df7bebb315fc6aa718a13f85f70",
+      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-6o8wxr7v\\dirty-worktree": {
+        "head": "862084a1a6520ed2c42ff338e81f0cd537cdb1e8",
         "branch": "agent/dirty",
         "status": "M README.md"
       }
@@ -69,10 +69,10 @@
       "dirty-worktree/README.md": "3f8c0cdfcc274eedc3fdbc41958967fae71e3a2087439eebcbd40ee3e32a85b2"
     },
     "bare_refs": {
-      "refs/heads/main": "9065cf72cf0892418fe511ebea37d16ab16cb3ed"
+      "refs/heads/main": "37fd87f6df6c9438311368eeca07acc7a8781848"
     }
   },
   "skill": "git-cleanup",
-  "skill_path": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-rr9i226n\\repo\\.agents\\skills\\MAGOS\\skills\\git-cleanup\\SKILL.md",
+  "skill_path": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-6o8wxr7v\\repo\\.agents\\skills\\MAGOS\\skills\\git-cleanup\\SKILL.md",
   "skill_source_sha256": "0e0c0cd631913b0ee0c77681e2de491b6794287baab4fda6dc9806b2aa8b7826"
 }

@@ -92,7 +92,8 @@ RUNTIME_ERROR = re.compile(
     r"helper_unknown_error|setup refresh had errors|"
     r"orchestrator_helper_exit_nonzero|setup helper exited with status|"
     r"access is denied|interrupted.update|auto.recover.*install|"
-    r"could not.*(?:connect|resolve)|model.*unavailable|provider.*error)"
+    r"could not.*(?:connect|resolve)|model.*unavailable|provider.*error|"
+    r"API call failed|request timed out)"
 )
 
 
@@ -352,16 +353,49 @@ print("equal" if first == second else "different")
 """
 
 
+HERMES_CONFIG_BACKUP = TESTS / ".hermes-config-backup.yaml"
+STALE_TRUST_EQUIVALENCE = """
+import sys, yaml
+first, second = (yaml.safe_load(open(path, encoding="utf-8")) or {} for path in sys.argv[1:3])
+for config in (first, second):
+    skills = config.get("skills") or {}
+    skills["trusted_project_dirs"] = [entry for entry in (skills.get("trusted_project_dirs") or [])
+                                      if ".magos-accept-" not in str(entry)]
+    config["skills"] = skills
+print("equal" if first == second else "different")
+"""
+
+
+def recover_hermes_config(install: dict, config: Path) -> str | None:
+    """Restore config.yaml from a backup left by an interrupted run (fixture trust entries only)."""
+    if not HERMES_CONFIG_BACKUP.is_file():
+        return None
+    verdict = subprocess.run([str(install["python"]), "-c", STALE_TRUST_EQUIVALENCE, str(HERMES_CONFIG_BACKUP),
+                              str(config)], text=True, capture_output=True, timeout=120, check=False).stdout.strip()
+    if verdict != "equal":
+        raise RuntimeError(f"{HERMES_CONFIG_BACKUP} is left from an interrupted run, but {config} has other "
+                           f"changes; compare them manually before running Hermes cases again")
+    config.write_bytes(HERMES_CONFIG_BACKUP.read_bytes())
+    HERMES_CONFIG_BACKUP.unlink()
+    return "restored config.yaml left trusted by an interrupted run"
+
+
 @contextlib.contextmanager
 def hermes_trusted(install: dict, root: Path, evidence: Path):
     """Trust the fixture for project skills, then untrust it and restore the user's config bytes.
 
     `hermes skills trust/untrust` rewrites config.yaml through save_config. The original bytes are
     restored only when the parsed config is otherwise unchanged; any other difference is reported.
+    The original is also kept in HERMES_CONFIG_BACKUP until then, so an interrupted run can be
+    recovered by the next one.
     """
     config = load_sync_hosts().hermes_home(Path.home(), False) / "config.yaml"
+    recovered = recover_hermes_config(install, config)
     original = config.read_bytes() if config.is_file() else None
-    record = {"config_sha256_before": hashlib.sha256(original).hexdigest() if original else None}
+    if original is not None:
+        HERMES_CONFIG_BACKUP.write_bytes(original)
+    record = {"config_sha256_before": hashlib.sha256(original).hexdigest() if original else None,
+              "recovered_interrupted_run": recovered}
     run = lambda *args: subprocess.run([install["executable"], "skills", *args, str(root)], text=True,  # noqa: E731
                                        encoding="utf-8", errors="replace", capture_output=True,
                                        timeout=120, check=False)
@@ -382,6 +416,8 @@ def hermes_trusted(install: dict, root: Path, evidence: Path):
             if verdict == "equal":
                 config.write_bytes(original)
                 record["restored"] = True
+        if record["restored"] or current == original:
+            HERMES_CONFIG_BACKUP.unlink(missing_ok=True)
         final = config.read_bytes() if config.is_file() else None
         record["config_sha256_after"] = hashlib.sha256(final).hexdigest() if final else None
         write_json(evidence / "hermes_trust.json", record)

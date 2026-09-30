@@ -21,13 +21,13 @@
   "initial_state": {
     "git_repository": true,
     "refs": {
-      "refs/heads/agent/auth": "f315959b3d919b36421df10dde955848b28e0e36",
-      "refs/heads/main": "c27a13b68d7164cfca4b1b2e1b15d5659f6cec9e",
-      "refs/remotes/origin/main": "c27a13b68d7164cfca4b1b2e1b15d5659f6cec9e"
+      "refs/heads/agent/auth": "8836450cf517199966dc8914d7191a8c4845e36c",
+      "refs/heads/main": "ba4df30339f1c6cada1010cbf247e6f17a92058a",
+      "refs/remotes/origin/main": "ba4df30339f1c6cada1010cbf247e6f17a92058a"
     },
     "worktrees": {
-      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-vdpodsre\\repo": {
-        "head": "c27a13b68d7164cfca4b1b2e1b15d5659f6cec9e",
+      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-e3y5nvvo\\repo": {
+        "head": "ba4df30339f1c6cada1010cbf247e6f17a92058a",
         "branch": "main",
         "status": ""
       }
@@ -54,10 +54,10 @@
       "repo/.agents/skills/MAGOS/skills/git-recon/agents/openai.yaml": "b2f304a87679d17d6bf487e125751d36be3fb1d83ce139467069afbf6b580fec"
     },
     "bare_refs": {
-      "refs/heads/main": "c27a13b68d7164cfca4b1b2e1b15d5659f6cec9e"
+      "refs/heads/main": "ba4df30339f1c6cada1010cbf247e6f17a92058a"
     }
   },
   "skill": "git-integrate",
-  "skill_path": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-vdpodsre\\repo\\.agents\\skills\\MAGOS\\skills\\git-integrate\\SKILL.md",
+  "skill_path": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-e3y5nvvo\\repo\\.agents\\skills\\MAGOS\\skills\\git-integrate\\SKILL.md",
   "skill_source_sha256": "0e0c0cd631913b0ee0c77681e2de491b6794287baab4fda6dc9806b2aa8b7826"
 }

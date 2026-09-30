@@ -25,18 +25,18 @@
   "initial_state": {
     "git_repository": true,
     "refs": {
-      "refs/heads/agent/auth": "3046ad7d97a6bc6b58c871900c8952059f719440",
-      "refs/heads/main": "eaa0c3110797a1f82f3e2f350a0d1b5c51bb60b7",
-      "refs/remotes/origin/main": "eaa0c3110797a1f82f3e2f350a0d1b5c51bb60b7"
+      "refs/heads/agent/auth": "a6ff6fc1eca421c03d8f1484f694461279429088",
+      "refs/heads/main": "d2f8326df3263808ae0faaac7b6c033197177b74",
+      "refs/remotes/origin/main": "d2f8326df3263808ae0faaac7b6c033197177b74"
     },
     "worktrees": {
-      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-3hvyyp7z\\repo": {
-        "head": "eaa0c3110797a1f82f3e2f350a0d1b5c51bb60b7",
+      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-7iecimyk\\repo": {
+        "head": "d2f8326df3263808ae0faaac7b6c033197177b74",
         "branch": "main",
         "status": ""
       },
-      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-3hvyyp7z\\auth-worktree": {
-        "head": "3046ad7d97a6bc6b58c871900c8952059f719440",
+      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-7iecimyk\\auth-worktree": {
+        "head": "a6ff6fc1eca421c03d8f1484f694461279429088",
         "branch": "agent/auth",
         "status": "M feature.txt"
       }
@@ -65,10 +65,10 @@
       "auth-worktree/README.md": "5bd17a4a66c4126008a147278511f1fb55774b443fa32bf571a0ffd5a8efc073"
     },
     "bare_refs": {
-      "refs/heads/main": "eaa0c3110797a1f82f3e2f350a0d1b5c51bb60b7"
+      "refs/heads/main": "d2f8326df3263808ae0faaac7b6c033197177b74"
     }
   },
   "skill": "git-recon",
-  "skill_path": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-3hvyyp7z\\repo\\.agents\\skills\\MAGOS\\skills\\git-recon\\SKILL.md",
+  "skill_path": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-7iecimyk\\repo\\.agents\\skills\\MAGOS\\skills\\git-recon\\SKILL.md",
   "skill_source_sha256": "0e0c0cd631913b0ee0c77681e2de491b6794287baab4fda6dc9806b2aa8b7826"
 }
