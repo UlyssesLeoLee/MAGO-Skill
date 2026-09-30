@@ -1,0 +1,47 @@
+{
+  "kind": "empty",
+  "checks": [
+    {
+      "name": "empty Git repository",
+      "passed": true
+    },
+    {
+      "name": "project-local Codex skill is present",
+      "passed": true
+    },
+    {
+      "name": "workspace contains only the skill scaffold",
+      "passed": true
+    },
+    {
+      "name": "adapter shared files resolve",
+      "passed": true
+    }
+  ],
+  "initial_state": {
+    "files": {
+      ".agents/skills/MAGOS/SKILL.md": "316f57b624f8d2a57faf5aa6ae99cb86fcad7269858158e1019467b51ddb418e",
+      ".agents/skills/MAGOS/references/commands.md": "6fd91d37b4e30efbff3d531df0916a6f1fa4706632c51eab47c7b1227871c0da",
+      ".agents/skills/MAGOS/references/decision-matrix.md": "954ffefa9c018e25d0b88987c8bed5f07739b148c8aa254b9a9cde41e6ffe141",
+      ".agents/skills/MAGOS/references/design-rationale.md": "9b5baf5107530fe275b304002fd37a24072510aebc140908d5702bda2e9f49bd",
+      ".agents/skills/MAGOS/references/handoff-and-state.md": "aba702cde8f67378f2898237a6a52cd1dba0f0967f5f28f5dea3d9d62ef593a4",
+      ".agents/skills/MAGOS/references/installation.md": "3bc18b67a90909376387fff2f22459a2eb4ca704b83c82e23b0a5cf3a71a3108",
+      ".agents/skills/MAGOS/references/pressure-tests.md": "c1bc668d7ba08362f3701d24340be9262de2c988ac0fd63068c1818a8dd831f4",
+      ".agents/skills/MAGOS/references/reconnaissance.md": "07b02f76c2bdedf5844ff29c5d1031cc60732ba1593bed9e32315d8ce54c9f2b",
+      ".agents/skills/MAGOS/skills/git-analyze/SKILL.md": "426e646ab29982eb986df1388da10189cc601fa0f8a4417971a3dc00df984363",
+      ".agents/skills/MAGOS/skills/git-cleanup/SKILL.md": "d50556791e6f18fd5f264eec3a41026ceb18eb2c646af787432c66c953183c00",
+      ".agents/skills/MAGOS/skills/git-integrate/SKILL.md": "6cee68f2e175655a77accd4db9fafae3305c57506a4a772513b2642a1182435c",
+      ".agents/skills/MAGOS/skills/git-recommend/SKILL.md": "b869d9b8308ad8b6b90c930f3d1aa35a687068d43c3e2890480ae9ea3b07e5e1",
+      ".agents/skills/MAGOS/skills/git-recon/SKILL.md": "bc0350766f9e2b58d65dd119dc7911ba884f1a741b514951ab390d043775dd64",
+      ".agents/skills/MAGOS/skills/git-analyze/agents/openai.yaml": "f17e63b132f976471d30c35dbd91b2d724933ee988e9053c86f3ac2b0516ecd6",
+      ".agents/skills/MAGOS/skills/git-cleanup/agents/openai.yaml": "7a3514189221f869dded7c226ad7e96f138ec336565811e02b3d2a47a24bdfef",
+      ".agents/skills/MAGOS/skills/git-integrate/agents/openai.yaml": "27cd7b6152f356ce6affe8d6c3f909fa4329ccfb3445d30b0d8d5d1142d07b9f",
+      ".agents/skills/MAGOS/skills/git-recommend/agents/openai.yaml": "bb62284310892ec3535845ac6126635f21c33590b06edbccd69e9b6de9918efa",
+      ".agents/skills/MAGOS/skills/git-recon/agents/openai.yaml": "b2f304a87679d17d6bf487e125751d36be3fb1d83ce139467069afbf6b580fec"
+    },
+    "git_repository": true
+  },
+  "skill": "git-recon",
+  "skill_path": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-13nkx_p8\\empty\\.agents\\skills\\MAGOS\\skills\\git-recon\\SKILL.md",
+  "skill_source_sha256": "0e0c0cd631913b0ee0c77681e2de491b6794287baab4fda6dc9806b2aa8b7826"
+}

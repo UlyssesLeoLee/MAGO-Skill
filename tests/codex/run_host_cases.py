@@ -56,6 +56,7 @@ CREATE
 """Run real Git-skill invocations in disposable fixtures and retain evidence."""
 
 import argparse
+import contextlib
 import copy
 import fnmatch
 import hashlib
@@ -272,8 +273,7 @@ def verify_fixture(fixture: dict, state: dict) -> list[dict]:
     return checks
 
 
-def load_package_files() -> tuple[str, ...]:
-    """Use the installer's package list so tests and real installs share one layout."""
+def load_sync_hosts():
     spec = importlib.util.spec_from_file_location("sync_hosts", ROOT / "scripts" / "sync_hosts.py")
     module = importlib.util.module_from_spec(spec)
     previous = sys.dont_write_bytecode
@@ -282,7 +282,12 @@ def load_package_files() -> tuple[str, ...]:
         spec.loader.exec_module(module)
     finally:
         sys.dont_write_bytecode = previous
-    return module.package_files(ROOT)
+    return module
+
+
+def load_package_files() -> tuple[str, ...]:
+    """Use the installer's package list so tests and real installs share one layout."""
+    return load_sync_hosts().package_files(ROOT)
 
 
 def provision_codex_skill(fixture: dict, skill: str) -> None:
@@ -317,6 +322,171 @@ def user_level_installs() -> list[str]:
     codex_home = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex")
     candidates = (Path.home() / ".agents" / "skills" / PACKAGE_DIR, codex_home / "skills" / PACKAGE_DIR)
     return [str(path) for path in candidates if path.exists()]
+
+
+def hermes_install() -> dict | None:
+    """Locate the Hermes CLI, its source checkout, and its venv Python."""
+    executable = shutil.which("hermes")
+    if not executable:
+        return None
+    completed = subprocess.run([executable, "--version"], text=True, encoding="utf-8", errors="replace",
+                               capture_output=True, timeout=120, check=False)
+    match = re.search(r"^Install directory:\s*(.+?)\s*$", completed.stdout, re.M)
+    if not match:
+        return None
+    agent_dir = Path(match.group(1))
+    python = next((path for path in (agent_dir / "venv" / "Scripts" / "python.exe",
+                                     agent_dir / "venv" / "bin" / "python") if path.is_file()), None)
+    version = completed.stdout.splitlines()[0].strip() if completed.stdout else ""
+    return {"executable": executable, "agent_dir": agent_dir, "python": python, "version": version}
+
+
+CONFIG_EQUIVALENCE = """
+import sys, yaml
+first, second = (yaml.safe_load(open(path, encoding="utf-8")) or {} for path in sys.argv[1:3])
+for config in (first, second):
+    skills = config.get("skills") or {}
+    skills["trusted_project_dirs"] = skills.get("trusted_project_dirs") or []
+    config["skills"] = skills
+print("equal" if first == second else "different")
+"""
+
+
+@contextlib.contextmanager
+def hermes_trusted(install: dict, root: Path, evidence: Path):
+    """Trust the fixture for project skills, then untrust it and restore the user's config bytes.
+
+    `hermes skills trust/untrust` rewrites config.yaml through save_config. The original bytes are
+    restored only when the parsed config is otherwise unchanged; any other difference is reported.
+    """
+    config = load_sync_hosts().hermes_home(Path.home(), False) / "config.yaml"
+    original = config.read_bytes() if config.is_file() else None
+    record = {"config_sha256_before": hashlib.sha256(original).hexdigest() if original else None}
+    run = lambda *args: subprocess.run([install["executable"], "skills", *args, str(root)], text=True,  # noqa: E731
+                                       encoding="utf-8", errors="replace", capture_output=True,
+                                       timeout=120, check=False)
+    record["trust"] = run("trust").stdout.strip()[-300:]
+    try:
+        yield
+    finally:
+        record["untrust"] = run("untrust").stdout.strip()[-300:]
+        current = config.read_bytes() if config.is_file() else None
+        record["restored"] = False
+        if original is not None and current != original:
+            with tempfile.TemporaryDirectory(prefix="magos-config-") as temporary:
+                saved = Path(temporary) / "original.yaml"
+                saved.write_bytes(original)
+                verdict = subprocess.run([str(install["python"]), "-c", CONFIG_EQUIVALENCE, str(saved), str(config)],
+                                         text=True, capture_output=True, timeout=120, check=False).stdout.strip()
+            record["semantic_comparison"] = verdict
+            if verdict == "equal":
+                config.write_bytes(original)
+                record["restored"] = True
+        final = config.read_bytes() if config.is_file() else None
+        record["config_sha256_after"] = hashlib.sha256(final).hexdigest() if final else None
+        write_json(evidence / "hermes_trust.json", record)
+
+
+def hermes_probe(install: dict, fixture: dict, skill: str, instruction: str) -> dict:
+    completed = subprocess.run(
+        [str(install["python"]), "-X", "utf8", str(TESTS / "hermes_probe.py"), str(install["agent_dir"]),
+         skill, instruction],
+        cwd=fixture["cwd"], text=True, encoding="utf-8", errors="replace", capture_output=True,
+        timeout=300, check=False)
+    line = next((line for line in completed.stdout.splitlines() if line.startswith("MAGOS_PROBE_RESULT ")), None)
+    if not line:
+        return {"error": (completed.stdout[-600:] + completed.stderr[-600:]).strip()}
+    return json.loads(line[len("MAGOS_PROBE_RESULT "):])
+
+
+def probe_checks(probe: dict) -> list[dict]:
+    registered = probe.get("registered") or {}
+    invocation = probe.get("invocation") or {}
+    return [
+        {"name": "Hermes loads the fixture's project skills", "passed": bool(probe.get("project_skill_tier_trusted"))},
+        {"name": "all six slash commands resolve to the fixture copy",
+         "passed": bool(registered) and all(item and item["from_fixture"] for item in registered.values())},
+        {"name": "skills_guard verdict is not dangerous for any skill",
+         "passed": bool(probe.get("guard")) and all(item["verdict"] != "dangerous" for item in probe["guard"].values())},
+        {"name": "slash message carries skill directory and user instruction",
+         "passed": bool(invocation.get("found") and invocation.get("has_skill_directory")
+                        and invocation.get("has_user_instruction"))},
+        {"name": "root skill references/commands.md is viewable",
+         "passed": bool((probe.get("root_skill_reference_view") or {}).get("success"))},
+        {"name": "skill viewer rejects '..' paths (adapters must use absolute paths)",
+         "passed": (probe.get("dotdot_view") or {}).get("success") is False},
+    ]
+
+
+def run_hermes_case(spec: dict, options: argparse.Namespace, fixture: dict, before: dict, evidence: Path) -> dict:
+    """Run one case through Hermes: project-skill trust, deterministic probe, then `hermes -z`."""
+    def finish(result: dict) -> dict:
+        write_json(evidence / "result.json", result)
+        (evidence / "summary.md").write_text(
+            f"# {spec['id']} — hermes\n\nStatus: **{result['status']}**\nScope: {result['scope']}\n\n"
+            f"Reason: {result.get('reason', 'See assertions/checks in result.json')}\n\n"
+            "Evidence: probe.json, hermes_trust.json, invocation.json, first_stdout.txt, first_stderr.txt, "
+            "before.json, after.json, observed.json.\n", encoding="utf-8")
+        return result
+
+    install = hermes_install()
+    if not install or not install["python"]:
+        return finish({"case": spec["id"], "status": "UNVERIFIED", "scope": "host runtime",
+                       "reason": "Hermes CLI or its Python environment is unavailable"})
+    if spec["assertion"] == "cleanup-stale":
+        return finish({"case": spec["id"], "status": "UNVERIFIED", "scope": "host runtime",
+                       "reason": "two-turn case is not supported for Hermes one-shot runs"})
+    skill = spec["id"].split("/")[0]
+    args = spec["args"].format(worktree=fixture.get("worktree", ""))
+    context = spec.get("context", "").format(lane_head=fixture.get("lane_head", ""))
+    instruction = "\n".join(part for part in (
+        args,
+        "The current working directory is a disposable acceptance-test fixture. "
+        "Operate only in this fixture and its local origin; do not touch other repositories.",
+        context) if part)
+    with hermes_trusted(install, fixture["cwd"], evidence):
+        probe = hermes_probe(install, fixture, skill, instruction)
+        message = probe.pop("message", "")
+        write_json(evidence / "probe.json", {"hermes": install["version"], **probe})
+        checks = probe_checks(probe)
+        if not all(item["passed"] for item in checks):
+            return finish({"case": spec["id"], "status": "FAIL", "scope": "Hermes discovery probe (no model call)",
+                           "checks": checks, "reason": probe.get("error", "probe check failed")})
+        if options.fixture_check:
+            return finish({"case": spec["id"], "status": "PASS", "checks": checks,
+                           "scope": "fixture setup + Hermes discovery probe; no model call"})
+        # `hermes -z` does not expand slash commands; send the exact message the interactive CLI
+        # builds for `/<skill> <args>` (cli.py -> build_skill_invocation_message).
+        command = [install["executable"], "-z", message]
+        write_json(evidence / "invocation.json", {"host": "hermes", "hermes": install["version"],
+                                                  "cwd": str(fixture["cwd"]), "skill_path": fixture["skill_path"],
+                                                  "skill_source_sha256": fixture["skill_source_sha256"],
+                                                  "slash_command": f"/{skill} {args}".strip(),
+                                                  "user_instruction": instruction, "command": command[:2],
+                                                  "message": message, "timeout_seconds": options.timeout})
+        first = invoke_host(command, fixture["cwd"], fixture["base"], options.timeout)
+    write_json(evidence / "first_call.json", {k: v for k, v in first.items() if k not in {"stdout", "stderr"}})
+    (evidence / "first_stdout.txt").write_text(first["stdout"], encoding="utf-8")
+    (evidence / "first_stderr.txt").write_text(first["stderr"], encoding="utf-8")
+    after = snapshot(fixture)
+    answer = first["stdout"].strip()
+    write_json(evidence / "before.json", before)
+    write_json(evidence / "after.json", after)
+    write_json(evidence / "observed.json", {"answer": answer, "tool_calls": [], "structured_trace": False})
+    runtime_error = RUNTIME_ERROR.search(first["stdout"] + "\n" + first["stderr"])
+    if first["timed_out"] or first["returncode"] != 0 or not answer or runtime_error:
+        return finish({"case": spec["id"], "status": "UNVERIFIED", "scope": "host runtime",
+                       "returncode": first["returncode"],
+                       "reason": "host timed out" if first["timed_out"] else
+                       f"host runtime error: {runtime_error.group(0)}" if runtime_error else
+                       "host did not return a usable agent response"})
+    assertions = evaluate(spec, fixture, before, after, answer, [], False)
+    if spec["assertion"] == "help":
+        return finish({"case": spec["id"], "status": "UNVERIFIED", "scope": "actual Hermes one-shot run",
+                       "assertions": assertions,
+                       "reason": "Hermes one-shot output has no tool trace; 'no repository inspection' cannot be checked"})
+    return finish({"case": spec["id"], "status": "PASS" if all(item["passed"] for item in assertions) else "FAIL",
+                   "scope": "actual Hermes one-shot run and disposable Git state", "assertions": assertions})
 
 
 def host_command(cwd: Path, prompt: str, options: argparse.Namespace) -> list[str] | None:
@@ -495,9 +665,15 @@ def evaluate(spec: dict, fixture: dict, before: dict, after: dict,
     return checks
 
 
+def evidence_name(options: argparse.Namespace) -> str:
+    if options.fixture_check:
+        return "fixture-check" if options.host == "codex" else f"fixture-check-{options.host}"
+    return f"host-{options.host}"
+
+
 def run_case(spec: dict, options: argparse.Namespace) -> dict:
     case_dir = CASES / spec["id"]
-    evidence = case_dir / "evidence" / ("fixture-check" if options.fixture_check else f"host-{options.host}")
+    evidence = case_dir / "evidence" / evidence_name(options)
     evidence.mkdir(parents=True, exist_ok=True)
     write_json(case_dir / "host_case.json", spec)
     with tempfile.TemporaryDirectory(prefix=".magos-accept-", dir=options.fixture_root) as temporary:
@@ -528,6 +704,8 @@ def run_case(spec: dict, options: argparse.Namespace) -> dict:
                       "checks": checks}
             write_json(evidence / "result.json", result)
             return result
+        if options.host == "hermes":
+            return run_hermes_case(spec, options, fixture, before, evidence)
         if options.fixture_check:
             result = {"case": spec["id"], "status": "PASS", "scope": "fixture setup only; no AI host invoked",
                       "checks": checks}
@@ -624,7 +802,8 @@ def run_case(spec: dict, options: argparse.Namespace) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Real host CLI acceptance in disposable Git fixtures")
-    parser.add_argument("--host", choices=("codex",), default="codex", help="Only Codex is executed")
+    parser.add_argument("--host", choices=("codex", "hermes"), default="codex",
+                        help="host CLI to run; hermes uses project-local skills in each trusted fixture")
     parser.add_argument("--case", action="append", default=[], help="glob case ID; repeatable")
     parser.add_argument("--fixture-check", action="store_true", help="verify fixture setup only; no model calls")
     parser.add_argument("--model", help="optional host model override")
@@ -656,8 +835,7 @@ def main() -> int:
         try:
             result = run_case(spec, options)
         except Exception as error:
-            evidence = CASES / spec["id"] / "evidence" / (
-                "fixture-check" if options.fixture_check else f"host-{options.host}")
+            evidence = CASES / spec["id"] / "evidence" / evidence_name(options)
             evidence.mkdir(parents=True, exist_ok=True)
             result = {"case": spec["id"], "status": "UNVERIFIED", "scope": "test harness",
                       "reason": f"{type(error).__name__}: {error}"}
@@ -673,7 +851,7 @@ def main() -> int:
         print(f"{result['status']:10} {result['case']}", flush=True)
     counts = {status: sum(item["status"] == status for item in results)
               for status in ("PASS", "FAIL", "UNVERIFIED")}
-    label = "fixture setups" if options.fixture_check else "Codex host cases"
+    label = f"{options.host} fixture setups" if options.fixture_check else f"{options.host} host cases"
     print(f"{label}: {counts['PASS']} PASS, {counts['FAIL']} FAIL, {counts['UNVERIFIED']} UNVERIFIED")
     return 1 if counts["FAIL"] else (2 if counts["UNVERIFIED"] else 0)
 

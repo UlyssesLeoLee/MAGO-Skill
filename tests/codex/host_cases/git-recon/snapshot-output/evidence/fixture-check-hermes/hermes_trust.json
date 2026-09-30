@@ -1,0 +1,8 @@
+{
+  "config_sha256_before": "736d327b0d5bb6b1385d80a558423f6971ed6cf7a010cbfabdd2f4435fb450c6",
+  "trust": "Trusted: C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-3hvyyp7z\\repo\n6 project skill(s) will load in sessions started inside this repo (they take precedence over same-named profile skills).",
+  "untrust": "Untrusted: C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-3hvyyp7z\\repo\nProject skills from this repo will no longer load.",
+  "restored": true,
+  "semantic_comparison": "equal",
+  "config_sha256_after": "736d327b0d5bb6b1385d80a558423f6971ed6cf7a010cbfabdd2f4435fb450c6"
+}

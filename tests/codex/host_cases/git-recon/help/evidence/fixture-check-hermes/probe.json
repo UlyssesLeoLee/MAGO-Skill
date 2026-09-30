@@ -1,0 +1,89 @@
+{
+  "hermes": "Hermes Agent v0.21.2 (2026.9.11) · upstream 5eb99eb2",
+  "project_skill_tier_trusted": true,
+  "registered": {
+    "/multi-agent-git-orchestrator": {
+      "skill_dir": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-13nkx_p8\\empty\\.agents\\skills\\MAGOS",
+      "from_fixture": true,
+      "description": "Automatically use for multi-agent or multi-worktree Git coordination, dependency-aware branch planning, review/integration, merge queues, cherry-pick/rebase/squash decisions, conflict ownership, rollback, and repository-specific advice about existing branches/worktrees. Also recognize explicit command intents GitRecon, GitAnalyze, GitRecommend, GitIntegrate, and GitCleanup. Inspect repository state before state-dependent advice. Do not use for ordinary conceptual or single-branch Git questions unless topology, coordination, or shared-history safety matters."
+    },
+    "/git-recon": {
+      "skill_dir": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-13nkx_p8\\empty\\.agents\\skills\\MAGOS\\skills\\git-recon",
+      "from_fixture": true,
+      "description": "查看仓库状态（只读）；/git-recon [--remote] [--help]."
+    },
+    "/git-analyze": {
+      "skill_dir": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-13nkx_p8\\empty\\.agents\\skills\\MAGOS\\skills\\git-analyze",
+      "from_fixture": true,
+      "description": "分析目标（只读）；/git-analyze TARGET [--remote] [--help]."
+    },
+    "/git-recommend": {
+      "skill_dir": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-13nkx_p8\\empty\\.agents\\skills\\MAGOS\\skills\\git-recommend",
+      "from_fixture": true,
+      "description": "给出 Git 建议（只读）；/git-recommend [goal] [--remote] [--help]."
+    },
+    "/git-integrate": {
+      "skill_dir": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-13nkx_p8\\empty\\.agents\\skills\\MAGOS\\skills\\git-integrate",
+      "from_fixture": true,
+      "description": "集成目标（仅限用户显式调用，写操作）；/git-integrate TARGET [--strategy] [--help]."
+    },
+    "/git-cleanup": {
+      "skill_dir": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-13nkx_p8\\empty\\.agents\\skills\\MAGOS\\skills\\git-cleanup",
+      "from_fixture": true,
+      "description": "预览清理（仅限用户显式调用；--apply 才删除）；/git-cleanup [--apply] [--help]."
+    }
+  },
+  "guard": {
+    ".": {
+      "verdict": "safe",
+      "findings": [
+        "path_traversal"
+      ]
+    },
+    "skills/git-analyze": {
+      "verdict": "safe",
+      "findings": [
+        "path_traversal"
+      ]
+    },
+    "skills/git-cleanup": {
+      "verdict": "safe",
+      "findings": [
+        "path_traversal"
+      ]
+    },
+    "skills/git-integrate": {
+      "verdict": "safe",
+      "findings": [
+        "path_traversal"
+      ]
+    },
+    "skills/git-recommend": {
+      "verdict": "safe",
+      "findings": [
+        "path_traversal"
+      ]
+    },
+    "skills/git-recon": {
+      "verdict": "safe",
+      "findings": [
+        "path_traversal"
+      ]
+    }
+  },
+  "guard_source": "project-local",
+  "invocation": {
+    "command": "/git-recon",
+    "found": true,
+    "has_skill_directory": true,
+    "has_user_instruction": true
+  },
+  "root_skill_reference_view": {
+    "success": true,
+    "error": null
+  },
+  "dotdot_view": {
+    "success": false,
+    "error": "Path traversal ('..') is not allowed."
+  }
+}
