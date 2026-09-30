@@ -32,7 +32,7 @@ If `--help` is present, even with other arguments, answer from the inline Usage 
 
 ## Explicit invocation only
 
-A semantic match or automatic skill selection is not authorization to write. Codex disables implicit selection for this adapter through `agents/openai.yaml`; Hermes has no per-skill switch, so this rule applies there by instruction. If this adapter was selected without an explicit `/git-cleanup` or `$git-cleanup` invocation, preview at most and delete nothing.
+A semantic match or automatic skill selection is not authorization to write. Codex disables implicit selection for this adapter through `agents/openai.yaml`; Hermes has no per-skill switch, so this rule applies there by instruction. An explicit invocation is the user's `/git-cleanup` command (Hermes renders it as "The user has invoked the "git-cleanup" skill" followed by the arguments) or `$git-cleanup` in Codex. If this adapter was selected without such an invocation, preview at most and delete nothing.
 
 ## Shared files
 

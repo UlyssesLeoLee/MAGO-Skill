@@ -29,18 +29,18 @@
   "initial_state": {
     "git_repository": true,
     "refs": {
-      "refs/heads/agent/auth": "72faddd1aba479a2d6eed1ec8d5089b23f059b79",
-      "refs/heads/main": "924bb296ae2f97f77fa83c0cebda521e106a6e84",
-      "refs/remotes/origin/main": "924bb296ae2f97f77fa83c0cebda521e106a6e84"
+      "refs/heads/agent/auth": "9caa0081caaa590bb7aa78cfa5daa655da2413ce",
+      "refs/heads/main": "54ff633e7938e890f4eeb2e24698c4a703da9580",
+      "refs/remotes/origin/main": "54ff633e7938e890f4eeb2e24698c4a703da9580"
     },
     "worktrees": {
-      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-pzqpkny_\\repo": {
-        "head": "924bb296ae2f97f77fa83c0cebda521e106a6e84",
+      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-p3ks4iex\\repo": {
+        "head": "54ff633e7938e890f4eeb2e24698c4a703da9580",
         "branch": "main",
         "status": ""
       },
-      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-pzqpkny_\\auth-worktree": {
-        "head": "72faddd1aba479a2d6eed1ec8d5089b23f059b79",
+      "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-p3ks4iex\\auth-worktree": {
+        "head": "9caa0081caaa590bb7aa78cfa5daa655da2413ce",
         "branch": "agent/auth",
         "status": "M feature.txt"
       }
@@ -52,12 +52,12 @@
       "repo/.agents/skills/MAGOS/references/decision-matrix.md": "954ffefa9c018e25d0b88987c8bed5f07739b148c8aa254b9a9cde41e6ffe141",
       "repo/.agents/skills/MAGOS/references/design-rationale.md": "9b5baf5107530fe275b304002fd37a24072510aebc140908d5702bda2e9f49bd",
       "repo/.agents/skills/MAGOS/references/handoff-and-state.md": "aba702cde8f67378f2898237a6a52cd1dba0f0967f5f28f5dea3d9d62ef593a4",
-      "repo/.agents/skills/MAGOS/references/installation.md": "3bc18b67a90909376387fff2f22459a2eb4ca704b83c82e23b0a5cf3a71a3108",
+      "repo/.agents/skills/MAGOS/references/installation.md": "65d4dfdffab53d78141eaf1af766acdf878b9a84d9d9709ac3a71825d11ffa3e",
       "repo/.agents/skills/MAGOS/references/pressure-tests.md": "c1bc668d7ba08362f3701d24340be9262de2c988ac0fd63068c1818a8dd831f4",
       "repo/.agents/skills/MAGOS/references/reconnaissance.md": "07b02f76c2bdedf5844ff29c5d1031cc60732ba1593bed9e32315d8ce54c9f2b",
       "repo/.agents/skills/MAGOS/skills/git-analyze/SKILL.md": "426e646ab29982eb986df1388da10189cc601fa0f8a4417971a3dc00df984363",
-      "repo/.agents/skills/MAGOS/skills/git-cleanup/SKILL.md": "d50556791e6f18fd5f264eec3a41026ceb18eb2c646af787432c66c953183c00",
-      "repo/.agents/skills/MAGOS/skills/git-integrate/SKILL.md": "6cee68f2e175655a77accd4db9fafae3305c57506a4a772513b2642a1182435c",
+      "repo/.agents/skills/MAGOS/skills/git-cleanup/SKILL.md": "b2b9835630e5444a8ee129e69f2a8ed7acedc7186831f061b2ae4757044a14a4",
+      "repo/.agents/skills/MAGOS/skills/git-integrate/SKILL.md": "30c7100ba883be51f69fa7f87bc6410ca9d5a46426a029d4fca6ef2836b9d546",
       "repo/.agents/skills/MAGOS/skills/git-recommend/SKILL.md": "b869d9b8308ad8b6b90c930f3d1aa35a687068d43c3e2890480ae9ea3b07e5e1",
       "repo/.agents/skills/MAGOS/skills/git-recon/SKILL.md": "bc0350766f9e2b58d65dd119dc7911ba884f1a741b514951ab390d043775dd64",
       "repo/.agents/skills/MAGOS/skills/git-analyze/agents/openai.yaml": "f17e63b132f976471d30c35dbd91b2d724933ee988e9053c86f3ac2b0516ecd6",
@@ -69,10 +69,10 @@
       "auth-worktree/README.md": "5bd17a4a66c4126008a147278511f1fb55774b443fa32bf571a0ffd5a8efc073"
     },
     "bare_refs": {
-      "refs/heads/main": "6d32b9465ecc9d436b30f0bd8658433898709d68"
+      "refs/heads/main": "2a3968b9cf6f5954617e494c8f0d90c70edf085d"
     }
   },
   "skill": "git-recon",
-  "skill_path": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-pzqpkny_\\repo\\.agents\\skills\\MAGOS\\skills\\git-recon\\SKILL.md",
-  "skill_source_sha256": "0e0c0cd631913b0ee0c77681e2de491b6794287baab4fda6dc9806b2aa8b7826"
+  "skill_path": "C:\\Users\\seiko\\.claude\\skills\\MAGOS\\tests\\codex\\.magos-accept-p3ks4iex\\repo\\.agents\\skills\\MAGOS\\skills\\git-recon\\SKILL.md",
+  "skill_source_sha256": "fd1f849ffb41e4d1fe5cd0b2161acbd2ec864cbc9dfcd55dc18078b1bee1e3ed"
 }

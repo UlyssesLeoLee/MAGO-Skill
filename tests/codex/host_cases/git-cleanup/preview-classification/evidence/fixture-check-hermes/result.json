@@ -21,10 +21,6 @@
     {
       "name": "root skill references/commands.md is viewable",
       "passed": true
-    },
-    {
-      "name": "skill viewer rejects '..' paths (adapters must use absolute paths)",
-      "passed": true
     }
   ],
   "scope": "fixture setup + Hermes discovery probe; no model call"

@@ -894,5 +894,197 @@
         ]
       }
     ]
+  },
+  {
+    "id": "claude/argument-hints",
+    "skill": "claude-commands",
+    "feature": "Claude Code slash commands keep the frontmatter and inline help the / menu and --help depend on",
+    "invocations": {
+      "claude": "/GitRecon --help"
+    },
+    "test_object": {
+      "commands": [
+        "GitRecon",
+        "GitAnalyze",
+        "GitRecommend",
+        "GitIntegrate",
+        "GitCleanup"
+      ],
+      "argument_hints": {
+        "GitRecon": "[--remote] [--help]",
+        "GitAnalyze": "<branch|worktree> [--remote] [--help]",
+        "GitRecommend": "[<goal>] [--remote] [--help]",
+        "GitIntegrate": "<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]",
+        "GitCleanup": "[--apply] [--help]"
+      }
+    },
+    "expected": [
+      "Each commands/Git*.md has a description and the exact argument-hint shown in the Claude Code / menu.",
+      "Each command handles --help from its inline help before loading the skill.",
+      "GitIntegrate and GitCleanup set disable-model-invocation: true so only the user can run them."
+    ],
+    "checks": [
+      {
+        "file": "commands/GitRecon.md",
+        "contains": [
+          "argument-hint: \"[--remote] [--help]\"",
+          "Handle `--help` first",
+          "## Inline help",
+          "Usage: `/GitRecon"
+        ],
+        "pattern": "^description: (.+)$",
+        "length": [
+          1,
+          120
+        ]
+      },
+      {
+        "file": "commands/GitAnalyze.md",
+        "contains": [
+          "argument-hint: \"<branch|worktree> [--remote] [--help]\"",
+          "Handle `--help` first",
+          "## Inline help",
+          "Usage: `/GitAnalyze"
+        ],
+        "pattern": "^description: (.+)$",
+        "length": [
+          1,
+          120
+        ]
+      },
+      {
+        "file": "commands/GitRecommend.md",
+        "contains": [
+          "argument-hint: \"[<goal>] [--remote] [--help]\"",
+          "Handle `--help` first",
+          "## Inline help",
+          "Usage: `/GitRecommend"
+        ],
+        "pattern": "^description: (.+)$",
+        "length": [
+          1,
+          120
+        ]
+      },
+      {
+        "file": "commands/GitIntegrate.md",
+        "contains": [
+          "argument-hint: \"<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]\"",
+          "Handle `--help` first",
+          "## Inline help",
+          "Usage: `/GitIntegrate",
+          "disable-model-invocation: true"
+        ],
+        "pattern": "^description: (.+)$",
+        "length": [
+          1,
+          120
+        ]
+      },
+      {
+        "file": "commands/GitCleanup.md",
+        "contains": [
+          "argument-hint: \"[--apply] [--help]\"",
+          "Handle `--help` first",
+          "## Inline help",
+          "Usage: `/GitCleanup",
+          "disable-model-invocation: true"
+        ],
+        "pattern": "^description: (.+)$",
+        "length": [
+          1,
+          120
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hermes/descriptions",
+    "skill": "hermes-adapters",
+    "feature": "Hermes slash-command descriptions stay within the width Hermes shows without truncation",
+    "invocations": {
+      "hermes": "/git-integrate --help"
+    },
+    "test_object": {
+      "adapters": [
+        "git-recon",
+        "git-analyze",
+        "git-recommend",
+        "git-integrate",
+        "git-cleanup"
+      ],
+      "max_description_chars": 77,
+      "source": "Hermes acp_adapter/commands.py truncates command descriptions to 77 chars + '...'"
+    },
+    "expected": [
+      "Each adapter description is a single quoted line of at most 77 characters ending with a period.",
+      "The write adapters define what counts as an explicit invocation on each host."
+    ],
+    "checks": [
+      {
+        "file": "skills/git-recon/SKILL.md",
+        "contains": [],
+        "pattern": "^description: \"([^\"]+)\"$",
+        "length": [
+          1,
+          77
+        ],
+        "ends_with": "."
+      },
+      {
+        "file": "skills/git-analyze/SKILL.md",
+        "contains": [],
+        "pattern": "^description: \"([^\"]+)\"$",
+        "length": [
+          1,
+          77
+        ],
+        "ends_with": "."
+      },
+      {
+        "file": "skills/git-recommend/SKILL.md",
+        "contains": [],
+        "pattern": "^description: \"([^\"]+)\"$",
+        "length": [
+          1,
+          77
+        ],
+        "ends_with": "."
+      },
+      {
+        "file": "skills/git-integrate/SKILL.md",
+        "contains": [],
+        "pattern": "^description: \"([^\"]+)\"$",
+        "length": [
+          1,
+          77
+        ],
+        "ends_with": "."
+      },
+      {
+        "file": "skills/git-cleanup/SKILL.md",
+        "contains": [],
+        "pattern": "^description: \"([^\"]+)\"$",
+        "length": [
+          1,
+          77
+        ],
+        "ends_with": "."
+      },
+      {
+        "file": "skills/git-integrate/SKILL.md",
+        "contains": [
+          "An explicit invocation is the user's",
+          "Hermes renders it as"
+        ]
+      },
+      {
+        "file": "skills/git-cleanup/SKILL.md",
+        "contains": [
+          "An explicit invocation is the user's",
+          "Hermes renders it as"
+        ]
+      }
+    ]
   }
 ]

@@ -59,6 +59,7 @@ import argparse
 import contextlib
 import copy
 import fnmatch
+import functools
 import hashlib
 import importlib.util
 import json
@@ -274,6 +275,7 @@ def verify_fixture(fixture: dict, state: dict) -> list[dict]:
     return checks
 
 
+@functools.lru_cache(maxsize=None)
 def load_sync_hosts():
     spec = importlib.util.spec_from_file_location("sync_hosts", ROOT / "scripts" / "sync_hosts.py")
     module = importlib.util.module_from_spec(spec)
@@ -325,8 +327,9 @@ def user_level_installs() -> list[str]:
     return [str(path) for path in candidates if path.exists()]
 
 
+@functools.lru_cache(maxsize=None)
 def hermes_install() -> dict | None:
-    """Locate the Hermes CLI, its source checkout, and its venv Python."""
+    """Locate the Hermes CLI, its source checkout, and its venv Python (once per run)."""
     executable = shutil.which("hermes")
     if not executable:
         return None
@@ -342,19 +345,9 @@ def hermes_install() -> dict | None:
     return {"executable": executable, "agent_dir": agent_dir, "python": python, "version": version}
 
 
-CONFIG_EQUIVALENCE = """
-import sys, yaml
-first, second = (yaml.safe_load(open(path, encoding="utf-8")) or {} for path in sys.argv[1:3])
-for config in (first, second):
-    skills = config.get("skills") or {}
-    skills["trusted_project_dirs"] = skills.get("trusted_project_dirs") or []
-    config["skills"] = skills
-print("equal" if first == second else "different")
-"""
-
-
 HERMES_CONFIG_BACKUP = TESTS / ".hermes-config-backup.yaml"
-STALE_TRUST_EQUIVALENCE = """
+# Equal when two Hermes configs differ only in fixture (.magos-accept-*) trust entries.
+CONFIG_EQUIVALENCE = """
 import sys, yaml
 first, second = (yaml.safe_load(open(path, encoding="utf-8")) or {} for path in sys.argv[1:3])
 for config in (first, second):
@@ -370,7 +363,7 @@ def recover_hermes_config(install: dict, config: Path) -> str | None:
     """Restore config.yaml from a backup left by an interrupted run (fixture trust entries only)."""
     if not HERMES_CONFIG_BACKUP.is_file():
         return None
-    verdict = subprocess.run([str(install["python"]), "-c", STALE_TRUST_EQUIVALENCE, str(HERMES_CONFIG_BACKUP),
+    verdict = subprocess.run([str(install["python"]), "-c", CONFIG_EQUIVALENCE, str(HERMES_CONFIG_BACKUP),
                               str(config)], text=True, capture_output=True, timeout=120, check=False).stdout.strip()
     if verdict != "equal":
         raise RuntimeError(f"{HERMES_CONFIG_BACKUP} is left from an interrupted run, but {config} has other "
@@ -416,6 +409,9 @@ def hermes_trusted(install: dict, root: Path, evidence: Path):
             if verdict == "equal":
                 config.write_bytes(original)
                 record["restored"] = True
+        elif original is None and current is not None:
+            config.unlink()  # Hermes had no config.yaml before `skills trust` created one
+            record["restored"] = True
         if record["restored"] or current == original:
             HERMES_CONFIG_BACKUP.unlink(missing_ok=True)
         final = config.read_bytes() if config.is_file() else None
@@ -449,9 +445,7 @@ def probe_checks(probe: dict) -> list[dict]:
                         and invocation.get("has_user_instruction"))},
         {"name": "root skill references/commands.md is viewable",
          "passed": bool((probe.get("root_skill_reference_view") or {}).get("success"))},
-        {"name": "skill viewer rejects '..' paths (adapters must use absolute paths)",
-         "passed": (probe.get("dotdot_view") or {}).get("success") is False},
-    ]
+    ]  # probe.json also records dotdot_view: a host detail the adapters work around, not a gate
 
 
 def run_hermes_case(spec: dict, options: argparse.Namespace, fixture: dict, before: dict, evidence: Path) -> dict:
@@ -525,7 +519,9 @@ def run_hermes_case(spec: dict, options: argparse.Namespace, fixture: dict, befo
                    "scope": "actual Hermes one-shot run and disposable Git state", "assertions": assertions})
 
 
-def host_command(cwd: Path, prompt: str, options: argparse.Namespace) -> list[str] | None:
+def host_command(cwd: Path, options: argparse.Namespace) -> list[str] | None:
+    """Build `codex exec`; the prompt goes through stdin (`-`) because the npm shim codex.cmd runs
+    under cmd.exe, which cuts a multi-line argument at its first newline."""
     executable = shutil.which("codex.cmd") or shutil.which("codex")
     if not executable:
         return None
@@ -535,7 +531,7 @@ def host_command(cwd: Path, prompt: str, options: argparse.Namespace) -> list[st
                "-c", "mcp_servers.serena.enabled=false"]
     if options.model:
         command += ["-m", options.model]
-    return command + [prompt]
+    return command + ["-"]
 
 
 def extract_response(stdout: str) -> tuple[str, list[str], bool]:
@@ -584,14 +580,16 @@ def has_git_command(tool_calls: list[str]) -> bool:
     return False
 
 
-def invoke_host(command: list[str], cwd: Path, base: Path, timeout: int) -> dict:
+def invoke_host(command: list[str], cwd: Path, base: Path, timeout: int, stdin_text: str | None = None) -> dict:
+    """Run a host CLI; stdin carries `stdin_text` or is closed, never the runner's own stdin."""
     started = datetime.now(timezone.utc).isoformat()
     environment = os.environ.copy()
     environment["GIT_CEILING_DIRECTORIES"] = str(base)
+    stdin = {"input": stdin_text} if stdin_text is not None else {"stdin": subprocess.DEVNULL}
     try:
         completed = subprocess.run(command, cwd=cwd, env=environment, text=True,
                                    encoding="utf-8", errors="replace", capture_output=True,
-                                   timeout=timeout, check=False)
+                                   timeout=timeout, check=False, **stdin)
         return {"started_utc": started, "returncode": completed.returncode,
                 "stdout": completed.stdout, "stderr": completed.stderr, "timed_out": False}
     except subprocess.TimeoutExpired as error:
@@ -658,10 +656,11 @@ def evaluate(spec: dict, fixture: dict, before: dict, after: dict,
         add("read-only Git state", unchanged())
     elif assertion == "integration-gate":
         add("review gate reported", has_any("review", "acceptance", "评审", "审核", "验收"))
-        add("no integration performed", unchanged())
+        # A permitted ref refresh (e.g. fetch creating refs/remotes/origin/HEAD) is not an integration.
+        add("no integration performed", unchanged(allow_remote=True))
     elif assertion == "invalid-strategy":
         add("invalid strategy reported", has_any("invalid", "unsupported", "strategy", "无效", "不支持", "策略"))
-        add("no integration performed", unchanged())
+        add("no integration performed", unchanged(allow_remote=True))
     elif assertion.startswith("integration-"):
         main_before = before["refs"]["refs/heads/main"]
         main_after = after["refs"]["refs/heads/main"]
@@ -754,7 +753,7 @@ def run_case(spec: dict, options: argparse.Namespace) -> dict:
         prompt = (f"Invoke the project-local MAGOS skill from this acceptance-test checkout exactly as requested: {invocation}\n"
                   f"The current working directory is a disposable acceptance-test fixture. "
                   f"Operate only in this fixture and its local origin; do not touch other repositories.\n{context}")
-        command = host_command(fixture["cwd"], prompt, options)
+        command = host_command(fixture["cwd"], options)
         shadows = user_level_installs()
         write_json(evidence / "invocation.json", {"host": options.host, "cwd": str(fixture["cwd"]),
                                                   "skill_path": fixture["skill_path"],
@@ -772,7 +771,7 @@ def run_case(spec: dict, options: argparse.Namespace) -> dict:
                       "reason": "host executable unavailable"}
             write_json(evidence / "result.json", result)
             return result
-        first = invoke_host(command, fixture["cwd"], fixture["base"], options.timeout)
+        first = invoke_host(command, fixture["cwd"], fixture["base"], options.timeout, prompt)
         write_json(evidence / "first_call.json", {k: v for k, v in first.items() if k not in {"stdout", "stderr"}})
         (evidence / "first_stdout.txt").write_text(first["stdout"], encoding="utf-8")
         (evidence / "first_stderr.txt").write_text(first["stderr"], encoding="utf-8")
@@ -799,10 +798,10 @@ def run_case(spec: dict, options: argparse.Namespace) -> dict:
                 second_prompt = (f"Invoke the project-local MAGOS skill from this acceptance-test checkout exactly as requested: {second_invocation}. "
                                  "A candidate changed after the previous preview. Recheck it before applying cleanup. "
                                  "Operate only in this disposable fixture and its local origin.")
-                second_command = host_command(repo, second_prompt, options)
+                second_command = host_command(repo, options)
                 write_json(evidence / "second_invocation.json", {"command": second_command,
                                                                    "prompt": second_prompt, "cwd": str(repo)})
-                last = invoke_host(second_command, repo, fixture["base"], options.timeout)
+                last = invoke_host(second_command, repo, fixture["base"], options.timeout, second_prompt)
                 (evidence / "second_stdout.txt").write_text(last["stdout"], encoding="utf-8")
                 (evidence / "second_stderr.txt").write_text(last["stderr"], encoding="utf-8")
                 answer, calls, trace = extract_response(last["stdout"])

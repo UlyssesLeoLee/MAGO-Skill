@@ -104,9 +104,18 @@ def hermes_home(home: Path, explicit_home: bool) -> Path:
         return Path(os.environ["HERMES_HOME"].strip())
     if sys.platform == "win32":
         local_appdata = os.environ.get("LOCALAPPDATA", "").strip()
-        base = Path(local_appdata) if local_appdata and not explicit_home else home / "AppData" / "Local"
-        return base / "hermes"
-    return home / ".hermes"
+        base = (Path(local_appdata) if local_appdata and not explicit_home else home / "AppData" / "Local") / "hermes"
+    else:
+        base = home / ".hermes"
+    if not explicit_home:
+        # The `hermes` launcher follows a sticky profile: HERMES_HOME=<root>/profiles/<name>.
+        try:
+            active = (base / "active_profile").read_text(encoding="utf-8").strip()
+        except OSError:
+            active = ""
+        if active and active != "default" and (base / "profiles" / active).is_dir():
+            return base / "profiles" / active
+    return base
 
 
 def hermes_install_root(home: Path, explicit_home: bool) -> tuple[Path, list[str]]:
@@ -296,12 +305,16 @@ def main() -> int:
     targets, notes = build_targets(home, selected_hosts, repo, explicit_home,
                                    args.codex_root, args.hermes_root)
     created: list[str] = []
-    if args.apply and args.create_roots:
+    report = inspect(repo, targets, home, selected_hosts, notes)
+    counts = report["summary"]
+    # Create missing roots only when nothing else would fail preflight, so a refused run writes nothing.
+    if (args.apply and args.create_roots and counts["missing_roots"]
+            and not (counts["git_checkouts"] or counts["source_errors"] or counts["blocked"])):
         for _, _, required, _ in targets:
             if not required.is_dir():
                 required.mkdir(parents=True, exist_ok=True)
                 created.append(str(required))
-    report = inspect(repo, targets, home, selected_hosts, notes)
+        report = inspect(repo, targets, home, selected_hosts, notes)
     report["mode"] = "apply" if args.apply else "verify" if args.verify else "plan"
     report["created_roots"] = created
     counts = report["summary"]

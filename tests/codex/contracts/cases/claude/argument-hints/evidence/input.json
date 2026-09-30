@@ -1,0 +1,16 @@
+{
+  "commands": [
+    "GitRecon",
+    "GitAnalyze",
+    "GitRecommend",
+    "GitIntegrate",
+    "GitCleanup"
+  ],
+  "argument_hints": {
+    "GitRecon": "[--remote] [--help]",
+    "GitAnalyze": "<branch|worktree> [--remote] [--help]",
+    "GitRecommend": "[<goal>] [--remote] [--help]",
+    "GitIntegrate": "<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]",
+    "GitCleanup": "[--apply] [--help]"
+  }
+}

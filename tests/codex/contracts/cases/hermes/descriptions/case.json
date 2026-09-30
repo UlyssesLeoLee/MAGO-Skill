@@ -1,0 +1,89 @@
+{
+  "id": "hermes/descriptions",
+  "skill": "hermes-adapters",
+  "feature": "Hermes slash-command descriptions stay within the width Hermes shows without truncation",
+  "invocations": {
+    "hermes": "/git-integrate --help"
+  },
+  "test_object": {
+    "adapters": [
+      "git-recon",
+      "git-analyze",
+      "git-recommend",
+      "git-integrate",
+      "git-cleanup"
+    ],
+    "max_description_chars": 77,
+    "source": "Hermes acp_adapter/commands.py truncates command descriptions to 77 chars + '...'"
+  },
+  "expected": [
+    "Each adapter description is a single quoted line of at most 77 characters ending with a period.",
+    "The write adapters define what counts as an explicit invocation on each host."
+  ],
+  "checks": [
+    {
+      "file": "skills/git-recon/SKILL.md",
+      "contains": [],
+      "pattern": "^description: \"([^\"]+)\"$",
+      "length": [
+        1,
+        77
+      ],
+      "ends_with": "."
+    },
+    {
+      "file": "skills/git-analyze/SKILL.md",
+      "contains": [],
+      "pattern": "^description: \"([^\"]+)\"$",
+      "length": [
+        1,
+        77
+      ],
+      "ends_with": "."
+    },
+    {
+      "file": "skills/git-recommend/SKILL.md",
+      "contains": [],
+      "pattern": "^description: \"([^\"]+)\"$",
+      "length": [
+        1,
+        77
+      ],
+      "ends_with": "."
+    },
+    {
+      "file": "skills/git-integrate/SKILL.md",
+      "contains": [],
+      "pattern": "^description: \"([^\"]+)\"$",
+      "length": [
+        1,
+        77
+      ],
+      "ends_with": "."
+    },
+    {
+      "file": "skills/git-cleanup/SKILL.md",
+      "contains": [],
+      "pattern": "^description: \"([^\"]+)\"$",
+      "length": [
+        1,
+        77
+      ],
+      "ends_with": "."
+    },
+    {
+      "file": "skills/git-integrate/SKILL.md",
+      "contains": [
+        "An explicit invocation is the user's",
+        "Hermes renders it as"
+      ]
+    },
+    {
+      "file": "skills/git-cleanup/SKILL.md",
+      "contains": [
+        "An explicit invocation is the user's",
+        "Hermes renders it as"
+      ]
+    }
+  ]
+}

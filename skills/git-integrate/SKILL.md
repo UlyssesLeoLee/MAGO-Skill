@@ -33,7 +33,7 @@ If `--help` is present, even with other arguments, answer from the inline Usage 
 
 ## Explicit invocation only
 
-A semantic match or automatic skill selection is not authorization to write. Codex disables implicit selection for this adapter through `agents/openai.yaml`; Hermes has no per-skill switch, so this rule applies there by instruction. If this adapter was selected without an explicit `/git-integrate` or `$git-integrate` invocation, do not integrate; offer the command instead.
+A semantic match or automatic skill selection is not authorization to write. Codex disables implicit selection for this adapter through `agents/openai.yaml`; Hermes has no per-skill switch, so this rule applies there by instruction. An explicit invocation is the user's `/git-integrate` command (Hermes renders it as "The user has invoked the "git-integrate" skill" followed by the arguments) or `$git-integrate` in Codex. If this adapter was selected without such an invocation, do not integrate; offer the command instead.
 
 ## Shared files
 

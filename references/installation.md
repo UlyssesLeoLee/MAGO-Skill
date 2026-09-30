@@ -11,7 +11,7 @@ python -X utf8 scripts/sync_hosts.py --verify
 
 用 `--host codex` 只检查、同步或校验 Codex；重复 `--host` 可以选择多个宿主。
 
-`--verify` 在所有文件都匹配时返回 0，存在缺失或差异时返回 1；缺少安装根目录、仓库源文件，或目标路径不安全时返回 2。`--apply` 会先检查所有目标，预检查失败时不写入任何文件。安装根目录不存在时，加 `--create-roots` 由脚本创建，否则预检查失败。复制中断后，可以再运行 `--verify` 查看状态，再重试 `--apply`。使用 `--json` 可以保存机器可读的验收记录。
+`--verify` 在所有文件都匹配时返回 0，存在缺失或差异时返回 1；缺少安装根目录、仓库源文件，或目标路径不安全时返回 2。`--apply` 会先检查所有目标，预检查失败时不写入任何文件。安装根目录不存在时，加 `--create-roots` 由脚本创建，否则预检查失败；`--create-roots` 只在其余预检查都通过时才创建目录。复制中断后，可以再运行 `--verify` 查看状态，再重试 `--apply`。使用 `--json` 可以保存机器可读的验收记录。
 
 同步范围如下：
 
@@ -19,7 +19,7 @@ python -X utf8 scripts/sync_hosts.py --verify
 | --- | --- | --- |
 | Claude | `~/.claude/commands` | 仓库 `commands/Git*.md`，共 5 个 |
 | Codex | `~/.agents/skills/MAGOS`。如果已有旧位置 `$CODEX_HOME/skills/MAGOS`（默认 `~/.codex/skills/MAGOS`）且新位置不存在，则继续使用旧位置 | 宿主中立包：`SKILL.md`、`references/*.md` 全部、每个 `skills/git-*/SKILL.md` 与 `agents/openai.yaml` |
-| Hermes | `<Hermes home>/skills/multi-agent-git-orchestrator`。Hermes home 依次取 `HERMES_HOME`、Windows 的 `%LOCALAPPDATA%\hermes`、其他系统的 `~/.hermes`；已有 `<Hermes home>/skills/MAGOS` 时沿用它 | 与 Codex 相同的宿主中立包 |
+| Hermes | `<Hermes home>/skills/multi-agent-git-orchestrator`。Hermes home 依次取 `HERMES_HOME`、Windows 的 `%LOCALAPPDATA%\hermes`、其他系统的 `~/.hermes`，有非默认的 `active_profile` 时取其 `profiles/<name>`；已有 `<Hermes home>/skills/MAGOS` 时沿用它 | 与 Codex 相同的宿主中立包 |
 
 - **文件清单：**宿主中立包的清单由 `scripts/sync_hosts.py` 的 `package_files()` 根据仓库内容生成，测试工具 `tests/codex/run_host_cases.py` 用同一个函数准备 fixture，因此测试布局与真实安装一致。
 - **`commands/`：**Codex 与 Hermes 包不再需要它。旧版本安装留下的 `commands/` 不会被删除，适配层也不会读取它。
