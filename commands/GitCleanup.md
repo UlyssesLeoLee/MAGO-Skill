@@ -18,9 +18,9 @@ Examples: `/GitCleanup`, `/GitCleanup --apply`, `/GitCleanup --help`.
 
 For a normal invocation, run the Multi-Agent Git Orchestrator command `/GitCleanup $ARGUMENTS`.
 
-1. Load the orchestrator skill with the Skill tool. Use whichever name the skill listing shows: `MAGO-Skill` (GitHub clone directory) or `multi-agent-git-orchestrator` (frontmatter name). If neither is listed, tell the user the skill is not installed, then continue read-only only: report observations, but do not mutate branches, worktrees, refs, or history.
+1. Load the orchestrator skill with the Skill tool. It may be listed as `MAGOS` (install directory), `multi-agent-git-orchestrator` (frontmatter name), or `MAGO-Skill` (older clone directory); any listed skill described as the Multi-Agent Git Orchestrator is the same skill. If none is listed but `~/.claude/skills/MAGOS/SKILL.md` exists, read that file instead. Only if the skill cannot be loaded at all, tell the user, then continue read-only only: report observations, but do not mutate branches, worktrees, refs, or history.
 2. Execute `/GitCleanup` exactly as defined in the skill's **Explicit Command Interface** and `references/commands.md`.
    Arguments (may be empty): $ARGUMENTS
 3. Inspect the current repository before giving any state-dependent advice.
 
-Safety default (applies even if the skill fails to load): preview only unless `--apply` is present. With `--apply`, delete only candidates that still meet every safety condition at apply time; never delete remote branches unless explicitly asked.
+Safety default: preview only unless `--apply` is present. With `--apply`, delete only after the skill is loaded and only candidates that still meet every safety condition at apply time; if the skill could not be loaded, preview only. Never delete remote branches unless explicitly asked.

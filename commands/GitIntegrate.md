@@ -19,9 +19,9 @@ Examples: `/GitIntegrate agent/auth`, `/GitIntegrate agent/auth --strategy squas
 
 For a normal invocation, run the Multi-Agent Git Orchestrator command `/GitIntegrate $ARGUMENTS`.
 
-1. Load the orchestrator skill with the Skill tool. Use whichever name the skill listing shows: `MAGO-Skill` (GitHub clone directory) or `multi-agent-git-orchestrator` (frontmatter name). If neither is listed, tell the user the skill is not installed, then continue read-only only: report observations, but do not mutate branches, worktrees, refs, or history.
+1. Load the orchestrator skill with the Skill tool. It may be listed as `MAGOS` (install directory), `multi-agent-git-orchestrator` (frontmatter name), or `MAGO-Skill` (older clone directory); any listed skill described as the Multi-Agent Git Orchestrator is the same skill. If none is listed but `~/.claude/skills/MAGOS/SKILL.md` exists, read that file instead. Only if the skill cannot be loaded at all, tell the user, then continue read-only only: report observations, but do not mutate branches, worktrees, refs, or history.
 2. Execute `/GitIntegrate` exactly as defined in the skill's **Explicit Command Interface** and `references/commands.md`.
    Arguments (may be empty): $ARGUMENTS
 3. Inspect the current repository before giving any state-dependent advice.
 
-Safety default (applies even if the skill fails to load): write intent, but only after review, dependency, freshness, protected-branch, and repository-policy gates pass. If any gate fails, stop and report the blocker. Never force-push or rewrite shared history. If no target is given, ask for one.
+Safety default: write intent, but only after the skill is loaded and review, dependency, freshness, protected-branch, and repository-policy gates pass. If the skill could not be loaded, do not integrate; report what is missing. If any gate fails, stop and report the blocker. Never force-push or rewrite shared history. If no target is given, ask for one.
