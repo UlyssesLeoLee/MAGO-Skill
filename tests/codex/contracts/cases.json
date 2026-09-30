@@ -713,5 +713,186 @@
         ]
       }
     ]
+  },
+  {
+    "id": "package/install-layout",
+    "skill": "package",
+    "feature": "Codex and Hermes installs contain every file the adapters reference, and a replica of each host's discovery rules finds every skill once",
+    "invocations": {
+      "installer": "python -X utf8 scripts/sync_hosts.py --home <temp> --host codex --host hermes --apply --create-roots --json"
+    },
+    "test_object": {
+      "hosts": [
+        "codex",
+        "hermes"
+      ],
+      "codex_discovery": "recursive, depth <= 6, hidden directories skipped (replica)",
+      "hermes_discovery": "rglob; SKILL.md below references/templates/assets/scripts of a parent skill ignored (replica)",
+      "expected_skills": [
+        "git-analyze",
+        "git-cleanup",
+        "git-integrate",
+        "git-recommend",
+        "git-recon",
+        "multi-agent-git-orchestrator"
+      ]
+    },
+    "expected": [
+      "sync_hosts.py installs the full package (SKILL.md, references/, skills/) for Codex and Hermes.",
+      "Every ../../ reference in an adapter and every references/ link in SKILL.md resolves inside the installed tree.",
+      "No adapter routes through commands/; all five adapters set policy.allow_implicit_invocation: false.",
+      "Each skill name appears exactly once in the Codex and Hermes discovery replicas."
+    ],
+    "checks": [
+      {
+        "kind": "install_layout"
+      }
+    ]
+  },
+  {
+    "id": "hermes/argument-passing",
+    "skill": "hermes-adapters",
+    "feature": "Adapters explain how Hermes passes arguments and how to read shared files without '..' skill-viewer paths",
+    "invocations": {
+      "hermes": "/git-recon --remote"
+    },
+    "test_object": {
+      "adapters": [
+        "git-recon",
+        "git-analyze",
+        "git-recommend",
+        "git-integrate",
+        "git-cleanup"
+      ]
+    },
+    "expected": [
+      "Each adapter takes Hermes arguments from the 'User instruction:' block.",
+      "Each adapter resolves shared files from the '[Skill directory: ...]' path or the root skill multi-agent-git-orchestrator."
+    ],
+    "checks": [
+      {
+        "file": "skills/git-recon/SKILL.md",
+        "contains": [
+          "`User instruction:`",
+          "`[Skill directory: ...]`",
+          "The skill viewer rejects paths that contain `..`",
+          "multi-agent-git-orchestrator",
+          "Do not use `commands/*.md` for this adapter."
+        ]
+      },
+      {
+        "file": "skills/git-analyze/SKILL.md",
+        "contains": [
+          "`User instruction:`",
+          "`[Skill directory: ...]`",
+          "The skill viewer rejects paths that contain `..`",
+          "multi-agent-git-orchestrator",
+          "Do not use `commands/*.md` for this adapter."
+        ]
+      },
+      {
+        "file": "skills/git-recommend/SKILL.md",
+        "contains": [
+          "`User instruction:`",
+          "`[Skill directory: ...]`",
+          "The skill viewer rejects paths that contain `..`",
+          "multi-agent-git-orchestrator",
+          "Do not use `commands/*.md` for this adapter."
+        ]
+      },
+      {
+        "file": "skills/git-integrate/SKILL.md",
+        "contains": [
+          "`User instruction:`",
+          "`[Skill directory: ...]`",
+          "The skill viewer rejects paths that contain `..`",
+          "multi-agent-git-orchestrator",
+          "Do not use `commands/*.md` for this adapter."
+        ]
+      },
+      {
+        "file": "skills/git-cleanup/SKILL.md",
+        "contains": [
+          "`User instruction:`",
+          "`[Skill directory: ...]`",
+          "The skill viewer rejects paths that contain `..`",
+          "multi-agent-git-orchestrator",
+          "Do not use `commands/*.md` for this adapter."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "claude/skill-lookup",
+    "skill": "claude-commands",
+    "feature": "Claude Code commands find the orchestrator under any installed name and never write without the loaded skill",
+    "invocations": {
+      "claude": "/GitIntegrate agent/auth"
+    },
+    "test_object": {
+      "accepted_skill_names": [
+        "MAGOS",
+        "multi-agent-git-orchestrator",
+        "MAGO-Skill"
+      ]
+    },
+    "expected": [
+      "Each command accepts MAGOS, multi-agent-git-orchestrator, or MAGO-Skill as the orchestrator skill.",
+      "GitIntegrate does not integrate and GitCleanup only previews when the skill cannot be loaded."
+    ],
+    "checks": [
+      {
+        "file": "commands/GitRecon.md",
+        "contains": [
+          "`MAGOS` (install directory)",
+          "`multi-agent-git-orchestrator` (frontmatter name)",
+          "`MAGO-Skill` (older clone directory)"
+        ]
+      },
+      {
+        "file": "commands/GitAnalyze.md",
+        "contains": [
+          "`MAGOS` (install directory)",
+          "`multi-agent-git-orchestrator` (frontmatter name)",
+          "`MAGO-Skill` (older clone directory)"
+        ]
+      },
+      {
+        "file": "commands/GitRecommend.md",
+        "contains": [
+          "`MAGOS` (install directory)",
+          "`multi-agent-git-orchestrator` (frontmatter name)",
+          "`MAGO-Skill` (older clone directory)"
+        ]
+      },
+      {
+        "file": "commands/GitIntegrate.md",
+        "contains": [
+          "`MAGOS` (install directory)",
+          "`multi-agent-git-orchestrator` (frontmatter name)",
+          "`MAGO-Skill` (older clone directory)"
+        ]
+      },
+      {
+        "file": "commands/GitCleanup.md",
+        "contains": [
+          "`MAGOS` (install directory)",
+          "`multi-agent-git-orchestrator` (frontmatter name)",
+          "`MAGO-Skill` (older clone directory)"
+        ]
+      },
+      {
+        "file": "commands/GitIntegrate.md",
+        "contains": [
+          "If the skill could not be loaded, do not integrate"
+        ]
+      },
+      {
+        "file": "commands/GitCleanup.md",
+        "contains": [
+          "if the skill could not be loaded, preview only"
+        ]
+      }
+    ]
   }
 ]

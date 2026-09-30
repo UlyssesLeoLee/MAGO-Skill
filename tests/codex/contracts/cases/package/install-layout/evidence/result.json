@@ -1,0 +1,59 @@
+{
+  "case": "package/install-layout",
+  "skill": "package",
+  "feature": "Codex and Hermes installs contain every file the adapters reference, and a replica of each host's discovery rules finds every skill once",
+  "passed": true,
+  "scope": "source-contract; AI host runtime is not invoked",
+  "checks": [
+    {
+      "file": "install:sync_hosts.py --apply --create-roots",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "install:roots stay inside the temporary home",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "install:codex relative references resolve",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "install:codex adapters do not route through commands/",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "install:codex adapters disable implicit invocation",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "install:codex discovery replica finds each skill once",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "install:hermes relative references resolve",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "install:hermes adapters do not route through commands/",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "install:hermes adapters disable implicit invocation",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "install:hermes discovery replica finds each skill once",
+      "passed": true,
+      "missing": []
+    }
+  ]
+}

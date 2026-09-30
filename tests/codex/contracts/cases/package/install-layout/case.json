@@ -1,0 +1,35 @@
+{
+  "id": "package/install-layout",
+  "skill": "package",
+  "feature": "Codex and Hermes installs contain every file the adapters reference, and a replica of each host's discovery rules finds every skill once",
+  "invocations": {
+    "installer": "python -X utf8 scripts/sync_hosts.py --home <temp> --host codex --host hermes --apply --create-roots --json"
+  },
+  "test_object": {
+    "hosts": [
+      "codex",
+      "hermes"
+    ],
+    "codex_discovery": "recursive, depth <= 6, hidden directories skipped (replica)",
+    "hermes_discovery": "rglob; SKILL.md below references/templates/assets/scripts of a parent skill ignored (replica)",
+    "expected_skills": [
+      "git-analyze",
+      "git-cleanup",
+      "git-integrate",
+      "git-recommend",
+      "git-recon",
+      "multi-agent-git-orchestrator"
+    ]
+  },
+  "expected": [
+    "sync_hosts.py installs the full package (SKILL.md, references/, skills/) for Codex and Hermes.",
+    "Every ../../ reference in an adapter and every references/ link in SKILL.md resolves inside the installed tree.",
+    "No adapter routes through commands/; all five adapters set policy.allow_implicit_invocation: false.",
+    "Each skill name appears exactly once in the Codex and Hermes discovery replicas."
+  ],
+  "checks": [
+    {
+      "kind": "install_layout"
+    }
+  ]
+}

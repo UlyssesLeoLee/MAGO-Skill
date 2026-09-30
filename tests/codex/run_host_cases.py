@@ -59,11 +59,13 @@ import argparse
 import copy
 import fnmatch
 import hashlib
+import importlib.util
 import json
 import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import traceback
 from datetime import datetime, timezone
@@ -74,6 +76,7 @@ TESTS = Path(__file__).resolve().parent
 ROOT = TESTS.parents[1]
 CASES = TESTS / "host_cases"
 MANIFEST = TESTS / "host_cases.json"
+PACKAGE_DIR = "MAGOS"
 HOST_NAME = {
     "git-recon": "$git-recon",
     "git-analyze": "$git-analyze",
@@ -230,7 +233,7 @@ def verify_fixture(fixture: dict, state: dict) -> list[dict]:
     if kind == "empty":
         checks.append({"name": "empty Git repository", "passed": state["git_repository"]})
         if fixture.get("skill"):
-            skill_file = f".agents/skills/{fixture['skill']}/SKILL.md"
+            skill_file = f".agents/skills/{PACKAGE_DIR}/skills/{fixture['skill']}/SKILL.md"
             checks.append({"name": "project-local Codex skill is present",
                            "passed": skill_file in state["files"]})
             checks.append({"name": "workspace contains only the skill scaffold",
@@ -261,19 +264,39 @@ def verify_fixture(fixture: dict, state: dict) -> list[dict]:
                            is_ancestor(fixture["cwd"], "agent/done", "main") and
                            not is_ancestor(fixture["cwd"], "agent/unique", "main") and
                            bool(state["worktrees"][str(fixture["worktree"])]["status"])})
+    if fixture.get("skill_path"):
+        adapter = Path(fixture["skill_path"]).parent
+        checks.append({"name": "adapter shared files resolve", "passed": all(
+            (adapter / relative).resolve().is_file()
+            for relative in ("../../SKILL.md", "../../references/commands.md", "../../references/reconnaissance.md"))})
     return checks
 
 
+def load_package_files() -> tuple[str, ...]:
+    """Use the installer's package list so tests and real installs share one layout."""
+    spec = importlib.util.spec_from_file_location("sync_hosts", ROOT / "scripts" / "sync_hosts.py")
+    module = importlib.util.module_from_spec(spec)
+    previous = sys.dont_write_bytecode
+    sys.dont_write_bytecode = True  # keep scripts/ free of __pycache__
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.dont_write_bytecode = previous
+    return module.package_files(ROOT)
+
+
 def provision_codex_skill(fixture: dict, skill: str) -> None:
-    """Expose the exact checkout skill through Codex's project-local discovery path."""
+    """Install the checkout package through Codex's project-local discovery path, as sync_hosts.py does."""
     if skill not in HOST_NAME:
         raise ValueError(f"Unknown Codex skill fixture: {skill}")
     workspace = fixture["cwd"]
     agents = workspace / ".agents"
-    skill_target = agents / "skills" / skill
-    agents.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(ROOT / "skills" / skill, skill_target)
-    shutil.copytree(ROOT / "references", agents / "references")
+    package = agents / "skills" / PACKAGE_DIR
+    for relative in load_package_files():
+        destination = package / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, destination)
+    skill_target = package / "skills" / skill
     fixture["skill"] = skill
     fixture["skill_path"] = str(skill_target / "SKILL.md")
     copied_files = sorted(path for path in agents.rglob("*") if path.is_file())
@@ -287,6 +310,13 @@ def provision_codex_skill(fixture: dict, skill: str) -> None:
         existing = exclude.read_text(encoding="utf-8") if exclude.exists() else ""
         if "/.agents/" not in existing.splitlines():
             exclude.write_text(existing.rstrip() + "\n/.agents/\n", encoding="utf-8")
+
+
+def user_level_installs() -> list[str]:
+    """Codex dedups skills by path, not name, so a user-level MAGOS install stays in the catalog."""
+    codex_home = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex")
+    candidates = (Path.home() / ".agents" / "skills" / PACKAGE_DIR, codex_home / "skills" / PACKAGE_DIR)
+    return [str(path) for path in candidates if path.exists()]
 
 
 def host_command(cwd: Path, prompt: str, options: argparse.Namespace) -> list[str] | None:
@@ -470,7 +500,7 @@ def run_case(spec: dict, options: argparse.Namespace) -> dict:
     evidence = case_dir / "evidence" / ("fixture-check" if options.fixture_check else f"host-{options.host}")
     evidence.mkdir(parents=True, exist_ok=True)
     write_json(case_dir / "host_case.json", spec)
-    with tempfile.TemporaryDirectory(prefix=".magos-accept-", dir=TESTS) as temporary:
+    with tempfile.TemporaryDirectory(prefix=".magos-accept-", dir=options.fixture_root) as temporary:
         try:
             fixture = prepare_fixture(Path(temporary), spec["fixture"])
         except Exception as error:
@@ -485,8 +515,7 @@ def run_case(spec: dict, options: argparse.Namespace) -> dict:
                 encoding="utf-8",
             )
             return result
-        if not options.fixture_check:
-            provision_codex_skill(fixture, spec["id"].split("/")[0])
+        provision_codex_skill(fixture, spec["id"].split("/")[0])
         before = snapshot(fixture)
         checks = verify_fixture(fixture, before)
         write_json(evidence / "fixture.json", {
@@ -512,11 +541,18 @@ def run_case(spec: dict, options: argparse.Namespace) -> dict:
                   f"The current working directory is a disposable acceptance-test fixture. "
                   f"Operate only in this fixture and its local origin; do not touch other repositories.\n{context}")
         command = host_command(fixture["cwd"], prompt, options)
+        shadows = user_level_installs()
         write_json(evidence / "invocation.json", {"host": options.host, "cwd": str(fixture["cwd"]),
                                                   "skill_path": fixture["skill_path"],
                                                   "skill_source_sha256": fixture["skill_source_sha256"],
+                                                  "user_level_installs": shadows,
                                                   "command": command, "prompt": prompt,
                                                   "timeout_seconds": options.timeout})
+        if shadows and not options.allow_user_install:
+            result = {"case": spec["id"], "status": "UNVERIFIED", "scope": "host runtime",
+                      "reason": "user-level MAGOS install may shadow the fixture copy: " + ", ".join(shadows)}
+            write_json(evidence / "result.json", result)
+            return result
         if not command:
             result = {"case": spec["id"], "status": "UNVERIFIED", "scope": "host runtime",
                       "reason": "host executable unavailable"}
@@ -593,6 +629,12 @@ def main() -> int:
     parser.add_argument("--fixture-check", action="store_true", help="verify fixture setup only; no model calls")
     parser.add_argument("--model", help="optional host model override")
     parser.add_argument("--timeout", type=int, default=300)
+    parser.add_argument("--allow-user-install", action="store_true",
+                        help="run even if ~/.agents/skills/MAGOS or $CODEX_HOME/skills/MAGOS exists; Codex may "
+                             "then load that copy instead of the fixture's")
+    parser.add_argument("--fixture-root", type=Path, default=TESTS,
+                        help="directory for disposable fixtures (default: tests/codex); use a short path "
+                             "if Windows reports 'Filename too long'")
     parser.add_argument("--codex-sandbox", choices=("read-only", "workspace-write", "danger-full-access"),
                         default="workspace-write")
     options = parser.parse_args()

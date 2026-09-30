@@ -1,0 +1,9 @@
+{
+  "adapters": [
+    "git-recon",
+    "git-analyze",
+    "git-recommend",
+    "git-integrate",
+    "git-cleanup"
+  ]
+}

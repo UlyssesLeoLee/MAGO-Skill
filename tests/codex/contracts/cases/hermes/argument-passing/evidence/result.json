@@ -1,0 +1,34 @@
+{
+  "case": "hermes/argument-passing",
+  "skill": "hermes-adapters",
+  "feature": "Adapters explain how Hermes passes arguments and how to read shared files without '..' skill-viewer paths",
+  "passed": true,
+  "scope": "source-contract; AI host runtime is not invoked",
+  "checks": [
+    {
+      "file": "skills/git-recon/SKILL.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-analyze/SKILL.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-recommend/SKILL.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-integrate/SKILL.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-cleanup/SKILL.md",
+      "passed": true,
+      "missing": []
+    }
+  ]
+}

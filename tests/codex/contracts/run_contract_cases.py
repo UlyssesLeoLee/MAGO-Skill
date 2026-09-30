@@ -103,6 +103,8 @@ import json
 import re
 from pathlib import Path
 
+import install_layout
+
 TESTS_DIR = Path(__file__).resolve().parent
 ROOT = TESTS_DIR.parents[2]
 CASES_DIR = TESTS_DIR / "cases"
@@ -112,6 +114,9 @@ MANIFEST = TESTS_DIR / "cases.json"
 def run_case(spec: dict) -> dict:
     check_results = []
     for check in spec["checks"]:
+        if check.get("kind") == "install_layout":
+            check_results.extend(install_layout.check(ROOT))
+            continue
         source_path = ROOT / check["file"]
         source = source_path.read_text(encoding="utf-8") if source_path.exists() else ""
         missing = [snippet for snippet in check["contains"] if snippet not in source]

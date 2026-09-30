@@ -1,0 +1,73 @@
+{
+  "id": "claude/skill-lookup",
+  "skill": "claude-commands",
+  "feature": "Claude Code commands find the orchestrator under any installed name and never write without the loaded skill",
+  "invocations": {
+    "claude": "/GitIntegrate agent/auth"
+  },
+  "test_object": {
+    "accepted_skill_names": [
+      "MAGOS",
+      "multi-agent-git-orchestrator",
+      "MAGO-Skill"
+    ]
+  },
+  "expected": [
+    "Each command accepts MAGOS, multi-agent-git-orchestrator, or MAGO-Skill as the orchestrator skill.",
+    "GitIntegrate does not integrate and GitCleanup only previews when the skill cannot be loaded."
+  ],
+  "checks": [
+    {
+      "file": "commands/GitRecon.md",
+      "contains": [
+        "`MAGOS` (install directory)",
+        "`multi-agent-git-orchestrator` (frontmatter name)",
+        "`MAGO-Skill` (older clone directory)"
+      ]
+    },
+    {
+      "file": "commands/GitAnalyze.md",
+      "contains": [
+        "`MAGOS` (install directory)",
+        "`multi-agent-git-orchestrator` (frontmatter name)",
+        "`MAGO-Skill` (older clone directory)"
+      ]
+    },
+    {
+      "file": "commands/GitRecommend.md",
+      "contains": [
+        "`MAGOS` (install directory)",
+        "`multi-agent-git-orchestrator` (frontmatter name)",
+        "`MAGO-Skill` (older clone directory)"
+      ]
+    },
+    {
+      "file": "commands/GitIntegrate.md",
+      "contains": [
+        "`MAGOS` (install directory)",
+        "`multi-agent-git-orchestrator` (frontmatter name)",
+        "`MAGO-Skill` (older clone directory)"
+      ]
+    },
+    {
+      "file": "commands/GitCleanup.md",
+      "contains": [
+        "`MAGOS` (install directory)",
+        "`multi-agent-git-orchestrator` (frontmatter name)",
+        "`MAGO-Skill` (older clone directory)"
+      ]
+    },
+    {
+      "file": "commands/GitIntegrate.md",
+      "contains": [
+        "If the skill could not be loaded, do not integrate"
+      ]
+    },
+    {
+      "file": "commands/GitCleanup.md",
+      "contains": [
+        "if the skill could not be loaded, preview only"
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 All test cases for this repository are collected here. Runtime tests invoke the installed Codex CLI against disposable Git repositories under `tests/codex`; the fixtures are removed after each case. Integration and cleanup never run against this repository.
 
-For each runtime case, the runner copies that skill and its referenced documents from the active test checkout into the fixture's project-local `.agents/skills` root, records the copied-source hash, and leaves the user's `.codex/develop_codex` worktree untouched.
+For each runtime case, the runner installs the host-neutral MAGOS package from the active test checkout into the fixture's project-local `.agents/skills/MAGOS/` root, using the same file list as `scripts/sync_hosts.py` (`package_files()`): `SKILL.md`, every `references/*.md`, and every `skills/git-*/` adapter. The adapters therefore resolve `../../SKILL.md` exactly as in a real install. The runner records the copied-source hash and leaves the user's `.codex/develop_codex` worktree untouched. The fixture check also verifies that the adapter's shared files resolve. Use `--fixture-root <short path>` if Windows reports `Filename too long`. Codex deduplicates skills by path, not by name, so a user-level install (`~/.agents/skills/MAGOS` or `$CODEX_HOME/skills/MAGOS`) stays visible next to the fixture copy; the runner records such installs in `invocation.json` and reports the case as `UNVERIFIED` unless `--allow-user-install` is given.
 
 Run the source-contract checks:
 
@@ -25,5 +25,7 @@ python -X utf8 tests/codex/run_host_cases.py
 ```
 
 The runner calls `$git-*` skills through `codex exec`, records the prompt, CLI transcript, and Git state before and after each invocation, then checks observable output and repository changes. Every case writes evidence under `tests/codex/host_cases/<skill>/<case>/evidence/host-codex/`. Results are `PASS`, `FAIL`, or `UNVERIFIED`; missing CLI access, authentication, quota, sandbox, or timeouts are never reported as passes. Use `--case 'git-integrate/*'` to select cases and `--codex-sandbox workspace-write` to set the child CLI's sandbox. Integration and cleanup write tests only use their disposable fixture.
+
+Note: the committed `host-codex` evidence predates the installed-layout fix (the runner then copied only `skills/<x>` and `references/`, so `../../SKILL.md` was missing in every fixture). Treat those results as stale until the Codex cases are rerun.
 
 The case manifest covers every command, required and optional arguments, branch and worktree targets, all integration strategies, acceptance gates, cleanup preview/apply, and stale-state rechecks. Codex CLI tests verify skill selection and behavior; they do not measure the gray hint rendering in the desktop composer.
