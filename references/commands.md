@@ -20,7 +20,7 @@ Each host reaches the same canonical command through its own adapter. Adapters d
 |---|---|---|---|
 | Claude Code | `commands/Git*.md` (installed into `~/.claude/commands/`) | `$ARGUMENTS` in the command template | loading the orchestrator skill (listed as `MAGOS`, `multi-agent-git-orchestrator`, or `MAGO-Skill`) |
 | Codex | `skills/git-*/SKILL.md` + `agents/openai.yaml` | the text after `$git-*` in the user's message | resolving `../../SKILL.md` and `../../references/*.md` relative to the adapter's `SKILL.md` |
-| Hermes | `skills/git-*/SKILL.md` | the text after `User instruction:` in the loaded skill message | the absolute `[Skill directory: ...]` path plus `../..`, read with the file or terminal tool (the skill viewer rejects `..`), or the root skill `multi-agent-git-orchestrator` and its `references/` files |
+| Hermes | `skills/git-*/SKILL.md` | the instruction Hermes appends after the skill content ("...alongside the skill invocation:" for one command, `User instruction:` for stacked commands) | the absolute `[Skill directory: ...]` path plus `../..`, read with the file or terminal tool (the skill viewer rejects `..`), or the root skill `multi-agent-git-orchestrator` and its `references/` files |
 
 Rules for every adapter:
 

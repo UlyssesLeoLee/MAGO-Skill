@@ -27,7 +27,7 @@ Examples: `/git-integrate agent/auth`, `$git-integrate agent/auth --strategy squ
 ## Arguments
 
 - Codex: the arguments are the text that follows `$git-integrate` in the user's message.
-- Hermes: the arguments are the text after `User instruction:` in the loaded skill message. An empty instruction means no arguments.
+- Hermes: the arguments are the instruction Hermes appends after the skill content, introduced by "The user has provided the following instruction alongside the skill invocation:" (single command) or `User instruction:` (stacked commands). An empty instruction means no arguments.
 
 If `--help` is present, even with other arguments, answer from the inline Usage section above and stop before any tool call, file read, or repository inspection. If the source target or strategy value is missing or invalid, show this help and ask for a valid value; for an unknown option, explain the error and show this help. Do not inspect or change the repository in these error cases. Read the shared files below only for a normal invocation.
 

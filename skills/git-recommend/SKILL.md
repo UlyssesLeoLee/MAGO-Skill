@@ -27,7 +27,7 @@ Examples: `/git-recommend`, `$git-recommend 哪些分支应该先合并 --remote
 ## Arguments
 
 - Codex: the arguments are the text that follows `$git-recommend` in the user's message.
-- Hermes: the arguments are the text after `User instruction:` in the loaded skill message. An empty instruction means no arguments.
+- Hermes: the arguments are the instruction Hermes appends after the skill content, introduced by "The user has provided the following instruction alongside the skill invocation:" (single command) or `User instruction:` (stacked commands). An empty instruction means no arguments.
 
 If `--help` is present, even with other arguments, answer from the inline Usage section above and stop before any tool call, file read, or repository inspection. Treat `--remote` as an option only when it is a standalone argument, and keep the remaining text as the goal; for an unknown option, explain the error, show this help, and stop. Read the shared files below only for a normal invocation.
 
