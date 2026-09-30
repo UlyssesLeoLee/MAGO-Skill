@@ -1,3 +1,5 @@
 interface:
   display_name: "git-recon"
   short_description: "仓库状态；$git-recon [--remote] [--help]"
+policy:
+  allow_implicit_invocation: false
