@@ -1,0 +1,6 @@
+{
+  "id": "git-recommend/no-goal",
+  "fixture": "branch",
+  "args": "",
+  "assertion": "recommend"
+}

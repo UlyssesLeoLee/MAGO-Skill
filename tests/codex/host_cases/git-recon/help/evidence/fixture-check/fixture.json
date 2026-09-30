@@ -1,0 +1,20 @@
+{
+  "kind": "empty",
+  "checks": [
+    {
+      "name": "empty Git repository",
+      "passed": true
+    },
+    {
+      "name": "workspace is empty",
+      "passed": true
+    }
+  ],
+  "initial_state": {
+    "files": {},
+    "git_repository": true
+  },
+  "skill": null,
+  "skill_path": null,
+  "skill_source_sha256": null
+}

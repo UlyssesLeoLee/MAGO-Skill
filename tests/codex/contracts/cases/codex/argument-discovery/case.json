@@ -1,0 +1,124 @@
+{
+  "id": "codex/argument-discovery",
+  "skill": "all",
+  "feature": "Codex exposes all five skills with compact usage hints",
+  "invocations": {
+    "codex": "$git-recon, $git-analyze, $git-recommend, $git-integrate, $git-cleanup"
+  },
+  "test_object": {
+    "host": "Codex CLI",
+    "skills": [
+      "git-recon",
+      "git-analyze",
+      "git-recommend",
+      "git-integrate",
+      "git-cleanup"
+    ]
+  },
+  "expected": [
+    "All five skill directories have Codex-recognized names and invocation syntax.",
+    "Each openai.yaml short description includes its $skill selector and --help."
+  ],
+  "checks": [
+    {
+      "file": "skills/git-recon/SKILL.md",
+      "contains": [
+        "- Codex: `$git-recon [--remote] [--help]`",
+        "`--help`:",
+        "Examples:"
+      ]
+    },
+    {
+      "file": "skills/git-recon/agents/openai.yaml",
+      "contains": [
+        "$git-recon",
+        "[--help]"
+      ],
+      "pattern": "^  short_description: \"([^\"]+)\"$",
+      "length": [
+        25,
+        64
+      ]
+    },
+    {
+      "file": "skills/git-analyze/SKILL.md",
+      "contains": [
+        "- Codex: `$git-analyze <branch|worktree> [--remote] [--help]`",
+        "`--help`:",
+        "Examples:"
+      ]
+    },
+    {
+      "file": "skills/git-analyze/agents/openai.yaml",
+      "contains": [
+        "$git-analyze",
+        "[--help]"
+      ],
+      "pattern": "^  short_description: \"([^\"]+)\"$",
+      "length": [
+        25,
+        64
+      ]
+    },
+    {
+      "file": "skills/git-recommend/SKILL.md",
+      "contains": [
+        "- Codex: `$git-recommend [goal] [--remote] [--help]`",
+        "`--help`:",
+        "Examples:"
+      ]
+    },
+    {
+      "file": "skills/git-recommend/agents/openai.yaml",
+      "contains": [
+        "$git-recommend",
+        "[--help]"
+      ],
+      "pattern": "^  short_description: \"([^\"]+)\"$",
+      "length": [
+        25,
+        64
+      ]
+    },
+    {
+      "file": "skills/git-integrate/SKILL.md",
+      "contains": [
+        "- Codex: `$git-integrate <lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]`",
+        "`--help`:",
+        "Examples:"
+      ]
+    },
+    {
+      "file": "skills/git-integrate/agents/openai.yaml",
+      "contains": [
+        "$git-integrate",
+        "[--help]"
+      ],
+      "pattern": "^  short_description: \"([^\"]+)\"$",
+      "length": [
+        25,
+        64
+      ]
+    },
+    {
+      "file": "skills/git-cleanup/SKILL.md",
+      "contains": [
+        "- Codex: `$git-cleanup [--apply] [--help]`",
+        "`--help`:",
+        "Examples:"
+      ]
+    },
+    {
+      "file": "skills/git-cleanup/agents/openai.yaml",
+      "contains": [
+        "$git-cleanup",
+        "[--help]"
+      ],
+      "pattern": "^  short_description: \"([^\"]+)\"$",
+      "length": [
+        25,
+        64
+      ]
+    }
+  ]
+}

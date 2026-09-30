@@ -1,0 +1,56 @@
+{
+  "kind": "remote",
+  "checks": [
+    {
+      "name": "main and local origin exist",
+      "passed": true
+    },
+    {
+      "name": "bare origin exists",
+      "passed": true
+    },
+    {
+      "name": "unmerged lane exists",
+      "passed": true
+    },
+    {
+      "name": "dirty lane worktree exists",
+      "passed": true
+    },
+    {
+      "name": "remote tracking ref is stale",
+      "passed": true
+    }
+  ],
+  "initial_state": {
+    "git_repository": true,
+    "refs": {
+      "refs/heads/agent/auth": "50d5b2597f51e4b8bad02f4793ca55dcfef1f38f",
+      "refs/heads/main": "468a07642e583a952ddce1bf4ed4b296a0116680",
+      "refs/remotes/origin/main": "468a07642e583a952ddce1bf4ed4b296a0116680"
+    },
+    "worktrees": {
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-_smksew6\\repo": {
+        "head": "468a07642e583a952ddce1bf4ed4b296a0116680",
+        "branch": "main",
+        "status": ""
+      },
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-_smksew6\\auth-worktree": {
+        "head": "50d5b2597f51e4b8bad02f4793ca55dcfef1f38f",
+        "branch": "agent/auth",
+        "status": "M feature.txt"
+      }
+    },
+    "files": {
+      "repo/README.md": "5bd17a4a66c4126008a147278511f1fb55774b443fa32bf571a0ffd5a8efc073",
+      "auth-worktree/feature.txt": "c3a247dd1c5f671dbf2df215bc3f7c924c6029b09f97abf651236356291d0fdf",
+      "auth-worktree/README.md": "5bd17a4a66c4126008a147278511f1fb55774b443fa32bf571a0ffd5a8efc073"
+    },
+    "bare_refs": {
+      "refs/heads/main": "30888b5f5e10f5a26f9249bb7fe3fd95e8de3345"
+    }
+  },
+  "skill": null,
+  "skill_path": null,
+  "skill_source_sha256": null
+}

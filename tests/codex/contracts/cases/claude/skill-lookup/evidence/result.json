@@ -1,0 +1,44 @@
+{
+  "case": "claude/skill-lookup",
+  "skill": "claude-commands",
+  "feature": "Claude Code commands find the orchestrator under any installed name and never write without the loaded skill",
+  "passed": true,
+  "scope": "source-contract; AI host runtime is not invoked",
+  "checks": [
+    {
+      "file": "commands/GitRecon.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "commands/GitAnalyze.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "commands/GitRecommend.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "commands/GitIntegrate.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "commands/GitCleanup.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "commands/GitIntegrate.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "commands/GitCleanup.md",
+      "passed": true,
+      "missing": []
+    }
+  ]
+}

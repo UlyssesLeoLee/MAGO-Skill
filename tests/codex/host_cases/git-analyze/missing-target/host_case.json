@@ -1,0 +1,6 @@
+{
+  "id": "git-analyze/missing-target",
+  "fixture": "branch",
+  "args": "",
+  "assertion": "missing-target"
+}

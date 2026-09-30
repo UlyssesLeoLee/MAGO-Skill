@@ -1,3 +1,5 @@
 interface:
   display_name: "git-cleanup"
   short_description: "清理候选；$git-cleanup [--apply] [--help]"
+policy:
+  allow_implicit_invocation: false

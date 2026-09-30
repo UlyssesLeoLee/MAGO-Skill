@@ -12,6 +12,23 @@ Recognize only the options listed for each command. For an unknown option or a r
 
 Host entry points are Claude Code `/GitRecon`, Hermes `/git-recon`, and Codex `$git-recon` (use the corresponding command name for the other four). Append the same arguments after the host-specific entry point.
 
+## Host Adapter Contract
+
+Each host reaches the same canonical command through its own adapter. Adapters differ only in how they receive arguments and locate shared files; the command behavior below is identical.
+
+| Host | Adapter | Arguments arrive as | Shared files are located by |
+|---|---|---|---|
+| Claude Code | `commands/Git*.md` (installed into `~/.claude/commands/`) | `$ARGUMENTS` in the command template | loading the orchestrator skill (listed as `MAGOS`, `multi-agent-git-orchestrator`, or `MAGO-Skill`) |
+| Codex | `skills/git-*/SKILL.md` + `agents/openai.yaml` | the text after `$git-*` in the user's message | resolving `../../SKILL.md` and `../../references/*.md` relative to the adapter's `SKILL.md` |
+| Hermes | `skills/git-*/SKILL.md` | the instruction Hermes appends after the skill content ("...alongside the skill invocation:" for one command, `User instruction:` for stacked commands) | the absolute `[Skill directory: ...]` path plus `../..`, read with the file or terminal tool (the skill viewer rejects `..`), or the root skill `multi-agent-git-orchestrator` and its `references/` files |
+
+Rules for every adapter:
+
+- `skills/` adapters must not read `commands/*.md`; those wrappers contain Claude-specific loading steps.
+- Codex adapters set `policy.allow_implicit_invocation: false`, so they run only when selected explicitly; the root skill keeps semantic activation. Hermes has no per-skill switch, so `git-integrate` and `git-cleanup` refuse to write unless invoked explicitly.
+- If the shared rules (`SKILL.md`, `references/commands.md`) cannot be read, read-only commands may continue read-only and report the incomplete installation; `GitIntegrate` must not integrate and `GitCleanup` must not delete.
+- An installed package must contain `SKILL.md`, every file under `references/`, and every `skills/git-*/SKILL.md` with its `agents/openai.yaml`, laid out exactly as in this repository, so that the relative paths above resolve.
+
 ## 1. GitRecon
 
 ### Invocation

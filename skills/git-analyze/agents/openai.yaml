@@ -1,3 +1,5 @@
 interface:
   display_name: "git-analyze"
   short_description: "分析目标；$git-analyze TARGET [--remote] [--help]"
+policy:
+  allow_implicit_invocation: false

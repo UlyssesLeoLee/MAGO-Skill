@@ -1,0 +1,41 @@
+{
+  "kind": "integrate",
+  "checks": [
+    {
+      "name": "main and local origin exist",
+      "passed": true
+    },
+    {
+      "name": "bare origin exists",
+      "passed": true
+    },
+    {
+      "name": "unmerged lane exists",
+      "passed": true
+    }
+  ],
+  "initial_state": {
+    "git_repository": true,
+    "refs": {
+      "refs/heads/agent/auth": "36f605c90f1776774203742af0a5f628bc28dd01",
+      "refs/heads/main": "67a33242b978c9f0e226df523bd4c9b6bf2940b3",
+      "refs/remotes/origin/main": "67a33242b978c9f0e226df523bd4c9b6bf2940b3"
+    },
+    "worktrees": {
+      "E:\\MAGOS\\tests\\codex\\.magos-accept-tg8unh5p\\repo": {
+        "head": "67a33242b978c9f0e226df523bd4c9b6bf2940b3",
+        "branch": "main",
+        "status": ""
+      }
+    },
+    "files": {
+      "repo/README.md": "5bd17a4a66c4126008a147278511f1fb55774b443fa32bf571a0ffd5a8efc073"
+    },
+    "bare_refs": {
+      "refs/heads/main": "67a33242b978c9f0e226df523bd4c9b6bf2940b3"
+    }
+  },
+  "skill": null,
+  "skill_path": null,
+  "skill_source_sha256": null
+}

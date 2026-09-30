@@ -1,7 +1,7 @@
 ---
 name: multi-agent-git-orchestrator
 description: Automatically use for multi-agent or multi-worktree Git coordination, dependency-aware branch planning, review/integration, merge queues, cherry-pick/rebase/squash decisions, conflict ownership, rollback, and repository-specific advice about existing branches/worktrees. Also recognize explicit command intents GitRecon, GitAnalyze, GitRecommend, GitIntegrate, and GitCleanup. Inspect repository state before state-dependent advice. Do not use for ordinary conceptual or single-branch Git questions unless topology, coordination, or shared-history safety matters.
-license: MIT
+license: Apache-2.0
 compatibility: Requires Git 2.30+ or harness-native workspace isolation; intended for Agent Skills-compatible coding agents.
 metadata:
   version: "3.3"
@@ -59,7 +59,7 @@ Treat the following names as explicit invocation intents. The canonical command 
 | `/GitIntegrate` | `/GitIntegrate` | `/git-integrate` | `$git-integrate` |
 | `/GitCleanup` | `/GitCleanup` | `/git-cleanup` | `$git-cleanup` |
 
-Claude Code reads the command Markdown files in `commands/`. Hermes reads the five Agent Skills in `skills/` as slash commands. Codex reads the same skill files as individually selectable skills; invoke them with `$name` (or open `/skills` to browse). Codex does not register arbitrary custom `/Git...` slash commands. Each adapter keeps its own display name and description while following the canonical command contract below.
+Claude Code reads the command Markdown files in `commands/`. Codex and Hermes discover the five Agent Skills in `skills/` (nested under this package) in addition to this root skill: Codex exposes them as `$git-*` skills (or browse with `/skills`) and does not register arbitrary custom `/Git...` slash commands; Hermes registers each as a `/git-*` slash command. The `skills/` adapters are host-neutral: they read this file and `references/` directly and never route through `commands/`, whose loading steps are Claude-specific. Codex adapters disable implicit selection in `agents/openai.yaml`; Hermes has no per-skill switch, so the write adapters (`git-integrate`, `git-cleanup`) enforce explicit invocation by instruction. See `references/commands.md` **Host Adapter Contract** for argument passing and file resolution per host.
 
 | Command | 中文调用说明 | Default effect |
 |---|---|---|

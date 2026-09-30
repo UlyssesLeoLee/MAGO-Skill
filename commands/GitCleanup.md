@@ -4,13 +4,23 @@ argument-hint: "[--apply] [--help]"
 disable-model-invocation: true
 ---
 
-Run the Multi-Agent Git Orchestrator command `/GitCleanup $ARGUMENTS`.
+Handle `--help` first, even if other arguments are present. Answer solely from the inline help below, then stop before any tool call, file read, skill load, or repository inspection. For an unknown option, explain the error, show this help, and stop.
 
-If `--help` is present, print the usage, argument descriptions, and examples from section **5. GitCleanup** in `references/commands.md`, then stop without loading the orchestrator skill or inspecting the repository. If an unknown option is supplied, explain the error and show the same help.
+## Inline help
 
-1. Load the orchestrator skill with the Skill tool. Use whichever name the skill listing shows: `MAGO-Skill` (GitHub clone directory) or `multi-agent-git-orchestrator` (frontmatter name). If neither is listed, tell the user the skill is not installed, then continue read-only only: report observations, but do not mutate branches, worktrees, refs, or history.
+Usage: `/GitCleanup [--apply] [--help]`
+
+- `--apply`: Recheck each safe local candidate, then apply cleanup only where every safety condition still holds. It does not permit deleting remote branches.
+- `--help`: Show this help and stop without inspecting or changing the repository.
+- Default: Preview cleanup candidates only; no deletion.
+
+Examples: `/GitCleanup`, `/GitCleanup --apply`, `/GitCleanup --help`.
+
+For a normal invocation, run the Multi-Agent Git Orchestrator command `/GitCleanup $ARGUMENTS`.
+
+1. Load the orchestrator skill with the Skill tool. It may be listed as `MAGOS` (install directory), `multi-agent-git-orchestrator` (frontmatter name), or `MAGO-Skill` (older clone directory); any listed skill described as the Multi-Agent Git Orchestrator is the same skill. If none is listed but `~/.claude/skills/MAGOS/SKILL.md` exists, read that file instead. Only if the skill cannot be loaded at all, tell the user, then continue read-only only: report observations, but do not mutate branches, worktrees, refs, or history.
 2. Execute `/GitCleanup` exactly as defined in the skill's **Explicit Command Interface** and `references/commands.md`.
    Arguments (may be empty): $ARGUMENTS
 3. Inspect the current repository before giving any state-dependent advice.
 
-Safety default (applies even if the skill fails to load): preview only unless `--apply` is present. With `--apply`, delete only candidates that still meet every safety condition at apply time; never delete remote branches unless explicitly asked.
+Safety default: preview only unless `--apply` is present. With `--apply`, delete only after the skill is loaded and only candidates that still meet every safety condition at apply time; if the skill could not be loaded, preview only. Never delete remote branches unless explicitly asked.

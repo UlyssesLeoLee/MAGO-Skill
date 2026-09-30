@@ -1,0 +1,16 @@
+{
+  "hosts": [
+    "codex",
+    "hermes"
+  ],
+  "codex_discovery": "recursive, depth <= 6, hidden directories skipped (replica)",
+  "hermes_discovery": "rglob; SKILL.md below references/templates/assets/scripts of a parent skill ignored (replica)",
+  "expected_skills": [
+    "git-analyze",
+    "git-cleanup",
+    "git-integrate",
+    "git-recommend",
+    "git-recon",
+    "multi-agent-git-orchestrator"
+  ]
+}

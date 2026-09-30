@@ -345,6 +345,16 @@ New-Item -ItemType Directory -Force "$HOME\.claude\commands"; Copy-Item commands
 | GitIntegrate | `/GitIntegrate` | `/git-integrate` | `$git-integrate` | 通过安全门禁后集成指定 lane 或 branch |
 | GitCleanup | `/GitCleanup` | `/git-cleanup` | `$git-cleanup` | 默认预览可清理项；`--apply` 才允许删除 |
 
+斜杠入口说明：
+
+| 宿主 | 从 `/` 进入 | 前提条件 |
+|---|---|---|
+| Claude Code | 直接输入 `/GitRecon` 等五个命令 | `~/.claude/commands/Git*.md` 已安装（`sync_hosts.py --host claude`），并已新开会话 |
+| Hermes | 直接输入 `/git-recon` 等五个命令 | 包已安装到 `<Hermes home>/skills/`，并已新开会话或执行 `/reload-skills` |
+| Codex | 输入 `/skills`，打开 Skill 列表后选择 `git-*`；也可以直接输入 `$git-recon` | 包已安装到 `~/.agents/skills/MAGOS`（`sync_hosts.py --host codex`），并已重启 Codex |
+
+Codex 的 `/` 菜单只包含内置命令（源码 `codex-rs/tui/src/bottom_pane/command_popup.rs` 中只有 `Builtin` 与 `ServiceTier` 两类条目），无法注册自定义的 `/git-*`。因此在 Codex 中，斜杠入口是内置的 `/skills`。
+
 ### 参数提示与帮助
 
 Claude Code 会在命令补全中显示 `commands/` 文件里的 `argument-hint`，例如 `/GitAnalyze <branch|worktree> [--remote] [--help]`。Codex 的 Skill 列表和 Hermes 的 Slash Command 说明会尽量带上简短用法；选中后可用 `--help` 查看完整参数说明和示例。`--help` 只显示说明，不检查或修改仓库。
@@ -359,48 +369,70 @@ Hermes help: /git-integrate --help
 Codex help:  $git-integrate --help
 ```
 
-Run the repository's command-contract cases with `python tests/run_cases.py`. Each case retains its input and result under `tests/cases/<skill>/<case>/evidence/`; these checks do not launch an AI host.
+运行源码契约检查：`python -X utf8 tests/codex/contracts/run_contract_cases.py`。每个用例的输入和结果保存在 `tests/codex/contracts/cases/<group>/<case>/evidence/`。这些检查不启动 AI 宿主；其中 `package/install-layout` 会把 Codex 与 Hermes 包安装到临时 home，确认适配层引用的每个文件都存在，并按两个宿主的发现规则（复刻版）确认每个 Skill 只被发现一次。
+
+### Codex / Hermes 的包结构
+
+Codex 和 Hermes 都安装同一个宿主中立的包，目录结构必须与仓库一致，`skills/git-*/SKILL.md` 才能通过 `../../SKILL.md`、`../../references/*.md` 找到共享规则：
+
+```text
+MAGOS/                       # Codex 包根；Hermes 使用 multi-agent-git-orchestrator/
+├── SKILL.md                 # 根 Skill：multi-agent-git-orchestrator（语义自动触发）
+├── references/*.md          # 全部参考文档
+└── skills/git-*/            # 五个命令适配层
+    ├── SKILL.md
+    └── agents/openai.yaml   # Codex：显示说明 + allow_implicit_invocation: false
+```
+
+`commands/` 只供 Claude Code 使用，Codex / Hermes 包中不需要。推荐用同步脚本安装或更新（`--create-roots` 会创建缺失的安装根目录；脚本从不删除文件）：
+
+```bash
+python -X utf8 scripts/sync_hosts.py --host codex --host hermes --apply --create-roots
+python -X utf8 scripts/sync_hosts.py --host codex --host hermes --verify
+```
 
 ### Codex：启用命令 Skill
 
-Codex 的自定义入口是 Skill 选择器（`$`），不是任意命名的 `/Git...` Slash Command。仓库的 `skills/` 为每个命令提供一个独立 Skill，`agents/openai.yaml` 中的简短说明会显示在 Codex 的 Skill 列表里。
+Codex 的自定义入口是 Skill 选择器（`$`），不是任意命名的 `/Git...` Slash Command。Codex 递归扫描 Skill 根目录，因此会同时加载根 Skill 和 `skills/` 下的五个命令 Skill；`agents/openai.yaml` 中的简短说明会显示在 Skill 列表里。五个命令 Skill 都设置了 `policy.allow_implicit_invocation: false`，只在显式选择时运行，语义自动触发由根 Skill 负责。
 
-将仓库内容放在用户级 Codex skills 目录下的 `MAGOS` 子目录中。Windows PowerShell：
+用户级安装位置是 `~/.agents/skills/MAGOS`。已经安装在旧位置 `$CODEX_HOME/skills/MAGOS`（默认 `~/.codex/skills/MAGOS`）的，同步脚本会继续更新旧位置；两个位置不要同时保留，否则 Codex 会看到重复的 Skill。手动安装（Windows PowerShell）：
 
 ```powershell
-$codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $HOME ".codex" }
-$codexPackage = Join-Path $codexHome "skills\MAGOS"
+$codexPackage = Join-Path $HOME ".agents\skills\MAGOS"
 New-Item -ItemType Directory -Force $codexPackage | Out-Null
-Copy-Item -Path .\SKILL.md, .\commands, .\references, .\skills -Destination $codexPackage -Recurse -Force
+Copy-Item -Path .\SKILL.md, .\references, .\skills -Destination $codexPackage -Recurse -Force
 ```
 
 macOS / Linux：
 
 ```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills/MAGOS"
-cp -R SKILL.md commands references skills "${CODEX_HOME:-$HOME/.codex}/skills/MAGOS/"
+mkdir -p "$HOME/.agents/skills/MAGOS"
+cp -R SKILL.md references skills "$HOME/.agents/skills/MAGOS/"
 ```
 
-重新启动 Codex 后，输入 `$` 选择命令 Skill，或直接调用 `$git-recon`、`$git-analyze`、`$git-recommend`、`$git-integrate`、`$git-cleanup`。`/skills` 可打开 Skill 浏览入口。每个命令在列表中的简短说明会尽量包含用法；调用时加 `--help` 可查看完整参数说明。
+重新启动 Codex 后，输入 `$` 选择命令 Skill，或直接调用 `$git-recon`、`$git-analyze`、`$git-recommend`、`$git-integrate`、`$git-cleanup`。`/skills` 可打开 Skill 浏览入口。参数写在 Skill 名后面，例如 `$git-analyze agent/auth --remote`；加 `--help` 可查看完整参数说明。
 
 ### Hermes：启用 Slash Skill
 
-Hermes 会把已安装的每个 Skill 自动注册成一个 Slash Command，并将 `SKILL.md` 的 `description` 用作命令说明。Windows PowerShell：
+Hermes 会把已安装的每个 Skill 自动注册成一个 Slash Command（名称取自 frontmatter 的 `name`），并将 `description` 用作命令说明。安装后会出现 `/multi-agent-git-orchestrator` 和五个 `/git-*` 命令。
+
+Hermes 的 home 目录依次取 `HERMES_HOME`、Windows 上的 `%LOCALAPPDATA%\hermes`、其他系统上的 `~/.hermes`；如果其中的 `active_profile` 指定了非默认 profile，则改用 `profiles/<name>`。Skill 放在 home 下的 `skills/`。同步脚本按同样规则定位。如果已有 `<Hermes home>/skills/MAGOS`（例如直接 `git clone` 的安装），脚本会沿用它；如果它是 git checkout，脚本会拒绝复制文件，请改用 git 更新。手动安装（Windows PowerShell）：
 
 ```powershell
-$hermesSkills = Join-Path $HOME ".hermes\skills\multi-agent-git-orchestrator"
+$hermesHome = if ($env:HERMES_HOME) { $env:HERMES_HOME } else { Join-Path $env:LOCALAPPDATA "hermes" }
+$hermesSkills = Join-Path $hermesHome "skills\multi-agent-git-orchestrator"
 New-Item -ItemType Directory -Force $hermesSkills | Out-Null
-Copy-Item -Path .\SKILL.md, .\commands, .\references, .\skills -Destination $hermesSkills -Recurse -Force
+Copy-Item -Path .\SKILL.md, .\references, .\skills -Destination $hermesSkills -Recurse -Force
 ```
 
 macOS / Linux：
 
 ```bash
-mkdir -p "$HOME/.hermes/skills/multi-agent-git-orchestrator"
-cp -R SKILL.md commands references skills "$HOME/.hermes/skills/multi-agent-git-orchestrator/"
+mkdir -p "${HERMES_HOME:-$HOME/.hermes}/skills/multi-agent-git-orchestrator"
+cp -R SKILL.md references skills "${HERMES_HOME:-$HOME/.hermes}/skills/multi-agent-git-orchestrator/"
 ```
 
-重新启动 Hermes 后，可运行 `hermes skills list` 查看各命令说明，并调用 `/git-recon`、`/git-analyze`、`/git-recommend`、`/git-integrate` 或 `/git-cleanup`。命令说明会尽量包含用法；参数直接跟在命令后面，例如 `/git-analyze main --remote`，也可用 `/git-analyze --help` 查看完整说明。
+重新启动 Hermes 后，可运行 `hermes skills list` 查看各命令说明，并调用 `/git-recon`、`/git-analyze`、`/git-recommend`、`/git-integrate` 或 `/git-cleanup`。参数直接跟在命令后面，例如 `/git-analyze main --remote`，也可用 `/git-analyze --help` 查看完整说明。Hermes 的 Skill 查看工具不接受含 `..` 的路径，适配层会改用 `[Skill directory: ...]` 给出的绝对路径读取共享文件。Hermes 没有按 Skill 关闭自动调用的开关，因此 `/git-integrate` 与 `/git-cleanup` 在适配层中规定：未经用户显式调用时不写入仓库。
 
 如果宿主不支持自定义 Slash Command，也可以直接输入：
 

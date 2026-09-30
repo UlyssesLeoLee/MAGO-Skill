@@ -1,0 +1,73 @@
+{
+  "id": "hermes/argument-passing",
+  "skill": "hermes-adapters",
+  "feature": "Adapters explain how Hermes passes arguments and how to read shared files without '..' skill-viewer paths",
+  "invocations": {
+    "hermes": "/git-recon --remote"
+  },
+  "test_object": {
+    "adapters": [
+      "git-recon",
+      "git-analyze",
+      "git-recommend",
+      "git-integrate",
+      "git-cleanup"
+    ]
+  },
+  "expected": [
+    "Each adapter takes Hermes arguments from the 'User instruction:' block.",
+    "Each adapter resolves shared files from the '[Skill directory: ...]' path or the root skill multi-agent-git-orchestrator."
+  ],
+  "checks": [
+    {
+      "file": "skills/git-recon/SKILL.md",
+      "contains": [
+        "`User instruction:`",
+        "`[Skill directory: ...]`",
+        "The skill viewer rejects paths that contain `..`",
+        "multi-agent-git-orchestrator",
+        "Do not use `commands/*.md` for this adapter."
+      ]
+    },
+    {
+      "file": "skills/git-analyze/SKILL.md",
+      "contains": [
+        "`User instruction:`",
+        "`[Skill directory: ...]`",
+        "The skill viewer rejects paths that contain `..`",
+        "multi-agent-git-orchestrator",
+        "Do not use `commands/*.md` for this adapter."
+      ]
+    },
+    {
+      "file": "skills/git-recommend/SKILL.md",
+      "contains": [
+        "`User instruction:`",
+        "`[Skill directory: ...]`",
+        "The skill viewer rejects paths that contain `..`",
+        "multi-agent-git-orchestrator",
+        "Do not use `commands/*.md` for this adapter."
+      ]
+    },
+    {
+      "file": "skills/git-integrate/SKILL.md",
+      "contains": [
+        "`User instruction:`",
+        "`[Skill directory: ...]`",
+        "The skill viewer rejects paths that contain `..`",
+        "multi-agent-git-orchestrator",
+        "Do not use `commands/*.md` for this adapter."
+      ]
+    },
+    {
+      "file": "skills/git-cleanup/SKILL.md",
+      "contains": [
+        "`User instruction:`",
+        "`[Skill directory: ...]`",
+        "The skill viewer rejects paths that contain `..`",
+        "multi-agent-git-orchestrator",
+        "Do not use `commands/*.md` for this adapter."
+      ]
+    }
+  ]
+}

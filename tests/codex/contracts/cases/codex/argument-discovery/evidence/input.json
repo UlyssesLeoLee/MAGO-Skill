@@ -1,0 +1,10 @@
+{
+  "host": "Codex CLI",
+  "skills": [
+    "git-recon",
+    "git-analyze",
+    "git-recommend",
+    "git-integrate",
+    "git-cleanup"
+  ]
+}

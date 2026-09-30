@@ -1,0 +1,6 @@
+{
+  "id": "git-cleanup/preview-classification",
+  "fixture": "cleanup",
+  "args": "",
+  "assertion": "cleanup-preview"
+}

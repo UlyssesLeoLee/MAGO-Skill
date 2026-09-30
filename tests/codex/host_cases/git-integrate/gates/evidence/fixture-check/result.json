@@ -1,0 +1,19 @@
+{
+  "case": "git-integrate/gates",
+  "status": "PASS",
+  "scope": "fixture setup only; no AI host invoked",
+  "checks": [
+    {
+      "name": "main and local origin exist",
+      "passed": true
+    },
+    {
+      "name": "bare origin exists",
+      "passed": true
+    },
+    {
+      "name": "unmerged lane exists",
+      "passed": true
+    }
+  ]
+}
