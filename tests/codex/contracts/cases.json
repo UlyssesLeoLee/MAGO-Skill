@@ -28,7 +28,7 @@
       {
         "file": "references/commands.md",
         "contains": [
-          "All five commands accept `--help`",
+          "All six commands accept `--help`",
           "## 1. GitRecon",
           "/GitRecon --help"
         ]
@@ -539,9 +539,9 @@
   {
     "id": "codex/argument-discovery",
     "skill": "all",
-    "feature": "Codex exposes all five skills with compact usage hints",
+    "feature": "Codex exposes all six skills with compact usage hints",
     "invocations": {
-      "codex": "$git-recon, $git-analyze, $git-recommend, $git-integrate, $git-cleanup"
+      "codex": "$git-recon, $git-analyze, $git-recommend, $git-integrate, $git-cleanup, $git-converge"
     },
     "test_object": {
       "host": "Codex CLI",
@@ -550,11 +550,12 @@
         "git-analyze",
         "git-recommend",
         "git-integrate",
-        "git-cleanup"
+        "git-cleanup",
+        "git-converge"
       ]
     },
     "expected": [
-      "All five skill directories have Codex-recognized names and invocation syntax.",
+      "All six skill directories have Codex-recognized names and invocation syntax.",
       "Each openai.yaml short description includes its $skill selector and --help."
     ],
     "checks": [
@@ -657,6 +658,26 @@
           25,
           64
         ]
+      },
+      {
+        "file": "skills/git-converge/SKILL.md",
+        "contains": [
+          "- Codex: `$git-converge <branch> [--apply] [--discard-ignored] [--help]`",
+          "`--help`:",
+          "Examples:"
+        ]
+      },
+      {
+        "file": "skills/git-converge/agents/openai.yaml",
+        "contains": [
+          "$git-converge",
+          "[--help]"
+        ],
+        "pattern": "^  short_description: \"([^\"]+)\"$",
+        "length": [
+          25,
+          64
+        ]
       }
     ]
   },
@@ -731,6 +752,7 @@
       "expected_skills": [
         "git-analyze",
         "git-cleanup",
+        "git-converge",
         "git-integrate",
         "git-recommend",
         "git-recon",
@@ -740,7 +762,7 @@
     "expected": [
       "sync_hosts.py installs the full package (SKILL.md, references/, skills/) for Codex and Hermes.",
       "Every ../../ reference in an adapter and every references/ link in SKILL.md resolves inside the installed tree.",
-      "No adapter routes through commands/; all five adapters set policy.allow_implicit_invocation: false.",
+      "No adapter routes through commands/; all six adapters set policy.allow_implicit_invocation: false.",
       "Each skill name appears exactly once in the Codex and Hermes discovery replicas."
     ],
     "checks": [
@@ -762,7 +784,8 @@
         "git-analyze",
         "git-recommend",
         "git-integrate",
-        "git-cleanup"
+        "git-cleanup",
+        "git-converge"
       ]
     },
     "expected": [
@@ -819,6 +842,16 @@
           "multi-agent-git-orchestrator",
           "Do not use `commands/*.md` for this adapter."
         ]
+      },
+      {
+        "file": "skills/git-converge/SKILL.md",
+        "contains": [
+          "`User instruction:`",
+          "`[Skill directory: ...]`",
+          "The skill viewer rejects paths that contain `..`",
+          "multi-agent-git-orchestrator",
+          "Do not use `commands/*.md` for this adapter."
+        ]
       }
     ]
   },
@@ -838,7 +871,7 @@
     },
     "expected": [
       "Each command accepts MAGOS, multi-agent-git-orchestrator, or MAGO-Skill as the orchestrator skill.",
-      "GitIntegrate does not integrate and GitCleanup only previews when the skill cannot be loaded."
+      "GitIntegrate does not integrate, GitCleanup and GitConverge only preview when the skill cannot be loaded."
     ],
     "checks": [
       {
@@ -882,6 +915,14 @@
         ]
       },
       {
+        "file": "commands/GitConverge.md",
+        "contains": [
+          "`MAGOS` (install directory)",
+          "`multi-agent-git-orchestrator` (frontmatter name)",
+          "`MAGO-Skill` (older clone directory)"
+        ]
+      },
+      {
         "file": "commands/GitIntegrate.md",
         "contains": [
           "If the skill could not be loaded, do not integrate"
@@ -889,6 +930,12 @@
       },
       {
         "file": "commands/GitCleanup.md",
+        "contains": [
+          "if the skill could not be loaded, preview only"
+        ]
+      },
+      {
+        "file": "commands/GitConverge.md",
         "contains": [
           "if the skill could not be loaded, preview only"
         ]
@@ -908,20 +955,22 @@
         "GitAnalyze",
         "GitRecommend",
         "GitIntegrate",
-        "GitCleanup"
+        "GitCleanup",
+        "GitConverge"
       ],
       "argument_hints": {
         "GitRecon": "[--remote] [--help]",
         "GitAnalyze": "<branch|worktree> [--remote] [--help]",
         "GitRecommend": "[<goal>] [--remote] [--help]",
         "GitIntegrate": "<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]",
-        "GitCleanup": "[--apply] [--help]"
+        "GitCleanup": "[--apply] [--help]",
+        "GitConverge": "<branch> [--apply] [--discard-ignored] [--help]"
       }
     },
     "expected": [
       "Each commands/Git*.md has a description and the exact argument-hint shown in the Claude Code / menu.",
       "Each command handles --help from its inline help before loading the skill.",
-      "GitIntegrate and GitCleanup set disable-model-invocation: true so only the user can run them."
+      "GitIntegrate, GitCleanup, and GitConverge set disable-model-invocation: true so only the user can run them."
     ],
     "checks": [
       {
@@ -995,6 +1044,21 @@
           1,
           120
         ]
+      },
+      {
+        "file": "commands/GitConverge.md",
+        "contains": [
+          "argument-hint: \"<branch> [--apply] [--discard-ignored] [--help]\"",
+          "Handle `--help` first",
+          "## Inline help",
+          "Usage: `/GitConverge",
+          "disable-model-invocation: true"
+        ],
+        "pattern": "^description: (.+)$",
+        "length": [
+          1,
+          120
+        ]
       }
     ]
   },
@@ -1011,7 +1075,8 @@
         "git-analyze",
         "git-recommend",
         "git-integrate",
-        "git-cleanup"
+        "git-cleanup",
+        "git-converge"
       ],
       "max_description_chars": 77,
       "source": "Hermes acp_adapter/commands.py truncates command descriptions to 77 chars + '...'"
@@ -1072,6 +1137,16 @@
         "ends_with": "."
       },
       {
+        "file": "skills/git-converge/SKILL.md",
+        "contains": [],
+        "pattern": "^description: \"([^\"]+)\"$",
+        "length": [
+          1,
+          77
+        ],
+        "ends_with": "."
+      },
+      {
         "file": "skills/git-integrate/SKILL.md",
         "contains": [
           "An explicit invocation is the user's",
@@ -1080,6 +1155,13 @@
       },
       {
         "file": "skills/git-cleanup/SKILL.md",
+        "contains": [
+          "An explicit invocation is the user's",
+          "Hermes renders it as"
+        ]
+      },
+      {
+        "file": "skills/git-converge/SKILL.md",
         "contains": [
           "An explicit invocation is the user's",
           "Hermes renders it as"

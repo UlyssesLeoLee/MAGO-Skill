@@ -5,6 +5,7 @@
     "git-analyze",
     "git-recommend",
     "git-integrate",
-    "git-cleanup"
+    "git-cleanup",
+    "git-converge"
   ]
 }

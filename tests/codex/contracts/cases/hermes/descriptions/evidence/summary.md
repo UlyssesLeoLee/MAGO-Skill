@@ -16,7 +16,9 @@
 - PASS `skills/git-recommend/SKILL.md`
 - PASS `skills/git-integrate/SKILL.md`
 - PASS `skills/git-cleanup/SKILL.md`
+- PASS `skills/git-converge/SKILL.md`
 - PASS `skills/git-integrate/SKILL.md`
 - PASS `skills/git-cleanup/SKILL.md`
+- PASS `skills/git-converge/SKILL.md`
 
 Evidence scope: source-contract check; no AI host CLI is invoked.

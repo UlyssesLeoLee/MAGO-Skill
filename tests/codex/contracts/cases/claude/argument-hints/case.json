@@ -11,20 +11,22 @@
       "GitAnalyze",
       "GitRecommend",
       "GitIntegrate",
-      "GitCleanup"
+      "GitCleanup",
+      "GitConverge"
     ],
     "argument_hints": {
       "GitRecon": "[--remote] [--help]",
       "GitAnalyze": "<branch|worktree> [--remote] [--help]",
       "GitRecommend": "[<goal>] [--remote] [--help]",
       "GitIntegrate": "<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]",
-      "GitCleanup": "[--apply] [--help]"
+      "GitCleanup": "[--apply] [--help]",
+      "GitConverge": "<branch> [--apply] [--discard-ignored] [--help]"
     }
   },
   "expected": [
     "Each commands/Git*.md has a description and the exact argument-hint shown in the Claude Code / menu.",
     "Each command handles --help from its inline help before loading the skill.",
-    "GitIntegrate and GitCleanup set disable-model-invocation: true so only the user can run them."
+    "GitIntegrate, GitCleanup, and GitConverge set disable-model-invocation: true so only the user can run them."
   ],
   "checks": [
     {
@@ -91,6 +93,21 @@
         "Handle `--help` first",
         "## Inline help",
         "Usage: `/GitCleanup",
+        "disable-model-invocation: true"
+      ],
+      "pattern": "^description: (.+)$",
+      "length": [
+        1,
+        120
+      ]
+    },
+    {
+      "file": "commands/GitConverge.md",
+      "contains": [
+        "argument-hint: \"<branch> [--apply] [--discard-ignored] [--help]\"",
+        "Handle `--help` first",
+        "## Inline help",
+        "Usage: `/GitConverge",
         "disable-model-invocation: true"
       ],
       "pattern": "^description: (.+)$",

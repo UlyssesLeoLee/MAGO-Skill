@@ -4,13 +4,15 @@
     "GitAnalyze",
     "GitRecommend",
     "GitIntegrate",
-    "GitCleanup"
+    "GitCleanup",
+    "GitConverge"
   ],
   "argument_hints": {
     "GitRecon": "[--remote] [--help]",
     "GitAnalyze": "<branch|worktree> [--remote] [--help]",
     "GitRecommend": "[<goal>] [--remote] [--help]",
     "GitIntegrate": "<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]",
-    "GitCleanup": "[--apply] [--help]"
+    "GitCleanup": "[--apply] [--help]",
+    "GitConverge": "<branch> [--apply] [--discard-ignored] [--help]"
   }
 }

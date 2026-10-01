@@ -11,7 +11,8 @@
       "git-analyze",
       "git-recommend",
       "git-integrate",
-      "git-cleanup"
+      "git-cleanup",
+      "git-converge"
     ],
     "max_description_chars": 77,
     "source": "Hermes acp_adapter/commands.py truncates command descriptions to 77 chars + '...'"
@@ -72,6 +73,16 @@
       "ends_with": "."
     },
     {
+      "file": "skills/git-converge/SKILL.md",
+      "contains": [],
+      "pattern": "^description: \"([^\"]+)\"$",
+      "length": [
+        1,
+        77
+      ],
+      "ends_with": "."
+    },
+    {
       "file": "skills/git-integrate/SKILL.md",
       "contains": [
         "An explicit invocation is the user's",
@@ -80,6 +91,13 @@
     },
     {
       "file": "skills/git-cleanup/SKILL.md",
+      "contains": [
+        "An explicit invocation is the user's",
+        "Hermes renders it as"
+      ]
+    },
+    {
+      "file": "skills/git-converge/SKILL.md",
       "contains": [
         "An explicit invocation is the user's",
         "Hermes renders it as"

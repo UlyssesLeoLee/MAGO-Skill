@@ -1,0 +1,5 @@
+{
+  "id": "happy-path",
+  "mode": "apply",
+  "title": "Everything ahead is merged into the target and only main and the target remain"
+}

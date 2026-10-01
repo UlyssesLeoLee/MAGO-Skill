@@ -1,0 +1,5 @@
+{
+  "id": "upstream-of-kept",
+  "mode": "apply",
+  "title": "A branch that a kept branch tracks is merged but kept"
+}

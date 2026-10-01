@@ -85,6 +85,7 @@ HOST_NAME = {
     "git-recommend": "$git-recommend",
     "git-integrate": "$git-integrate",
     "git-cleanup": "$git-cleanup",
+    "git-converge": "$git-converge",
 }
 RUNTIME_ERROR = re.compile(
     r"(?i)(insufficient.?(?:credit|balance)|usage limit|rate limit|quota|"
@@ -436,7 +437,7 @@ def probe_checks(probe: dict) -> list[dict]:
     invocation = probe.get("invocation") or {}
     return [
         {"name": "Hermes loads the fixture's project skills", "passed": bool(probe.get("project_skill_tier_trusted"))},
-        {"name": "all six slash commands resolve to the fixture copy",
+        {"name": "all seven slash commands resolve to the fixture copy",
          "passed": bool(registered) and all(item and item["from_fixture"] for item in registered.values())},
         {"name": "skills_guard verdict is not dangerous for any skill",
          "passed": bool(probe.get("guard")) and all(item["verdict"] != "dangerous" for item in probe["guard"].values())},
@@ -622,7 +623,7 @@ def evaluate(spec: dict, fixture: dict, before: dict, after: dict,
         add("usage includes --help", "--help" in text)
         option = {"git-recon": "--remote", "git-analyze": "--remote",
                   "git-recommend": "--remote", "git-integrate": "--strategy",
-                  "git-cleanup": "--apply"}[spec["id"].split("/")[0]]
+                  "git-cleanup": "--apply", "git-converge": "--apply"}[spec["id"].split("/")[0]]
         add("usage describes command option", option in text)
         add("repository state remains unchanged", before == after)
         add("structured trace permits inspection check", trace)

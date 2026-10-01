@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 
 EXPECTED_SKILLS = {"multi-agent-git-orchestrator", "git-recon", "git-analyze", "git-recommend",
-                   "git-integrate", "git-cleanup"}
+                   "git-integrate", "git-cleanup", "git-converge"}
 CODEX_MAX_SCAN_DEPTH = 6
 HERMES_SUPPORT_DIRS = {"references", "templates", "assets", "scripts"}
 HERMES_SKIP_PARTS = {".git", ".github", ".hub", ".archive", ".locks"}
@@ -86,8 +86,8 @@ def check_package(host: str, package_root: Path, skills_root: Path, discover) ->
                       for path in sorted(package_root.glob("skills/*/agents/openai.yaml"))
                       if not re.search(r"^policy:\n  allow_implicit_invocation: false$",
                                        path.read_text(encoding="utf-8"), re.M)]
-    if len(list(package_root.glob("skills/*/agents/openai.yaml"))) != 5:
-        policy_missing.append("expected 5 agents/openai.yaml files")
+    if len(list(package_root.glob("skills/*/agents/openai.yaml"))) != len(EXPECTED_SKILLS) - 1:
+        policy_missing.append(f"expected {len(EXPECTED_SKILLS) - 1} agents/openai.yaml files")
     results.append({"file": f"install:{host} adapters disable implicit invocation",
                     "passed": not policy_missing, "missing": policy_missing})
 

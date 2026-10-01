@@ -31,12 +31,22 @@
       "missing": []
     },
     {
+      "file": "skills/git-converge/SKILL.md",
+      "passed": true,
+      "missing": []
+    },
+    {
       "file": "skills/git-integrate/SKILL.md",
       "passed": true,
       "missing": []
     },
     {
       "file": "skills/git-cleanup/SKILL.md",
+      "passed": true,
+      "missing": []
+    },
+    {
+      "file": "skills/git-converge/SKILL.md",
       "passed": true,
       "missing": []
     }

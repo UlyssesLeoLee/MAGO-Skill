@@ -1,0 +1,5 @@
+{
+  "id": "target-is-main",
+  "mode": "apply",
+  "title": "main is never a target"
+}

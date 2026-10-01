@@ -1,0 +1,5 @@
+interface:
+  display_name: "git-converge"
+  short_description: "收敛分支；$git-converge BRANCH [--apply] [--discard-ignored] [--help]"
+policy:
+  allow_implicit_invocation: false

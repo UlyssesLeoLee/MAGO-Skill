@@ -8,7 +8,15 @@
       "passed": true
     },
     {
-      "name": "workspace is empty",
+      "name": "project-local Codex skill is present",
+      "passed": true
+    },
+    {
+      "name": "workspace contains only the skill scaffold",
+      "passed": true
+    },
+    {
+      "name": "adapter shared files resolve",
       "passed": true
     }
   ]

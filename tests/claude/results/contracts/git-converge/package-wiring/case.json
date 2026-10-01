@@ -1,0 +1,62 @@
+{
+  "id": "git-converge/package-wiring",
+  "skill": "git-converge",
+  "feature": "The sync script, docs, and pressure tests all know about the sixth command",
+  "invocations": {
+    "installer": "python -X utf8 scripts/sync_hosts.py"
+  },
+  "test_object": {
+    "files": [
+      "scripts/sync_hosts.py",
+      "README.md",
+      "references/installation.md",
+      "references/pressure-tests.md",
+      "SKILL.md"
+    ]
+  },
+  "expected": [
+    "sync_hosts.py installs commands/GitConverge.md for Claude.",
+    "Docs list /GitConverge, /git-converge, and $git-converge.",
+    "Pressure tests describe the GitConverge scenarios."
+  ],
+  "checks": [
+    {
+      "file": "scripts/sync_hosts.py",
+      "contains": [
+        "\"GitCleanup\", \"GitConverge\")"
+      ]
+    },
+    {
+      "file": "README.md",
+      "contains": [
+        "## 六个核心命令",
+        "### `/GitConverge`",
+        "| GitConverge | `/GitConverge` | `/git-converge` | `$git-converge` |",
+        "└── GitConverge.md"
+      ]
+    },
+    {
+      "file": "references/installation.md",
+      "contains": [
+        "共 6 个",
+        "六个 `agents/openai.yaml`"
+      ]
+    },
+    {
+      "file": "references/pressure-tests.md",
+      "contains": [
+        "## GitConverge pressure tests (v3.4)",
+        "### GitConverge with an unrelated-history branch",
+        "### GitConverge with a stale preview"
+      ]
+    },
+    {
+      "file": "SKILL.md",
+      "contains": [
+        "version: \"3.4\"",
+        "| `/GitConverge` | `/GitConverge` | `/git-converge` | `$git-converge` |",
+        "discover the six Agent Skills"
+      ]
+    }
+  ]
+}

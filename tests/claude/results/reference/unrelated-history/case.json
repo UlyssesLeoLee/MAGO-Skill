@@ -1,0 +1,5 @@
+{
+  "id": "unrelated-history",
+  "mode": "apply",
+  "title": "An orphan branch is neither merged nor deleted and the rest still converges"
+}
