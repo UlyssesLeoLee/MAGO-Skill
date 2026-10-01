@@ -1,5 +1,7 @@
 # Multi-Agent Git Orchestrator Skills
 
+[English](README.en.md) | [中文](README.md)
+
 > **让多个 AI Agent 安全地并行开发同一个 Git 仓库。**
 
 `Multi-Agent Git Orchestrator` 是一个面向 Claude Code、Codex、Cursor、OpenCode 等 Coding Agent 的 Git Workflow Skill。
