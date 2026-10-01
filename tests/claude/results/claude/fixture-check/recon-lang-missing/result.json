@@ -26,9 +26,9 @@
     }
   ],
   "git_calls_seen": 2,
-  "id": "recommend-goal-lang",
+  "id": "recon-lang-missing",
   "mode": "preview",
-  "prompt": "/GitRecommend which branches --lang English should merge first",
+  "prompt": "/GitRecon --lang",
   "status": "PASS",
-  "title": "--lang in the middle of GitRecommend's free-text goal is honored"
+  "title": "--lang without a value is an error in Chinese; the command does not run"
 }

@@ -1,6 +1,6 @@
-# recommend-goal-lang
+# recon-lang-missing
 
-- Prompt: `/GitRecommend which branches --lang English should merge first`
+- Prompt: `/GitRecon --lang`
 - Result: **PASS**
 
 ## Checks

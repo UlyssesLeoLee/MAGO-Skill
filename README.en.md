@@ -130,7 +130,7 @@ These three work the same way in every command that supports them. Learn them on
 
 **What does it control?** All the text it writes back to you: explanations, reports, questions to you, error messages, and the text of `--help`.
 
-**What is never translated?** Command names, option names, branch names, file paths, commit IDs, Git commands, and status codes such as `BLOCKED_DIRTY` or `MERGE`, because you may need to copy or search for them exactly. A short gloss in your language is added next to them, for example `BLOCKED_DIRTY` (unsaved edits in its worktree).
+**What is never translated?** Command names, option names, branch names, file paths, commit IDs, Git commands, and status codes such as `BLOCKED_DIRTY` or `MERGE`, because you may need to copy or search for them exactly. It may add a short gloss in your language next to them, for example `BLOCKED_DIRTY` (unsaved edits in its worktree).
 
 | Item | Explanation |
 |---|---|
@@ -432,7 +432,7 @@ Use it when finished branches have piled up and you want to tidy up without dele
 | If you leave it out | **Preview only**: lists the objects that can be cleaned and the ones that cannot (with reasons); deletes nothing |
 | What it does with it | For each object marked "can be cleaned", it **checks the current state again** and deletes only if it is still safe: first removes its worktree, then deletes the branch |
 | An object changed between preview and apply | For example the branch got a new change after the preview: it **skips** that one and tells you, rather than deleting from the old list |
-| What it never does | Delete online (remote) branches; force-delete; clean a worktree with unsaved edits; delete a branch that holds work found nowhere else |
+| What it never does | Force-delete; clean a worktree with unsaved edits; delete a branch that holds work found nowhere else; delete online (remote) branches unless you explicitly ask |
 
 Suggested habit: **read the list without `--apply` first; add it only when you are happy.**
 
