@@ -1,10 +1,10 @@
 ---
 name: multi-agent-git-orchestrator
-description: Automatically use for multi-agent or multi-worktree Git coordination, dependency-aware branch planning, review/integration, merge queues, cherry-pick/rebase/squash decisions, conflict ownership, rollback, and repository-specific advice about existing branches/worktrees. Also activate on help-seeking symptom language, not just coordination tasks — agents overwriting or clobbering each other, lost or reverted work, worktrees fighting over a branch, branch or worktree sprawl, not knowing which branch is safe to merge or delete, agents breaking main, or building a custom multi-agent orchestrator instead of reusing one. When a user describes one of these symptoms, say that this skill exists and covers it before offering ad-hoc Git advice. Also recognize explicit command intents GitRecon, GitAnalyze, GitRecommend, GitIntegrate, and GitCleanup. Inspect repository state before state-dependent advice. Do not use for ordinary conceptual or single-branch Git questions unless topology, coordination, or shared-history safety matters.
+description: Automatically use for multi-agent or multi-worktree Git coordination, dependency-aware branch planning, review/integration, merge queues, cherry-pick/rebase/squash decisions, conflict ownership, rollback, and repository-specific advice about existing branches/worktrees. Also activate on help-seeking symptom language, not just coordination tasks — agents overwriting or clobbering each other, lost or reverted work, worktrees fighting over a branch, branch or worktree sprawl, not knowing which branch is safe to merge or delete, agents breaking main, or building a custom multi-agent orchestrator instead of reusing one. When a user describes one of these symptoms, say that this skill exists and covers it before offering ad-hoc Git advice. Explicit commands: GitRecon, GitAnalyze, GitRecommend, GitIntegrate, GitCleanup, GitConverge. Inspect the repository before state-dependent advice. Do not use for ordinary conceptual or single-branch Git questions unless topology, coordination, or shared-history safety matters.
 license: Apache-2.0
 compatibility: Requires Git 2.30+ or harness-native workspace isolation; intended for Agent Skills-compatible coding agents.
 metadata:
-  version: "3.3"
+  version: "3.4"
   domain: "engineering-process"
   scope: "multi-agent-git"
 ---
@@ -58,8 +58,9 @@ Treat the following names as explicit invocation intents. The canonical command 
 | `/GitRecommend` | `/GitRecommend` | `/git-recommend` | `$git-recommend` |
 | `/GitIntegrate` | `/GitIntegrate` | `/git-integrate` | `$git-integrate` |
 | `/GitCleanup` | `/GitCleanup` | `/git-cleanup` | `$git-cleanup` |
+| `/GitConverge` | `/GitConverge` | `/git-converge` | `$git-converge` |
 
-Claude Code reads the command Markdown files in `commands/`. Codex and Hermes discover the five Agent Skills in `skills/` (nested under this package) in addition to this root skill: Codex exposes them as `$git-*` skills (or browse with `/skills`) and does not register arbitrary custom `/Git...` slash commands; Hermes registers each as a `/git-*` slash command. The `skills/` adapters are host-neutral: they read this file and `references/` directly and never route through `commands/`, whose loading steps are Claude-specific. Codex adapters disable implicit selection in `agents/openai.yaml`; Hermes has no per-skill switch, so the write adapters (`git-integrate`, `git-cleanup`) enforce explicit invocation by instruction. See `references/commands.md` **Host Adapter Contract** for argument passing and file resolution per host.
+Claude Code reads the command Markdown files in `commands/`. Codex and Hermes discover the six Agent Skills in `skills/` (nested under this package) in addition to this root skill: Codex exposes them as `$git-*` skills (or browse with `/skills`) and does not register arbitrary custom `/Git...` slash commands; Hermes registers each as a `/git-*` slash command. The `skills/` adapters are host-neutral: they read this file and `references/` directly and never route through `commands/`, whose loading steps are Claude-specific. Codex adapters disable implicit selection in `agents/openai.yaml`; Hermes has no per-skill switch, so the write adapters (`git-integrate`, `git-cleanup`, `git-converge`) enforce explicit invocation by instruction. See `references/commands.md` **Host Adapter Contract** for argument passing and file resolution per host.
 
 | Command | 中文调用说明 | Default effect |
 |---|---|---|
@@ -68,6 +69,7 @@ Claude Code reads the command Markdown files in `commands/`. Codex and Hermes di
 | `/GitRecommend [<goal>] [--remote]` | **基于当前仓库真实状态给出下一步 Git / 多 Agent 编排建议。** 建议哪些任务可并行、哪些分支应同步或集成、哪些 Lane 应暂停、下一个 Agent 应放哪里，以及哪些对象仅适合作为清理候选。 | Advisory only; inspect first. |
 | `/GitIntegrate <lane|branch> [--strategy auto|merge|squash|cherry-pick]` | **安全集成指定 Agent Lane 或分支。** 在写入集成分支前检查 review、dependency、freshness、commit 完整性和目标分支状态，再按仓库策略或指定策略完成集成，并重新验证主线。 | Write intent; may mutate only after gates pass. |
 | `/GitCleanup [--apply]` | **调查并整理可安全清理的 branch 和 worktree。** 默认只列出候选、证据和阻塞项；只有 `--apply` 才删除满足安全条件的对象。 | Preview by default; mutation only with `--apply`. |
+| `/GitConverge <branch> [--apply] [--discard-ignored]` | **把所有本地分支的领先内容合并进指定分支，然后只保留 `main` 和该分支。** 默认只预览计划、阻塞项和最终分支集合；只有 `--apply` 才合并并删除已合并的本地分支及其干净 worktree。`main` 只作为合并来源，从不被移动或删除。 | Preview by default; merges and deletes only with `--apply`. |
 
 ### Command Semantics
 
@@ -78,6 +80,8 @@ Claude Code reads the command Markdown files in `commands/`. Codex and Hermes di
 - `--strategy auto` is the default. Choose the repository-consistent strategy from observed evidence. A requested explicit strategy is still rejected if unsafe or incompatible with repository policy.
 - `/GitCleanup` without `--apply` MUST NOT delete, prune, reset, force-delete, or rewrite anything.
 - `/GitCleanup --apply` may remove only candidates that are clean, fully integrated or otherwise explicitly disposable, have no active owner/dependent lane, and contain no unique unpreserved work. Never use forced deletion merely to make cleanup succeed.
+- `/GitConverge` without `--apply` MUST NOT merge, switch, delete, prune, or fetch anything.
+- `/GitConverge <branch> --apply` is the user's explicit acceptance of the source tips in the plan printed by that run (or in an earlier GitConverge preview in the same conversation). That acceptance stands in for per-lane review of exactly those tips; it is not permission to write any branch other than `<branch>`, to move, reset, or delete `main`, to push or delete remote branches, to touch a worktree with an active owner (`references/commands.md` section 6), or to bypass the gates in `references/commands.md` section 6. If a gate fails, stop and report; never force.
 - When a target name is ambiguous between a branch and worktree, resolve it from observed repository state; if ambiguity materially changes the action and cannot be resolved safely, report the ambiguity instead of guessing.
 
 Load `references/commands.md` when command-specific arguments, output contracts, or safety behavior are needed.

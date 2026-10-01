@@ -1,0 +1,5 @@
+{
+  "id": "ordering-and-containment",
+  "mode": "apply",
+  "title": "Larger sources merge first so a contained source needs no second merge"
+}

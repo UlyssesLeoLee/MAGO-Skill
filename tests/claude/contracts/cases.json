@@ -1,0 +1,658 @@
+[
+  {
+    "id": "git-converge/help",
+    "skill": "git-converge",
+    "feature": "Help returns usage before repository inspection on every host",
+    "invocations": {
+      "claude": "/GitConverge --help",
+      "codex": "$git-converge --help",
+      "hermes": "/git-converge --help"
+    },
+    "test_object": {
+      "repository": "absent",
+      "arguments": [
+        "--help"
+      ]
+    },
+    "expected": [
+      "Shows syntax, argument descriptions, defaults, and examples.",
+      "Does not inspect or change a repository."
+    ],
+    "checks": [
+      {
+        "file": "commands/GitConverge.md",
+        "contains": [
+          "Handle `--help` first",
+          "## Inline help",
+          "Usage: `/GitConverge <branch> [--apply] [--discard-ignored] [--help]`",
+          "- `--help`: Show this help and stop without inspecting or changing the repository.",
+          "Examples: `/GitConverge agent/release`"
+        ]
+      },
+      {
+        "file": "skills/git-converge/SKILL.md",
+        "contains": [
+          "- Codex: `$git-converge <branch> [--apply] [--discard-ignored] [--help]`",
+          "- Hermes: `/git-converge <branch> [--apply] [--discard-ignored] [--help]`",
+          "If `--help` is present, even with other arguments, answer from the inline Usage section above and stop before any tool call"
+        ]
+      },
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "/GitConverge --help",
+          "All six commands accept `--help`."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/target-required",
+    "skill": "git-converge",
+    "feature": "A missing or unsupported branch argument is reported, not guessed",
+    "invocations": {
+      "claude": "/GitConverge",
+      "codex": "$git-converge"
+    },
+    "test_object": {
+      "arguments": [],
+      "also": [
+        "main",
+        "missing branch",
+        "differs only in letter case"
+      ]
+    },
+    "expected": [
+      "Asks for a branch when none is given.",
+      "Rejects main, a missing branch, and a case-only mismatch without writing."
+    ],
+    "checks": [
+      {
+        "file": "commands/GitConverge.md",
+        "contains": [
+          "If the branch is missing, show this help and ask for it",
+          "it must not be `main`",
+          "If no branch is given, ask for one."
+        ]
+      },
+      {
+        "file": "skills/git-converge/SKILL.md",
+        "contains": [
+          "If the branch is missing, show this help and ask for it",
+          "Ask for a branch if none is provided."
+        ]
+      },
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "Matched exactly and case-sensitively against `refs/heads/`; it must not be `main`.",
+          "target missing locally; target is `main`; local `main` missing",
+          "A name that only matches when case is ignored is rejected with the exact name suggested"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/preview-default",
+    "skill": "git-converge",
+    "feature": "Without --apply the command changes nothing",
+    "invocations": {
+      "claude": "/GitConverge agent/release",
+      "codex": "$git-converge agent/release"
+    },
+    "test_object": {
+      "repository": "several ahead branches",
+      "apply": false
+    },
+    "expected": [
+      "Reports gates, merge order, classifications, expected final branches, and what is not touched.",
+      "Does not merge, switch, delete, prune, or fetch."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "### Preview behavior (default, read-only)",
+          "The preview does not merge, switch, delete, prune, or fetch.",
+          "**Expected final state**",
+          "**Not touched**",
+          "remote freshness is local-only"
+        ]
+      },
+      {
+        "file": "SKILL.md",
+        "contains": [
+          "`/GitConverge` without `--apply` MUST NOT merge, switch, delete, prune, or fetch anything."
+        ]
+      },
+      {
+        "file": "commands/GitConverge.md",
+        "contains": [
+          "Safety default: preview only unless `--apply` is present."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/classification",
+    "skill": "git-converge",
+    "feature": "Every source gets a class with evidence",
+    "invocations": {
+      "claude": "/GitConverge agent/release"
+    },
+    "test_object": {
+      "classes": [
+        "MERGE",
+        "CONTAINED",
+        "BLOCKED_UNRELATED_HISTORY",
+        "BLOCKED_IN_PROGRESS",
+        "BLOCKED_DIRTY",
+        "BLOCKED_LOCKED",
+        "BLOCKED_ACTIVE_OWNER",
+        "BLOCKED_IGNORED_FILES",
+        "BLOCKED_SUBMODULE",
+        "BLOCKED_UPSTREAM_OF_KEPT",
+        "UNKNOWN"
+      ]
+    },
+    "expected": [
+      "Each class is defined with its merge and delete consequence.",
+      "A blocked source that remains is named with a reason."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "MERGE                         unique commits to merge, then delete",
+          "CONTAINED                     already in target (`git merge-base --is-ancestor <sha> refs/heads/<target>`); delete only",
+          "BLOCKED_UNRELATED_HISTORY",
+          "BLOCKED_IN_PROGRESS",
+          "BLOCKED_DIRTY",
+          "BLOCKED_LOCKED",
+          "BLOCKED_ACTIVE_OWNER",
+          "BLOCKED_IGNORED_FILES",
+          "BLOCKED_SUBMODULE",
+          "BLOCKED_UPSTREAM_OF_KEPT",
+          "UNKNOWN",
+          "say plainly that \"only `main` and `<branch>`\" will not be reached"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/merge-procedure",
+    "skill": "git-converge",
+    "feature": "Sources merge in a fixed order with real merge commits and stop on any failure",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply"
+    },
+    "test_object": {
+      "order": "main first, then descending unique commits, ties by refname",
+      "conflict": "abort and stop"
+    },
+    "expected": [
+      "main merges first; larger sources before smaller so a contained source needs no second merge.",
+      "A failing merge is aborted, the whole command stops, nothing is deleted, completed merges stay."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "`main` first, then the rest by descending unique-commit count",
+          "ties by refname",
+          "Skip it if it is now an ancestor of target",
+          "git merge --no-ff -m \"Merge branch '<name>' into <target>\" <recorded-sha>",
+          "never squash or rebase, because the later ancestry check needs real merge ancestry",
+          "Never pass `--no-verify`, `-X ours`, `-X theirs`, or `--allow-unrelated-histories`.",
+          "**stop the whole command and delete nothing**",
+          "Keep completed merges and report the failing source"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/delete-safety",
+    "skill": "git-converge",
+    "feature": "Deletion rechecks, scoped worktree removal, and never a forced delete",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply"
+    },
+    "test_object": {
+      "rechecks": [
+        "tip unchanged",
+        "ancestor of target",
+        "worktree still clean/unlocked/not in progress/no ignored files"
+      ]
+    },
+    "expected": [
+      "Each deletion is rechecked immediately before it happens.",
+      "Worktrees are removed by path without --force; no repository-wide prune; no branch -D."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "Recheck immediately before each write",
+          "(a) the tip still equals the recorded SHA",
+          "(b) `git merge-base --is-ancestor <sha> refs/heads/<target>` succeeds",
+          "`git worktree remove <path>`, never `--force`, never retried with it",
+          "Never run a repository-wide `git worktree prune`",
+          "`git branch --unset-upstream <name>` first",
+          "Never use `git branch -D`, never `git worktree remove --force`, never `remove -f -f`.",
+          "an entry that vanished while the directory remains is a partial removal that needs manual cleanup",
+          "`git for-each-ref --format='%(upstream)|%(upstream:short)' refs/heads/<name>`"
+        ]
+      },
+      {
+        "file": "commands/GitConverge.md",
+        "contains": [
+          "never use `git branch -D` or `git worktree remove --force`",
+          "never run a repository-wide `git worktree prune`",
+          "Never push, force-push, or delete remote branches"
+        ]
+      },
+      {
+        "file": "skills/git-converge/SKILL.md",
+        "contains": [
+          "never use `git branch -D` or `git worktree remove --force`",
+          "never run a repository-wide `git worktree prune`",
+          "Never push, force-push, or delete remote branches"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/refname-safety",
+    "skill": "git-converge",
+    "feature": "Branches resolve through full refnames and recorded SHAs",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply"
+    },
+    "test_object": {
+      "hazards": [
+        "tag named like a branch",
+        "case-insensitive filesystem"
+      ]
+    },
+    "expected": [
+      "Merges use the recorded SHA, never a bare name that a tag could shadow.",
+      "The target is matched exactly against refs/heads."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "resolve every branch through its full refname (`refs/heads/<name>`) and record its SHA",
+          "`<target>` and `<source>` in a revision argument mean `refs/heads/<name>` or the recorded SHA, never the bare name",
+          "Merge the recorded SHA.",
+          "Report a same-named tag for any branch, the target included.",
+          "`rev-parse` success is not a match (case-insensitive filesystems resolve the wrong case)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/ownership",
+    "skill": "git-converge",
+    "feature": "Only the invoking worktree is written to; other actors' worktrees are protected",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply"
+    },
+    "test_object": {
+      "blocked": [
+        "locked",
+        "dirty",
+        "in progress",
+        "under an agent-harness root",
+        "main worktree that is not the invoking one"
+      ]
+    },
+    "expected": [
+      "The command writes only into the invoking worktree.",
+      "Another actor's worktree is never removed or switched; its committed content is still merged."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "It is the only worktree this command writes into or switches.",
+          "- **active owner**:",
+          "Clean is not proof that nobody is using it.",
+          "target is checked out in a worktree other than the invoking one (run the command from that worktree)",
+          "The command never switches any other worktree and never switches to `main`.",
+          "touch a detached worktree or any worktree other than the invoking one"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/ignored-files",
+    "skill": "git-converge",
+    "feature": "Ignored files are never destroyed silently",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply --discard-ignored"
+    },
+    "test_object": {
+      "hazards": [
+        "merge overwrites an ignored file",
+        "worktree remove deletes ignored files"
+      ]
+    },
+    "expected": [
+      "A merge that would overwrite an ignored file stops the command.",
+      "A worktree holding ignored files is kept unless --discard-ignored is given."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "a merge silently overwrites ignored files (`--no-overwrite-ignore` is not honored by merge)",
+          "`git switch --no-overwrite-ignore <target>`",
+          "--untracked-files=all",
+          "Ignored files are not covered by \"clean\".",
+          "BLOCKED_IGNORED_FILES         its worktree holds ignored files (paths listed in full); lifted by --discard-ignored",
+          "when one lies under the other (a directory/file clash)",
+          "if `git config --bool core.ignorecase` is true, when they match ignoring case",
+          "`git ls-files --others --ignored --exclude-standard --directory`"
+        ]
+      },
+      {
+        "file": "commands/GitConverge.md",
+        "contains": [
+          "`--discard-ignored`: With `--apply`, also allow removing worktrees that hold ignored files"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/acceptance-and-freshness",
+    "skill": "git-converge",
+    "feature": "--apply accepts exactly the printed plan; a stale preview stops",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply"
+    },
+    "test_object": {
+      "stale": "a source tip changed after the preview"
+    },
+    "expected": [
+      "The acceptance covers only the listed tips and never permits writing main or another branch.",
+      "A changed tip after an earlier preview stops the command; new branches are left alone."
+    ],
+    "checks": [
+      {
+        "file": "SKILL.md",
+        "contains": [
+          "`/GitConverge <branch> --apply` is the user's explicit acceptance of the source tips in the plan printed by that run",
+          "it is not permission to write any branch other than `<branch>`, to move, reset, or delete `main`"
+        ]
+      },
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "### Acceptance rule",
+          "Stop and show a new preview when any source tip or `main` differs from it",
+          "merge commits whose second parent is a source tip recorded in that plan",
+          "print the whole plan as a message before running any command that changes the repository",
+          "appeared after preview, untouched",
+          "A rerun after an interruption starts from a fresh survey"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/hard-stops",
+    "skill": "git-converge",
+    "feature": "The hard stops are stated once and apply to every host",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply"
+    },
+    "test_object": {
+      "never": [
+        "move main",
+        "delete remote branches",
+        "global prune",
+        "touch detached worktrees",
+        "merge a rebasing branch",
+        "ours/theirs",
+        "force"
+      ]
+    },
+    "expected": [
+      "The hard-stop list covers main, remotes, prune, detached worktrees, rebases, ours/theirs, and force."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "### Hard stop conditions",
+          "Never: move, reset, or delete `main`; push, force-push, or delete remote branches, or delete remote-tracking refs",
+          "merge a branch whose worktree is in progress",
+          "resolve a conflict with ours/theirs; force anything",
+          "Do not proceed when the skill or this reference could not be loaded; preview only."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/explicit-invocation-only",
+    "skill": "git-converge",
+    "feature": "No host writes unless the user explicitly invoked the command",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply",
+      "codex": "$git-converge agent/release --apply",
+      "hermes": "/git-converge agent/release --apply"
+    },
+    "test_object": {
+      "implicit_selection": "disabled or refused"
+    },
+    "expected": [
+      "Claude and Codex disable automatic selection; Hermes refuses by instruction.",
+      "A missing skill or shared file leaves only a preview."
+    ],
+    "checks": [
+      {
+        "file": "commands/GitConverge.md",
+        "contains": [
+          "disable-model-invocation: true",
+          "if the skill could not be loaded, preview only"
+        ]
+      },
+      {
+        "file": "skills/git-converge/agents/openai.yaml",
+        "contains": [
+          "allow_implicit_invocation: false"
+        ]
+      },
+      {
+        "file": "skills/git-converge/SKILL.md",
+        "contains": [
+          "A semantic match or automatic skill selection is not authorization to write.",
+          "If this adapter was selected without such an invocation, preview at most and merge and delete nothing.",
+          "do not merge, switch, or delete anything; a read-only preview is still allowed.",
+          "Do not use `commands/*.md` for this adapter."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/two-axis-classification",
+    "skill": "git-converge",
+    "feature": "Each source has one merge status (with precedence) and separate delete blockers",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply"
+    },
+    "test_object": {
+      "precedence": [
+        "BLOCKED_UNRELATED_HISTORY",
+        "BLOCKED_IN_PROGRESS",
+        "CONTAINED",
+        "MERGE",
+        "UNKNOWN"
+      ]
+    },
+    "expected": [
+      "A source in a dirty/locked/owned worktree is still merged; only deletion is blocked.",
+      "Merge status precedence is explicit."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "### Classification",
+          "Every source gets exactly one **merge status**, decided in this order (the first match wins)",
+          "A delete blocker never stops a `MERGE` source from being merged; it only keeps the branch and its worktree",
+          "**Merge every source whose merge status is `MERGE`, in order, whatever its delete blockers**",
+          "**Delete** every source whose merge status is `MERGE` or `CONTAINED` and that has no delete blocker"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/hidden-state",
+    "skill": "git-converge",
+    "feature": "In-progress sequences and hidden edits keep a worktree",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply"
+    },
+    "test_object": {
+      "hazards": [
+        "paused cherry-pick/revert sequence (sequencer/)",
+        "skip-worktree / assume-unchanged edits"
+      ]
+    },
+    "expected": [
+      "A paused sequence counts as in progress.",
+      "Edits hidden from status by index flags make a worktree not clean."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "or a paused cherry-pick/revert sequence",
+          "`sequencer/`",
+          "Check every worktree, including detached ones.",
+          "No entry of `git -C <worktree> ls-files -v` is tagged `S` (skip-worktree) or with a lowercase letter (assume-unchanged) while its file exists on disk"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/ownership-roots",
+    "skill": "git-converge",
+    "feature": "Claude Code session worktrees are owned; unknown owners are surfaced",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply"
+    },
+    "test_object": {
+      "roots": [
+        "<main worktree>/.claude/worktrees/",
+        "~/.codex/worktrees/"
+      ]
+    },
+    "expected": [
+      "Worktrees under the project-local .claude/worktrees are active owners.",
+      "Removing an unknown-owner worktree is listed in the plan."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "`<main worktree>/.claude/worktrees/`, where Claude Code keeps its session worktrees",
+          "- **unknown owner**:",
+          "The plan must list such a removal as \"owner: not recorded\"."
+        ]
+      },
+      {
+        "file": "SKILL.md",
+        "contains": [
+          "to push or delete remote branches, to touch a worktree with an active owner"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/remaining-dependencies",
+    "skill": "git-converge",
+    "feature": "A branch that a remaining branch tracks is kept, to a fixpoint",
+    "invocations": {
+      "claude": "/GitConverge agent/release --apply"
+    },
+    "test_object": {
+      "chain": "c -> b -> a with c dirty keeps b and a"
+    },
+    "expected": [
+      "Dependencies are evaluated against every branch that will remain, repeatedly."
+    ],
+    "checks": [
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "BLOCKED_UPSTREAM_OF_KEPT      a branch that will remain tracks this branch",
+          "Re-evaluate `BLOCKED_UPSTREAM_OF_KEPT` until nothing changes"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "git-converge/package-wiring",
+    "skill": "git-converge",
+    "feature": "The sync script, docs, and pressure tests all know about the sixth command",
+    "invocations": {
+      "installer": "python -X utf8 scripts/sync_hosts.py"
+    },
+    "test_object": {
+      "files": [
+        "scripts/sync_hosts.py",
+        "README.md",
+        "references/installation.md",
+        "references/pressure-tests.md",
+        "SKILL.md"
+      ]
+    },
+    "expected": [
+      "sync_hosts.py installs commands/GitConverge.md for Claude.",
+      "Docs list /GitConverge, /git-converge, and $git-converge.",
+      "Pressure tests describe the GitConverge scenarios."
+    ],
+    "checks": [
+      {
+        "file": "scripts/sync_hosts.py",
+        "contains": [
+          "\"GitCleanup\", \"GitConverge\")"
+        ]
+      },
+      {
+        "file": "README.md",
+        "contains": [
+          "## 六个核心命令",
+          "### `/GitConverge`",
+          "| GitConverge | `/GitConverge` | `/git-converge` | `$git-converge` |",
+          "└── GitConverge.md"
+        ]
+      },
+      {
+        "file": "references/installation.md",
+        "contains": [
+          "共 6 个",
+          "六个 `agents/openai.yaml`"
+        ]
+      },
+      {
+        "file": "references/pressure-tests.md",
+        "contains": [
+          "## GitConverge pressure tests (v3.4)",
+          "### GitConverge with an unrelated-history branch",
+          "### GitConverge with a stale preview"
+        ]
+      },
+      {
+        "file": "SKILL.md",
+        "contains": [
+          "version: \"3.4\"",
+          "| `/GitConverge` | `/GitConverge` | `/git-converge` | `$git-converge` |",
+          "discover the six Agent Skills"
+        ]
+      }
+    ]
+  }
+]

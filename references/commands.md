@@ -1,16 +1,16 @@
 # Explicit Command Contracts
 
-This reference defines the command-layer behavior for `multi-agent-git-orchestrator` v3.3.
+This reference defines the command-layer behavior for `multi-agent-git-orchestrator` v3.4.
 
 These are **semantic command intents**. Canonical names use a leading `/`. A host may expose them as slash commands, palette actions, prompt aliases, or plain-text invocations. If slash commands are unsupported, accept the same name without `/`. The behavior must remain the same.
 
 ## Argument and Help Behavior
 
-All five commands accept `--help`. When it is present, show that command's usage, argument descriptions, defaults, and examples, then stop before inspecting or changing a repository. `--help` takes precedence over other arguments.
+All six commands accept `--help`. When it is present, show that command's usage, argument descriptions, defaults, and examples, then stop before inspecting or changing a repository. `--help` takes precedence over other arguments.
 
 Recognize only the options listed for each command. For an unknown option or a required option value that is missing or invalid, explain the issue and show the relevant usage without executing the command. If a required positional target is missing, ask the user for it. Host adapters should preserve the supplied argument text and route `--help` to this reference.
 
-Host entry points are Claude Code `/GitRecon`, Hermes `/git-recon`, and Codex `$git-recon` (use the corresponding command name for the other four). Append the same arguments after the host-specific entry point.
+Host entry points are Claude Code `/GitRecon`, Hermes `/git-recon`, and Codex `$git-recon` (use the corresponding command name for the other five). Append the same arguments after the host-specific entry point.
 
 ## Host Adapter Contract
 
@@ -25,8 +25,8 @@ Each host reaches the same canonical command through its own adapter. Adapters d
 Rules for every adapter:
 
 - `skills/` adapters must not read `commands/*.md`; those wrappers contain Claude-specific loading steps.
-- Codex adapters set `policy.allow_implicit_invocation: false`, so they run only when selected explicitly; the root skill keeps semantic activation. Hermes has no per-skill switch, so `git-integrate` and `git-cleanup` refuse to write unless invoked explicitly.
-- If the shared rules (`SKILL.md`, `references/commands.md`) cannot be read, read-only commands may continue read-only and report the incomplete installation; `GitIntegrate` must not integrate and `GitCleanup` must not delete.
+- Codex adapters set `policy.allow_implicit_invocation: false`, so they run only when selected explicitly; the root skill keeps semantic activation. Hermes has no per-skill switch, so `git-integrate`, `git-cleanup`, and `git-converge` refuse to write unless invoked explicitly.
+- If the shared rules (`SKILL.md`, `references/commands.md`) cannot be read, read-only commands may continue read-only and report the incomplete installation; `GitIntegrate` must not integrate, `GitCleanup` must not delete, and `GitConverge` must not merge or delete (preview only).
 - An installed package must contain `SKILL.md`, every file under `references/`, and every `skills/git-*/SKILL.md` with its `agents/openai.yaml`, laid out exactly as in this repository, so that the relative paths above resolve.
 
 ## 1. GitRecon
@@ -300,6 +300,129 @@ Skipped items + reasons
 Remaining risks
 ```
 
+## 6. GitConverge
+
+### Invocation
+
+```text
+/GitConverge <branch>
+/GitConverge <branch> --apply
+/GitConverge <branch> --apply --discard-ignored
+/GitConverge --help
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|---|---:|---|
+| `<branch>` | Yes | Local branch that receives everything. Matched exactly and case-sensitively against `refs/heads/`; it must not be `main`. |
+| `--apply` | No | Merge the planned sources into `<branch>`, then delete the merged local branches and their clean worktrees. Without it, only show a preview. |
+| `--discard-ignored` | No | With `--apply`, allow removing a worktree that holds ignored files (for example `.env`, `node_modules/`). Without it such a worktree and its branch are kept. |
+| `--help` | No | Show this command's usage and stop without inspecting or changing the repository. |
+
+Examples: `/GitConverge agent/release`, `/GitConverge agent/release --apply`, `/GitConverge --help`.
+
+### 中文描述
+
+把所有本地分支（含 `main`）里 `<branch>` 还没有的提交合并进 `<branch>`，然后只保留 `main` 和 `<branch>` 两个本地分支。默认只预览；只有 `--apply` 才合并并删除。`main` 只作为合并来源，不会被移动、重置或删除；远端分支、tag、detached worktree 不会被改动。
+
+### Definitions
+
+- **target**: `<branch>`, resolved by exact match in `git for-each-ref --format=%(refname) refs/heads`. A name that only matches when case is ignored is rejected with the exact name suggested; `rev-parse` success is not a match (case-insensitive filesystems resolve the wrong case).
+- **kept set**: `main` and target. Every other local branch is a **source**; `main` is also a merge source.
+- **Names vs SHAs**: resolve every branch through its full refname (`refs/heads/<name>`) and record its SHA. In every git command in this section, `<target>` and `<source>` in a revision argument mean `refs/heads/<name>` or the recorded SHA, never the bare name: a same-named tag wins bare-name resolution (`refname '<name>' is ambiguous`). Merge the recorded SHA.
+- **invoking worktree**: the worktree that contains the current directory. It is the only worktree this command writes into or switches.
+- **clean**: both hold. (1) `git -C <worktree> status --porcelain=v1 --untracked-files=all` is empty; always pass the flag, because `status.showUntrackedFiles=no` would otherwise hide untracked files. (2) No entry of `git -C <worktree> ls-files -v` is tagged `S` (skip-worktree) or with a lowercase letter (assume-unchanged) while its file exists on disk; status cannot see edits to those files, and `git worktree remove` deletes them. Entries absent from disk (sparse checkout) do not count. Ignored files are not covered by "clean".
+- **in progress**: a worktree has a merge, cherry-pick, revert, rebase, am, or bisect underway, or a paused cherry-pick/revert sequence (`MERGE_HEAD`, `CHERRY_PICK_HEAD`, `REVERT_HEAD`, `sequencer/`, `rebase-merge/`, `rebase-apply/`, `BISECT_LOG`, each located with `git -C <worktree> rev-parse --git-path <name>`). Check every worktree, including detached ones. A rebase or bisect shows its worktree as `detached`; the branch it is working on is named in `rebase-merge/head-name`, `rebase-apply/head-name`, or `BISECT_START`, and that branch counts as checked out there.
+- **active owner**: a worktree that is locked, lies under an agent-harness worktree root (`<main worktree>/.claude/worktrees/`, where Claude Code keeps its session worktrees; `~/.codex/worktrees/`; or a root the repository documents), or has a lane record naming another owner. Clean is not proof that nobody is using it.
+- **unknown owner**: a linked worktree with no active-owner evidence and no lane record. GitConverge may remove it: this is the one exception to the reconnaissance rule "UNKNOWN_OWNER: do not assume it is free", and `--apply` is the authorization. The plan must list such a removal as "owner: not recorded".
+
+### Acceptance rule
+
+`/GitConverge <branch> --apply` is the user's explicit acceptance of the source tips listed in the plan printed by that run, or in a GitConverge preview earlier in the same conversation. It replaces per-lane review for exactly those tips and meets the freshness gate for them. It does not permit writing any branch other than `<branch>`, and it never moves, resets, or deletes `main`.
+
+### Classification
+
+Every source gets exactly one **merge status**, decided in this order (the first match wins):
+
+```text
+BLOCKED_UNRELATED_HISTORY     no merge base with target (for example an orphan gh-pages); never merged, never deleted
+BLOCKED_IN_PROGRESS           checked out in a worktree that is in progress; its tip is stale, so it is neither merged nor deleted
+CONTAINED                     already in target (`git merge-base --is-ancestor <sha> refs/heads/<target>`); delete only
+MERGE                         unique commits to merge, then delete
+UNKNOWN                       a needed fact could not be established; neither merged nor deleted
+```
+
+and zero or more **delete blockers**. A delete blocker never stops a `MERGE` source from being merged; it only keeps the branch and its worktree:
+
+```text
+BLOCKED_DIRTY                 its worktree is not clean
+BLOCKED_LOCKED                its worktree is locked
+BLOCKED_ACTIVE_OWNER          its worktree has an active owner, or it is checked out in the main worktree that is not the invoking one
+BLOCKED_IGNORED_FILES         its worktree holds ignored files (paths listed in full); lifted by --discard-ignored
+BLOCKED_SUBMODULE             its worktree has initialized submodules (`git worktree remove` refuses them)
+BLOCKED_UPSTREAM_OF_KEPT      a branch that will remain tracks this branch (`branch.<x>.remote` is `.` and `branch.<x>.merge` is `refs/heads/<this>`), or a lane record names it as a dependency of a branch that will remain
+```
+
+A branch **will remain** when it is `main`, the target, a source whose merge status is not `MERGE` or `CONTAINED`, or a source with a delete blocker. Re-evaluate `BLOCKED_UPSTREAM_OF_KEPT` until nothing changes, so a chain `c -> b -> a` with `c` dirty keeps both `b` and `a`.
+
+### Preview behavior (default, read-only)
+
+Collect and report:
+
+1. **Gates** (any failure stops the whole command, even for a preview): target missing locally; target is `main`; local `main` missing; target or `main` is checked out only in a prunable (missing-directory) worktree entry; target is checked out in a worktree other than the invoking one (run the command from that worktree); the invoking worktree is detached, dirty, or in progress; target is in progress anywhere.
+2. **Plan header**: target and `main` with SHAs, the invoking worktree, and the recorded tip of every local branch. Report a same-named tag for any branch, the target included. Report `main` being behind or ahead of `origin/main` when the remote-tracking ref exists; remote freshness is local-only.
+3. **Sources to merge**, in merge order: `main` first, then the rest by descending unique-commit count (`git rev-list --count refs/heads/<target>..<sha>`), ties by refname. For each: SHA, exact unique-commit count, and its commit list. A commit list may be shortened only with an explicit "(N more)"; counts and branch sets are never truncated. When `git merge-tree --write-tree` exists, test each source against the current target tip and mark it `PREDICTED_CONFLICT` if it exits 1. This is a hint only: it cannot see a clash between two sources, which appears when the second one merges.
+4. **Contained sources**: delete only.
+5. **Classification of every source**: its merge status and every delete blocker, each with evidence. For every worktree that will be removed, its path and whether its owner is recorded ("owner: not recorded" otherwise).
+6. **Expected final state**: the local branches that will remain (each with its reason and next step) and the worktrees that will be removed. If any source remains, say plainly that "only `main` and `<branch>`" will not be reached.
+7. **Not touched**: remote branches and remote-tracking refs (listed), tags, stashes, detached worktrees, and the main worktree unless it is the invoking one.
+8. **Validation**: the repository's normal checks if they can be identified, or "not identifiable".
+
+The preview does not merge, switch, delete, prune, or fetch. `git merge-tree --write-tree` may create unreachable objects but no refs, index, or worktree changes.
+
+### Apply behavior (`--apply`)
+
+1. **Re-survey and print the plan.** Run the preview logic fresh and print the whole plan as a message before running any command that changes the repository. Compare it with the most recent GitConverge preview or apply plan printed earlier in this conversation, if any. Stop and show a new preview when any source tip or `main` differs from it, or when the target moved in any way other than through merge commits whose second parent is a source tip recorded in that plan (an earlier `--apply` that was interrupted). A branch that is not in that plan, and a worktree that appeared since it, are reported as "appeared after preview, untouched": such a branch is neither merged nor deleted, and a previewed branch that gained a worktree is still merged as planned but neither it nor its worktree is deleted. Stop on any gate failure or `UNKNOWN` needed for a write. Without an earlier plan the printed plan is the plan; the run acts on exactly that plan and nothing that appears later.
+2. **Record** the target's start SHA and every source and delete-set tip.
+3. **Switch** the invoking worktree to target if it is on another branch, using `git switch --no-overwrite-ignore <target>`. A refusal stops the command before any merge. The command never switches any other worktree and never switches to `main`.
+4. **Merge every source whose merge status is `MERGE`, in order, whatever its delete blockers**, inside the invoking worktree:
+   1. Recheck that the source tip still equals the recorded SHA; if not, skip it and report.
+   2. Skip it if it is now an ancestor of target (an earlier source contained it).
+   3. List the paths the source changed since the merge base (`git diff --name-only <merge-base> <sha>`) and the ignored entries in the invoking worktree (`git ls-files --others --ignored --exclude-standard --directory`; a trailing `/` marks an ignored directory). They overlap when a changed path equals an ignored entry, when one lies under the other (a directory/file clash), or, if `git config --bool core.ignorecase` is true, when they match ignoring case. If they overlap, stop: a merge silently overwrites ignored files (`--no-overwrite-ignore` is not honored by merge). Completed merges stay.
+   4. Run `git merge --no-ff -m "Merge branch '<name>' into <target>" <recorded-sha>`. Use another merge shape only when repository policy requires it, and never squash or rebase, because the later ancestry check needs real merge ancestry. Never pass `--no-verify`, `-X ours`, `-X theirs`, or `--allow-unrelated-histories`.
+   5. On any failure: run `git merge --abort` if a merge is in progress, then **stop the whole command and delete nothing**. Keep completed merges and report the failing source, the error text, the target's start SHA, and how to restore it.
+5. **Validate** with the repository's normal checks when identifiable. If they fail because of the merge, stop before any deletion and report. If they cannot be identified, report "not validated" and continue; deletion is still gated by the ancestry check below.
+6. **Delete** every source whose merge status is `MERGE` or `CONTAINED` and that has no delete blocker. Recheck immediately before each write: (a) the tip still equals the recorded SHA, (b) `git merge-base --is-ancestor <sha> refs/heads/<target>` succeeds, and (c) for a source with a linked worktree, that worktree is still clean, unlocked, not in progress, and has no ignored files unless `--discard-ignored` was given.
+   1. **Remove the worktree** (linked, not invoking): `git worktree remove <path>`, never `--force`, never retried with it. A prunable entry (directory missing) is removed the same way, for that entry only. Never run a repository-wide `git worktree prune`; it would also drop detached worktrees and orphan their commits. If the command exits non-zero, keep the branch, run `git worktree list --porcelain`, and report whether the entry is still listed; an entry that vanished while the directory remains is a partial removal that needs manual cleanup.
+   2. **Unset a lagging upstream.** `git branch -d` judges a branch against its upstream when one exists. If the branch has an upstream that does not contain the branch tip, record it (`git for-each-ref --format='%(upstream)|%(upstream:short)' refs/heads/<name>`; empty means no upstream) and run `git branch --unset-upstream <name>` first.
+   3. **Delete the branch** with `git -C <invoking-worktree> branch -d <name>`. On failure, restore the upstream (`git branch --set-upstream-to=<saved short name> <name>`), skip the branch, and report. Never use `git branch -D`, never `git worktree remove --force`, never `remove -f -f`.
+7. **Report**: applied operations, skipped items with reasons, the target's start and end SHA, the final local branch list, the validation result, and every deleted branch with its tip SHA (recreate with `git branch <name> <sha>`; the deleted branch's reflog is not kept). State that remote branches still exist and lack the commits that are now only in local `<branch>`; pushing is the user's decision.
+
+A rerun after an interruption starts from a fresh survey: merged sources are then `CONTAINED` and only get deleted, and the target movement caused by the interrupted run's merges does not make the earlier plan stale (step 1).
+
+### Hard stop conditions
+
+Never: move, reset, or delete `main`; push, force-push, or delete remote branches, or delete remote-tracking refs (`git branch -d -r`, `git remote prune`); run a repository-wide `git worktree prune`; touch a detached worktree or any worktree other than the invoking one, except removing a clean, unlocked worktree without an active owner whose branch is being deleted; merge a branch whose worktree is in progress; resolve a conflict with ours/theirs; force anything. Do not proceed when the skill or this reference could not be loaded; preview only.
+
+### Output
+
+```text
+Plan / Preview header
+Gates
+Sources to merge (ordered)
+Contained sources
+Blocked items + reasons
+Expected final local branches
+Not touched
+Applied operations (only with --apply)
+Skipped items + reasons
+Target start SHA -> end SHA
+Deleted branches + tip SHAs
+Validation
+Remaining risks
+```
+
 ## Command Relationship
 
 ```text
@@ -313,6 +436,8 @@ Remaining risks
    ↓ guarded integration mutation
 /GitCleanup [--apply]
    ↓ guarded lifecycle cleanup
+/GitConverge <branch> [--apply]
+   ↓ guarded merge-everything-and-delete convergence
 ```
 
-`/GitRecon`, `/GitAnalyze`, and `/GitRecommend` are observation/advice commands. `/GitIntegrate` is an integration write-intent. `/GitCleanup` is preview-only unless `--apply` is explicit.
+`/GitRecon`, `/GitAnalyze`, and `/GitRecommend` are observation/advice commands. `/GitIntegrate` is an integration write-intent. `/GitCleanup` is preview-only unless `--apply` is explicit. `/GitConverge` is preview-only unless `--apply` is explicit; it is the only command that merges unreviewed local branches, and it does so only on the user's acceptance of the plan it prints.

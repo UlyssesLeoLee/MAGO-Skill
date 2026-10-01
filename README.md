@@ -66,7 +66,7 @@ flowchart LR
 
 ---
 
-## 五个核心命令
+## 六个核心命令
 
 ### `/GitRecon`
 
@@ -200,6 +200,51 @@ Cleanup Candidates
 
 ---
 
+### `/GitConverge`
+
+把所有本地分支的领先内容合并进指定分支，然后只保留 `main` 和该分支。
+
+```text
+/GitConverge agent/release
+```
+
+默认只预览：
+
+```text
+合并顺序（main 最先，其余按独有提交数）
+已包含、只需删除的分支
+阻塞项（dirty / locked / 活动 Owner / 孤立历史 / 进行中的 rebase ...）
+最终保留的本地分支
+```
+
+确认计划后执行：
+
+```text
+/GitConverge agent/release --apply
+```
+
+```mermaid
+flowchart TD
+    A["预览计划"] --> B["逐个 merge --no-ff"]
+    B -->|"冲突"| X["abort，停止，不删除任何分支"]
+    B --> C["校验"]
+    C --> D["逐个复查：tip 未变 + 已是 target 祖先"]
+    D --> E["worktree remove → branch -d"]
+```
+
+关键保证：
+
+```text
+✓ main 只作为合并来源，从不移动、重置或删除
+✓ 远端分支、tag、detached worktree 不动
+✓ 冲突时 abort 并停止，已完成的合并保留，什么都不删
+✓ 用完整 refname 和记录的 SHA 合并，避免同名 tag 误判
+✓ 绝不使用 branch -D、worktree remove --force、全局 worktree prune
+✓ 含 ignored 文件的 worktree 默认保留；--discard-ignored 才允许删除
+```
+
+---
+
 ## 多 Agent 生命周期
 
 ```mermaid
@@ -304,7 +349,7 @@ Skill 可以通过语义自动触发。
 
 ### Claude Code：启用 Slash Command
 
-Claude Code 只会为每个 Skill 注册**一个**以 Skill 名命名的斜杠命令，`/GitRecon` 等五个命令需要额外安装 `commands/` 下的命令文件：
+Claude Code 只会为每个 Skill 注册**一个**以 Skill 名命名的斜杠命令，`/GitRecon` 等六个命令需要额外安装 `commands/` 下的命令文件：
 
 ```text
 commands/
@@ -312,7 +357,8 @@ commands/
 ├── GitAnalyze.md
 ├── GitRecommend.md
 ├── GitIntegrate.md
-└── GitCleanup.md
+├── GitCleanup.md
+└── GitConverge.md
 ```
 
 在本仓库根目录执行，复制到用户级命令目录（所有项目可用）；也可以复制到某个项目的 `.claude/commands/`（仅该项目可用）。注意不要放进 Skill 目录内部，那里的文件不会被识别为命令：
@@ -325,7 +371,7 @@ mkdir -p ~/.claude/commands && cp commands/Git*.md ~/.claude/commands/
 New-Item -ItemType Directory -Force "$HOME\.claude\commands"; Copy-Item commands\Git*.md "$HOME\.claude\commands\"
 ```
 
-安装后**重新开启会话**，输入 `/Git` 即可看到五个命令。
+安装后**重新开启会话**，输入 `/Git` 即可看到六个命令。
 
 也可以显式调用：
 
@@ -335,9 +381,10 @@ New-Item -ItemType Directory -Force "$HOME\.claude\commands"; Copy-Item commands
 /GitRecommend [goal]
 /GitIntegrate <lane-or-branch>
 /GitCleanup
+/GitConverge <branch>
 ```
 
-五个命令的跨宿主名称和说明：
+六个命令的跨宿主名称和说明：
 
 | 命令 | Claude Code | Hermes | Codex | 说明 |
 |---|---|---|---|---|
@@ -346,13 +393,14 @@ New-Item -ItemType Directory -Force "$HOME\.claude\commands"; Copy-Item commands
 | GitRecommend | `/GitRecommend` | `/git-recommend` | `$git-recommend` | 根据当前状态建议 Git 与多 Agent 下一步 |
 | GitIntegrate | `/GitIntegrate` | `/git-integrate` | `$git-integrate` | 通过安全门禁后集成指定 lane 或 branch |
 | GitCleanup | `/GitCleanup` | `/git-cleanup` | `$git-cleanup` | 默认预览可清理项；`--apply` 才允许删除 |
+| GitConverge | `/GitConverge` | `/git-converge` | `$git-converge` | 把所有本地分支合并进指定分支并只保留 `main` 和它；默认预览，`--apply` 才执行 |
 
 斜杠入口说明：
 
 | 宿主 | 从 `/` 进入 | 前提条件 |
 |---|---|---|
-| Claude Code | 直接输入 `/GitRecon` 等五个命令 | `~/.claude/commands/Git*.md` 已安装（`sync_hosts.py --host claude`），并已新开会话 |
-| Hermes | 直接输入 `/git-recon` 等五个命令 | 包已安装到 `<Hermes home>/skills/`，并已新开会话或执行 `/reload-skills` |
+| Claude Code | 直接输入 `/GitRecon` 等六个命令 | `~/.claude/commands/Git*.md` 已安装（`sync_hosts.py --host claude`），并已新开会话 |
+| Hermes | 直接输入 `/git-recon` 等六个命令 | 包已安装到 `<Hermes home>/skills/`，并已新开会话或执行 `/reload-skills` |
 | Codex | 输入 `/skills`，打开 Skill 列表后选择 `git-*`；也可以直接输入 `$git-recon` | 包已安装到 `~/.agents/skills/MAGOS`（`sync_hosts.py --host codex`），并已重启 Codex |
 
 Codex 的 `/` 菜单只包含内置命令（源码 `codex-rs/tui/src/bottom_pane/command_popup.rs` 中只有 `Builtin` 与 `ServiceTier` 两类条目），无法注册自定义的 `/git-*`。因此在 Codex 中，斜杠入口是内置的 `/skills`。
@@ -381,7 +429,7 @@ Codex 和 Hermes 都安装同一个宿主中立的包，目录结构必须与仓
 MAGOS/                       # Codex 包根；Hermes 使用 multi-agent-git-orchestrator/
 ├── SKILL.md                 # 根 Skill：multi-agent-git-orchestrator（语义自动触发）
 ├── references/*.md          # 全部参考文档
-└── skills/git-*/            # 五个命令适配层
+└── skills/git-*/            # 六个命令适配层
     ├── SKILL.md
     └── agents/openai.yaml   # Codex：显示说明 + allow_implicit_invocation: false
 ```
@@ -395,7 +443,7 @@ python -X utf8 scripts/sync_hosts.py --host codex --host hermes --verify
 
 ### Codex：启用命令 Skill
 
-Codex 的自定义入口是 Skill 选择器（`$`），不是任意命名的 `/Git...` Slash Command。Codex 递归扫描 Skill 根目录，因此会同时加载根 Skill 和 `skills/` 下的五个命令 Skill；`agents/openai.yaml` 中的简短说明会显示在 Skill 列表里。五个命令 Skill 都设置了 `policy.allow_implicit_invocation: false`，只在显式选择时运行，语义自动触发由根 Skill 负责。
+Codex 的自定义入口是 Skill 选择器（`$`），不是任意命名的 `/Git...` Slash Command。Codex 递归扫描 Skill 根目录，因此会同时加载根 Skill 和 `skills/` 下的六个命令 Skill；`agents/openai.yaml` 中的简短说明会显示在 Skill 列表里。六个命令 Skill 都设置了 `policy.allow_implicit_invocation: false`，只在显式选择时运行，语义自动触发由根 Skill 负责。
 
 用户级安装位置是 `~/.agents/skills/MAGOS`。已经安装在旧位置 `$CODEX_HOME/skills/MAGOS`（默认 `~/.codex/skills/MAGOS`）的，同步脚本会继续更新旧位置；两个位置不要同时保留，否则 Codex 会看到重复的 Skill。手动安装（Windows PowerShell）：
 
@@ -412,11 +460,11 @@ mkdir -p "$HOME/.agents/skills/MAGOS"
 cp -R SKILL.md references skills "$HOME/.agents/skills/MAGOS/"
 ```
 
-重新启动 Codex 后，输入 `$` 选择命令 Skill，或直接调用 `$git-recon`、`$git-analyze`、`$git-recommend`、`$git-integrate`、`$git-cleanup`。`/skills` 可打开 Skill 浏览入口。参数写在 Skill 名后面，例如 `$git-analyze agent/auth --remote`；加 `--help` 可查看完整参数说明。
+重新启动 Codex 后，输入 `$` 选择命令 Skill，或直接调用 `$git-recon`、`$git-analyze`、`$git-recommend`、`$git-integrate`、`$git-cleanup`、`$git-converge`。`/skills` 可打开 Skill 浏览入口。参数写在 Skill 名后面，例如 `$git-analyze agent/auth --remote`；加 `--help` 可查看完整参数说明。
 
 ### Hermes：启用 Slash Skill
 
-Hermes 会把已安装的每个 Skill 自动注册成一个 Slash Command（名称取自 frontmatter 的 `name`），并将 `description` 用作命令说明。安装后会出现 `/multi-agent-git-orchestrator` 和五个 `/git-*` 命令。
+Hermes 会把已安装的每个 Skill 自动注册成一个 Slash Command（名称取自 frontmatter 的 `name`），并将 `description` 用作命令说明。安装后会出现 `/multi-agent-git-orchestrator` 和六个 `/git-*` 命令。
 
 Hermes 的 home 目录依次取 `HERMES_HOME`、Windows 上的 `%LOCALAPPDATA%\hermes`、其他系统上的 `~/.hermes`；如果其中的 `active_profile` 指定了非默认 profile，则改用 `profiles/<name>`。Skill 放在 home 下的 `skills/`。同步脚本按同样规则定位。如果已有 `<Hermes home>/skills/MAGOS`（例如直接 `git clone` 的安装），脚本会沿用它；如果它是 git checkout，脚本会拒绝复制文件，请改用 git 更新。手动安装（Windows PowerShell）：
 
@@ -434,7 +482,7 @@ mkdir -p "${HERMES_HOME:-$HOME/.hermes}/skills/multi-agent-git-orchestrator"
 cp -R SKILL.md references skills "${HERMES_HOME:-$HOME/.hermes}/skills/multi-agent-git-orchestrator/"
 ```
 
-重新启动 Hermes 后，可运行 `hermes skills list` 查看各命令说明，并调用 `/git-recon`、`/git-analyze`、`/git-recommend`、`/git-integrate` 或 `/git-cleanup`。参数直接跟在命令后面，例如 `/git-analyze main --remote`，也可用 `/git-analyze --help` 查看完整说明。Hermes 的 Skill 查看工具不接受含 `..` 的路径，适配层会改用 `[Skill directory: ...]` 给出的绝对路径读取共享文件。Hermes 没有按 Skill 关闭自动调用的开关，因此 `/git-integrate` 与 `/git-cleanup` 在适配层中规定：未经用户显式调用时不写入仓库。
+重新启动 Hermes 后，可运行 `hermes skills list` 查看各命令说明，并调用 `/git-recon`、`/git-analyze`、`/git-recommend`、`/git-integrate`、`/git-cleanup` 或 `/git-converge`。参数直接跟在命令后面，例如 `/git-analyze main --remote`，也可用 `/git-analyze --help` 查看完整说明。Hermes 的 Skill 查看工具不接受含 `..` 的路径，适配层会改用 `[Skill directory: ...]` 给出的绝对路径读取共享文件。Hermes 没有按 Skill 关闭自动调用的开关，因此 `/git-integrate`、`/git-cleanup` 与 `/git-converge` 在适配层中规定：未经用户显式调用时不写入仓库。
 
 如果宿主不支持自定义 Slash Command，也可以直接输入：
 

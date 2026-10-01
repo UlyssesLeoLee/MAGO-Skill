@@ -67,7 +67,7 @@ The core principle:
 
 ---
 
-## The five commands
+## The six commands
 
 ### `GitRecon` — read the room
 
@@ -150,6 +150,26 @@ A branch is only a cleanup candidate when **all** of these hold:
 ✓ no active owner
 ✓ no downstream dependents
 ✓ no unique unsaved work
+```
+
+### `GitConverge <branch>` — fold every lane into one branch
+
+```text
+/GitConverge agent/release            # preview the plan only
+/GitConverge agent/release --apply    # merge, then delete merged branches
+```
+
+Merges every local branch's unique commits into `<branch>` (`main` first, then the largest sources), then deletes the merged
+local branches and their clean worktrees, so only `main` and `<branch>` remain. The preview shows the merge order, each
+source's status, the blockers, and the final branch list; `--apply` runs exactly the plan it prints.
+
+```text
+✓ main is a merge source only: never moved, reset, or deleted
+✓ a conflict aborts that merge, stops the run, and deletes nothing
+✓ remote branches, tags, and detached worktrees are never touched
+✓ dirty, locked, in-progress, or agent-owned worktrees keep their branch
+✓ ignored files (.env) are never overwritten; worktrees holding them stay unless --discard-ignored
+✓ never branch -D, worktree remove --force, or a repository-wide worktree prune
 ```
 
 ---
@@ -241,7 +261,7 @@ multi-agent-git-orchestrator/
     └── pressure-tests.md
 ```
 
-The root skill triggers on its own through semantic matching. The five commands are optional explicit entry points.
+The root skill triggers on its own through semantic matching. The six commands are optional explicit entry points.
 
 ### Cross-host install (recommended)
 
@@ -276,7 +296,7 @@ New-Item -ItemType Directory -Force $codexPackage | Out-Null
 Copy-Item -Path .\SKILL.md, .\references, .\skills -Destination $codexPackage -Recurse -Force
 ```
 
-Restart Codex, press `$` to pick a command skill, or call `$git-recon`, `$git-analyze`, `$git-recommend`, `$git-integrate`, `$git-cleanup` directly. `/skills` opens the skill browser. Arguments go after the skill name, e.g. `$git-analyze agent/auth --remote`; `--help` prints full usage.
+Restart Codex, press `$` to pick a command skill, or call `$git-recon`, `$git-analyze`, `$git-recommend`, `$git-integrate`, `$git-cleanup`, `$git-converge` directly. `/skills` opens the skill browser. Arguments go after the skill name, e.g. `$git-analyze agent/auth --remote`; `--help` prints full usage.
 
 > Codex's `/` menu only contains built-in commands, so custom `/git-*` slash commands cannot be registered. The skill selector (`$` / `/skills`) is the entry point on Codex.
 
@@ -291,7 +311,7 @@ mkdir -p "${HERMES_HOME:-$HOME/.hermes}/skills/multi-agent-git-orchestrator"
 cp -R SKILL.md references skills "${HERMES_HOME:-$HOME/.hermes}/skills/multi-agent-git-orchestrator/"
 ```
 
-Restart Hermes, then `hermes skills list`, then `/git-recon`, `/git-analyze`, `/git-recommend`, `/git-integrate`, `/git-cleanup`. Hermes has no per-skill auto-invoke switch, so the adapter layer specifies that `/git-integrate` and `/git-cleanup` never write to the repository unless you invoke them explicitly.
+Restart Hermes, then `hermes skills list`, then `/git-recon`, `/git-analyze`, `/git-recommend`, `/git-integrate`, `/git-cleanup`, `/git-converge`. Hermes has no per-skill auto-invoke switch, so the adapter layer specifies that `/git-integrate`, `/git-cleanup`, and `/git-converge` never write to the repository unless you invoke them explicitly.
 
 ### Hosts without custom slash commands
 
@@ -314,6 +334,7 @@ GitRecommend
 | GitRecommend | `/GitRecommend` | `/git-recommend` | `$git-recommend` | Recommend the next Git/multi-agent move from real state |
 | GitIntegrate | `/GitIntegrate` | `/git-integrate` | `$git-integrate` | Integrate a lane through safety gates |
 | GitCleanup | `/GitCleanup` | `/git-cleanup` | `$git-cleanup` | Preview cleanups; `--apply` required to delete |
+| GitConverge | `/GitConverge` | `/git-converge` | `$git-converge` | Merge every local branch into one and keep only `main` and it; preview by default, `--apply` to run |
 
 ```bash
 python -X utf8 tests/codex/contracts/run_contract_cases.py

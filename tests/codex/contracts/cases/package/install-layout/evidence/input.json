@@ -8,6 +8,7 @@
   "expected_skills": [
     "git-analyze",
     "git-cleanup",
+    "git-converge",
     "git-integrate",
     "git-recommend",
     "git-recon",

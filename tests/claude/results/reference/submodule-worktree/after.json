@@ -1,0 +1,40 @@
+{
+  "files": {},
+  "heads": {
+    "agent/release": "061a91540a71ec0af0f1e6c977200f2650300b91",
+    "agent/sub": "8143f638541d4ce0a88f15ca9403401cc51fd640",
+    "main": "a7865dbe7a31d2bb23b950e1254840cd742e243e"
+  },
+  "invoking_head": "agent/release",
+  "merge_head": false,
+  "origin": [
+    "refs/heads/main a7865dbe7a31d2bb23b950e1254840cd742e243e"
+  ],
+  "remote_refs": [
+    "refs/remotes/origin/main a7865dbe7a31d2bb23b950e1254840cd742e243e"
+  ],
+  "tag_refs": [],
+  "tags": [],
+  "worktrees": [
+    {
+      "branch": "agent/release",
+      "detached": false,
+      "exists": true,
+      "head": "061a91540a71ec0af0f1e6c977200f2650300b91",
+      "locked": false,
+      "path": "repo",
+      "prunable": false,
+      "status": ""
+    },
+    {
+      "branch": "agent/sub",
+      "detached": false,
+      "exists": true,
+      "head": "8143f638541d4ce0a88f15ca9403401cc51fd640",
+      "locked": false,
+      "path": "wt-sub",
+      "prunable": false,
+      "status": ""
+    }
+  ]
+}

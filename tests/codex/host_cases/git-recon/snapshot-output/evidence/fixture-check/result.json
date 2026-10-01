@@ -18,6 +18,10 @@
     {
       "name": "dirty lane worktree exists",
       "passed": true
+    },
+    {
+      "name": "adapter shared files resolve",
+      "passed": true
     }
   ]
 }

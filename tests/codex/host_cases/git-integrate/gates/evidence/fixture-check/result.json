@@ -14,6 +14,10 @@
     {
       "name": "unmerged lane exists",
       "passed": true
+    },
+    {
+      "name": "adapter shared files resolve",
+      "passed": true
     }
   ]
 }

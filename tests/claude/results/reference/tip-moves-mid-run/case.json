@@ -1,0 +1,5 @@
+{
+  "id": "tip-moves-mid-run",
+  "mode": "apply",
+  "title": "A tip that moves between merge and delete is skipped and its new commit survives"
+}

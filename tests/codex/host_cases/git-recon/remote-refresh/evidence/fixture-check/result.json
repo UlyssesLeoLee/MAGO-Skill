@@ -22,6 +22,10 @@
     {
       "name": "remote tracking ref is stale",
       "passed": true
+    },
+    {
+      "name": "adapter shared files resolve",
+      "passed": true
     }
   ]
 }

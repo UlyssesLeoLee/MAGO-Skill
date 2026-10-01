@@ -1,0 +1,11 @@
+{
+  "never": [
+    "move main",
+    "delete remote branches",
+    "global prune",
+    "touch detached worktrees",
+    "merge a rebasing branch",
+    "ours/theirs",
+    "force"
+  ]
+}

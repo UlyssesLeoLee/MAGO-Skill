@@ -8,7 +8,7 @@
 
 - sync_hosts.py installs the full package (SKILL.md, references/, skills/) for Codex and Hermes.
 - Every ../../ reference in an adapter and every references/ link in SKILL.md resolves inside the installed tree.
-- No adapter routes through commands/; all five adapters set policy.allow_implicit_invocation: false.
+- No adapter routes through commands/; all six adapters set policy.allow_implicit_invocation: false.
 - Each skill name appears exactly once in the Codex and Hermes discovery replicas.
 
 ## Contract checks

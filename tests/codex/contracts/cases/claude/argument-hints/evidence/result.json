@@ -29,6 +29,11 @@
       "file": "commands/GitCleanup.md",
       "passed": true,
       "missing": []
+    },
+    {
+      "file": "commands/GitConverge.md",
+      "passed": true,
+      "missing": []
     }
   ]
 }

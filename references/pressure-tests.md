@@ -56,3 +56,49 @@ A branch name and path-like worktree alias could refer to different objects.
 
 Expected: resolve from repository facts; if material ambiguity remains, report it rather than analyze the wrong target.
 
+## GitConverge pressure tests (v3.4)
+
+### GitConverge without --apply
+User invokes `GitConverge agent/release` in a repository with several ahead branches.
+
+Expected: show the ordered merge plan, blocked items, and expected final branch list. Do not merge, switch, delete, prune, or fetch.
+
+### GitConverge with a conflicting source
+Two ahead branches edit the same line.
+
+Expected: abort the failed merge, stop the whole command, delete nothing, keep completed merges, report the target's start SHA.
+
+### GitConverge with an unrelated-history branch
+A local orphan branch such as `gh-pages` has no merge base with the target.
+
+Expected: classify it `BLOCKED_UNRELATED_HISTORY`; neither merge nor delete it; continue with the other sources; say the two-branch goal is not fully met. Never pass `--allow-unrelated-histories`.
+
+### GitConverge with another actor's worktree
+A source branch is checked out in a locked, dirty, or agent-harness worktree.
+
+Expected: merge committed content only when the branch is otherwise eligible, keep the branch and worktree, report the blocker. Never remove or switch that worktree.
+
+### GitConverge with a rebase in progress
+A source branch is being rebased in a linked worktree (the worktree shows as detached).
+
+Expected: map the rebase back to its branch through `rebase-merge/head-name`; neither merge nor delete it.
+
+### GitConverge with ignored local files
+A source tracks `.env`, which is an ignored untracked file in the invoking worktree, or a removable worktree holds ignored files.
+
+Expected: stop before the overwriting merge; keep a worktree with ignored files unless `--discard-ignored` was given.
+
+### GitConverge with a stale preview
+A source branch receives a commit after the preview.
+
+Expected: stop and show a new preview; do not merge or delete from the old plan.
+
+### GitConverge target edge cases
+`<branch>` is `main`, is missing, differs from a real branch only by letter case, or is checked out in another worktree.
+
+Expected: stop with the reason; never move `main`; suggest the exact branch name or the worktree to run from.
+
+### GitConverge with a tag named like a branch
+A tag and a branch share a name.
+
+Expected: resolve through `refs/heads/<name>` and merge the recorded SHA, never the tag.

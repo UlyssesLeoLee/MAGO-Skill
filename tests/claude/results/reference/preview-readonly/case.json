@@ -1,0 +1,5 @@
+{
+  "id": "preview-readonly",
+  "mode": "preview",
+  "title": "Without --apply nothing changes and the plan is reported"
+}

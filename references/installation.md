@@ -17,7 +17,7 @@ python -X utf8 scripts/sync_hosts.py --verify
 
 | 目标 | 安装根目录 | 同步文件 |
 | --- | --- | --- |
-| Claude | `~/.claude/commands` | 仓库 `commands/Git*.md`，共 5 个 |
+| Claude | `~/.claude/commands` | 仓库 `commands/Git*.md`，共 6 个 |
 | Codex | `~/.agents/skills/MAGOS`。如果已有旧位置 `$CODEX_HOME/skills/MAGOS`（默认 `~/.codex/skills/MAGOS`）且新位置不存在，则继续使用旧位置 | 宿主中立包：`SKILL.md`、`references/*.md` 全部、每个 `skills/git-*/SKILL.md` 与 `agents/openai.yaml` |
 | Hermes | `<Hermes home>/skills/multi-agent-git-orchestrator`。Hermes home 依次取 `HERMES_HOME`、Windows 的 `%LOCALAPPDATA%\hermes`、其他系统的 `~/.hermes`，有非默认的 `active_profile` 时取其 `profiles/<name>`；已有 `<Hermes home>/skills/MAGOS` 时沿用它 | 与 Codex 相同的宿主中立包 |
 
@@ -39,7 +39,7 @@ python -X utf8 scripts/sync_hosts.py --host codex --host hermes --home C:\temp\m
 - 适配层中的每个 `../../` 引用都能解析；
 - 根 `SKILL.md` 引用的 `references/` 文件都存在；
 - 适配层不经由 `commands/`；
-- 五个 `agents/openai.yaml` 都设置了 `allow_implicit_invocation: false`；
+- 六个 `agents/openai.yaml` 都设置了 `allow_implicit_invocation: false`；
 - 按 Codex 与 Hermes 的发现规则（复刻版，并非真实宿主），每个 Skill 只出现一次。
 
 `--verify` 只校验磁盘上的安装内容。参数灰字提示由各宿主的命令或 Skill 选择界面决定；更新安装文件后，可能需要重新载入宿主会话才能看到新的说明，界面效果仍需在对应宿主中单独检查。
