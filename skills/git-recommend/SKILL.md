@@ -15,14 +15,15 @@ Command adapter for the canonical `/GitRecommend` command of the MAGOS (Multi-Ag
 
 ## Usage
 
-- Hermes: `/git-recommend [goal] [--remote] [--help]`
-- Codex: `$git-recommend [goal] [--remote] [--help]`
+- Hermes: `/git-recommend [goal] [--remote] [--lang <language>] [--help]`
+- Codex: `$git-recommend [goal] [--remote] [--lang <language>] [--help]`
 - `[goal]`: Optional natural-language question or desired outcome; omit it for general next-step recommendations.
 - `--remote`: Refresh remote-tracking refs before recommending; it does not change branches, worktrees, or commit history.
+- `--lang <language>`: Language of the reply, as a name or code (for example `English`, `ja`); Chinese when absent. Command names, options, branch names, paths, SHAs, and status codes stay untranslated.
 - `--help`: Show this inline usage and argument description, then stop without inspecting the repository.
 - Default: Advisory recommendations using a fresh local reconnaissance snapshot; no remote refresh.
 
-Examples: `/git-recommend`, `$git-recommend 哪些分支应该先合并 --remote`, `$git-recommend --help`.
+Examples: `/git-recommend`, `$git-recommend 哪些分支应该先合并 --remote`, `$git-recommend --lang English`, `$git-recommend --help`.
 
 ## Arguments
 
@@ -51,4 +52,4 @@ If a shared file cannot be read, name the missing path, report that the MAGOS in
 
 ## Execution
 
-Execute the canonical `/GitRecommend` command with the supplied arguments. Inspect the current repository first, and run or reuse a fresh reconnaissance snapshot before recommending. Recommendations are advisory and must not mutate repository topology.
+Execute the canonical `/GitRecommend` command with the supplied arguments. Inspect the current repository first, and run or reuse a fresh reconnaissance snapshot before recommending. Recommendations are advisory and must not mutate repository topology. Reply in the language selected by `--lang` (Chinese when absent); never translate commands, options, branch names, paths, SHAs, or status codes. Remove `--lang` and its value from the arguments before parsing the rest.

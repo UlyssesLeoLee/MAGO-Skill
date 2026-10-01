@@ -15,14 +15,15 @@ Command adapter for the canonical `/GitAnalyze` command of the MAGOS (Multi-Agen
 
 ## Usage
 
-- Hermes: `/git-analyze <branch|worktree> [--remote] [--help]`
-- Codex: `$git-analyze <branch|worktree> [--remote] [--help]`
+- Hermes: `/git-analyze <branch|worktree> [--remote] [--lang <language>] [--help]`
+- Codex: `$git-analyze <branch|worktree> [--remote] [--lang <language>] [--help]`
 - `<branch|worktree>`: Required branch name or worktree path to analyze.
 - `--remote`: Refresh remote-tracking refs before analysis; it does not change branches, worktrees, or commit history.
+- `--lang <language>`: Language of the reply, as a name or code (for example `English`, `ja`); Chinese when absent. Command names, options, branch names, paths, SHAs, and status codes stay untranslated.
 - `--help`: Show this inline usage and argument description, then stop without inspecting the repository.
 - Default: Read-only analysis using existing local refs; no remote refresh.
 
-Examples: `/git-analyze feature/auth`, `$git-analyze feature/auth --remote`, `$git-analyze --help`.
+Examples: `/git-analyze feature/auth`, `$git-analyze feature/auth --remote`, `$git-analyze <branch> --lang English`, `$git-analyze --help`.
 
 ## Arguments
 
@@ -51,4 +52,4 @@ If a shared file cannot be read, name the missing path, report that the MAGOS in
 
 ## Execution
 
-Execute the canonical `/GitAnalyze` command with the supplied arguments. Inspect the target's current state, ancestry, unique commits, dependencies, and worktree cleanliness before assessing operations. Keep the analysis read-only; `--remote` only permits refreshing remote-tracking refs. Ask for a target if none is provided.
+Execute the canonical `/GitAnalyze` command with the supplied arguments. Inspect the target's current state, ancestry, unique commits, dependencies, and worktree cleanliness before assessing operations. Keep the analysis read-only; `--remote` only permits refreshing remote-tracking refs. Ask for a target if none is provided. Reply in the language selected by `--lang` (Chinese when absent); never translate commands, options, branch names, paths, SHAs, or status codes. Remove `--lang` and its value from the arguments before parsing the rest.

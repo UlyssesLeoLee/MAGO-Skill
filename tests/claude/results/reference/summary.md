@@ -4,6 +4,7 @@
 |---|---|---|
 | `happy-path` | PASS | 19/19 |
 | `preview-readonly` | PASS | 11/11 |
+| `preview-lang-english` | PASS | 11/11 |
 | `ordering-and-containment` | PASS | 9/9 |
 | `conflict-stops` | PASS | 13/13 |
 | `conflict-predicted` | PASS | 13/13 |

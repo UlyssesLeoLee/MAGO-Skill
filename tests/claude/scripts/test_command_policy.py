@@ -121,11 +121,6 @@ class ShellParsing(unittest.TestCase):
         calls = policy.shell_git_calls('cd "/tmp/r" && git status --porcelain; T=x; for b in a b; do git log --oneline $b; done | head')
         self.assertEqual([c[0] for c in calls], ["status", "log"])
 
-    def test_writes_ignores_reads_and_finds_merges(self):
-        self.assertEqual(policy.writes("git merge-tree --write-tree a b && git for-each-ref refs/heads"), [])
-        found = policy.writes("git -C /r switch t && git merge --no-ff -m x abc && git branch -d old")
-        self.assertEqual([policy.subcommand(c)[0] for c in found], ["switch", "merge", "branch"])
-
     def test_non_git_commands_are_ignored(self):
         self.assertEqual(policy.shell_git_calls("echo git is great; ls -la"), [])
         self.assertEqual(policy.shell_git_calls("grep -r git docs/"), [])

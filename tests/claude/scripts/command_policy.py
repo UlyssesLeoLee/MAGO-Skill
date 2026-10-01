@@ -27,7 +27,6 @@
 #   (f_violations:Function {name: "violations", type: "function", signature: "violations(commands: list[list[str]], mode: str) -> list[str]"}),
 #   (f_command_word:Function {name: "command_word", type: "function", signature: "command_word(tokens: list[str]) -> int | None"}),
 #   (f_shell_git_calls:Function {name: "shell_git_calls", type: "function", signature: "shell_git_calls(command: str) -> list[list[str]]"}),
-#   (f_writes:Function {name: "writes", type: "function", signature: "writes(command: str) -> list[list[str]]"}),
 #   (file)-[:CONTAINS]->(v_SHELL_SPLIT),
 #   (file)-[:CONTAINS]->(v_SHELL_KEYWORDS),
 #   (file)-[:CONTAINS]->(v_WRAPPERS),
@@ -54,7 +53,6 @@
 #   (file)-[:CONTAINS]->(f_violations),
 #   (file)-[:CONTAINS]->(f_command_word),
 #   (file)-[:CONTAINS]->(f_shell_git_calls),
-#   (file)-[:CONTAINS]->(f_writes),
 #   (f_command_word)-[:USES]->(v_SHELL_KEYWORDS),
 #   (f_command_word)-[:USES]->(v_WRAPPERS),
 #   (f_contract_write)-[:CALLS]->(f_parse),
@@ -80,10 +78,7 @@
 #   (f_violations)-[:USES]->(v_FORBIDDEN_MERGE),
 #   (f_violations)-[:USES]->(v_FORBIDDEN_REMOTE),
 #   (f_violations)-[:USES]->(v_FORBIDDEN_SWITCH),
-#   (f_violations)-[:USES]->(v_FORBIDDEN_WORKTREE),
-#   (f_writes)-[:CALLS]->(f_is_read_only),
-#   (f_writes)-[:CALLS]->(f_shell_git_calls),
-#   (f_writes)-[:CALLS]->(f_subcommand);
+#   (f_violations)-[:USES]->(v_FORBIDDEN_WORKTREE);
 # ```
 """Command policy for GitConverge: which git invocations the contract forbids, and which a preview may use.
 
@@ -105,7 +100,8 @@ ALWAYS_READ_ONLY = {"rev-parse", "for-each-ref", "status", "ls-files", "log", "r
                     "merge-tree", "cat-file", "show", "ls-tree", "describe", "version", "blame", "shortlog",
                     "whatchanged", "check-ref-format", "name-rev", "grep", "var", "count-objects", "fsck", "show-ref",
                     "diff-tree", "diff-index", "diff-files", "ls-remote", "check-ignore", "check-attr", "cherry",
-                    "show-branch", "range-diff", "help", *QUERY_GLOBALS}
+                    "show-branch", "range-diff", "patch-id", "check-mailmap", "verify-commit", "verify-tag", "help",
+                    *QUERY_GLOBALS}
 ALWAYS_FORBIDDEN = {"push", "fetch", "pull", "reset", "clean", "gc", "prune", "filter-branch", "update-ref", "rebase",
                     "cherry-pick", "revert", "replace", "notes", "am", "apply", "bisect", "restore", "checkout",
                     "update-index", "commit", "add", "rm", "mv"}
@@ -283,13 +279,3 @@ def shell_git_calls(command: str) -> list[list[str]]:
         if index is not None and (tokens[index] == "git" or re.search(r"[/\\]git(\.exe)?$", tokens[index])):
             calls.append(tokens[index + 1:])
     return calls
-
-
-def writes(command: str) -> list[list[str]]:
-    """The git calls in a shell command that can change the repository."""
-    found = []
-    for args in shell_git_calls(command):
-        sub, rest = subcommand(args)
-        if sub and not is_read_only(sub, rest):
-            found.append(args)
-    return found

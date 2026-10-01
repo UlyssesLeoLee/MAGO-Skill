@@ -15,12 +15,12 @@
       "GitConverge"
     ],
     "argument_hints": {
-      "GitRecon": "[--remote] [--help]",
-      "GitAnalyze": "<branch|worktree> [--remote] [--help]",
-      "GitRecommend": "[<goal>] [--remote] [--help]",
-      "GitIntegrate": "<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]",
-      "GitCleanup": "[--apply] [--help]",
-      "GitConverge": "<branch> [--apply] [--discard-ignored] [--help]"
+      "GitRecon": "[--remote] [--lang <language>] [--help]",
+      "GitAnalyze": "<branch|worktree> [--remote] [--lang <language>] [--help]",
+      "GitRecommend": "[<goal>] [--remote] [--lang <language>] [--help]",
+      "GitIntegrate": "<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--lang <language>] [--help]",
+      "GitCleanup": "[--apply] [--lang <language>] [--help]",
+      "GitConverge": "<branch> [--apply] [--discard-ignored] [--lang <language>] [--help]"
     }
   },
   "expected": [
@@ -32,7 +32,7 @@
     {
       "file": "commands/GitRecon.md",
       "contains": [
-        "argument-hint: \"[--remote] [--help]\"",
+        "argument-hint: \"[--remote] [--lang <language>] [--help]\"",
         "Handle `--help` first",
         "## Inline help",
         "Usage: `/GitRecon"
@@ -46,7 +46,7 @@
     {
       "file": "commands/GitAnalyze.md",
       "contains": [
-        "argument-hint: \"<branch|worktree> [--remote] [--help]\"",
+        "argument-hint: \"<branch|worktree> [--remote] [--lang <language>] [--help]\"",
         "Handle `--help` first",
         "## Inline help",
         "Usage: `/GitAnalyze"
@@ -60,7 +60,7 @@
     {
       "file": "commands/GitRecommend.md",
       "contains": [
-        "argument-hint: \"[<goal>] [--remote] [--help]\"",
+        "argument-hint: \"[<goal>] [--remote] [--lang <language>] [--help]\"",
         "Handle `--help` first",
         "## Inline help",
         "Usage: `/GitRecommend"
@@ -74,7 +74,7 @@
     {
       "file": "commands/GitIntegrate.md",
       "contains": [
-        "argument-hint: \"<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]\"",
+        "argument-hint: \"<lane|branch> [--strategy auto|merge|squash|cherry-pick] [--lang <language>] [--help]\"",
         "Handle `--help` first",
         "## Inline help",
         "Usage: `/GitIntegrate",
@@ -89,7 +89,7 @@
     {
       "file": "commands/GitCleanup.md",
       "contains": [
-        "argument-hint: \"[--apply] [--help]\"",
+        "argument-hint: \"[--apply] [--lang <language>] [--help]\"",
         "Handle `--help` first",
         "## Inline help",
         "Usage: `/GitCleanup",
@@ -104,7 +104,7 @@
     {
       "file": "commands/GitConverge.md",
       "contains": [
-        "argument-hint: \"<branch> [--apply] [--discard-ignored] [--help]\"",
+        "argument-hint: \"<branch> [--apply] [--discard-ignored] [--lang <language>] [--help]\"",
         "Handle `--help` first",
         "## Inline help",
         "Usage: `/GitConverge",

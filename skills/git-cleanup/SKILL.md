@@ -15,13 +15,14 @@ Command adapter for the canonical `/GitCleanup` command of the MAGOS (Multi-Agen
 
 ## Usage
 
-- Hermes: `/git-cleanup [--apply] [--help]`
-- Codex: `$git-cleanup [--apply] [--help]`
+- Hermes: `/git-cleanup [--apply] [--lang <language>] [--help]`
+- Codex: `$git-cleanup [--apply] [--lang <language>] [--help]`
 - `--apply`: Recheck each safe local candidate, then apply cleanup only where every safety condition still holds. It does not permit deleting remote branches.
+- `--lang <language>`: Language of the reply, as a name or code (for example `English`, `ja`); Chinese when absent. Command names, options, branch names, paths, SHAs, and status codes stay untranslated.
 - `--help`: Show this inline usage and argument description, then stop without inspecting or changing the repository.
 - Default: Preview cleanup candidates only; no deletion.
 
-Examples: `/git-cleanup`, `$git-cleanup --apply`, `$git-cleanup --help`.
+Examples: `/git-cleanup`, `$git-cleanup --apply`, `$git-cleanup --lang English`, `$git-cleanup --help`.
 
 ## Arguments
 
@@ -54,4 +55,4 @@ If `../../SKILL.md` or `../../references/commands.md` cannot be read, name the m
 
 ## Execution
 
-Execute the canonical `/GitCleanup` command only when the user explicitly invoked this command skill. Preview candidates by default; delete only when the explicit command includes `--apply` and every safety condition still passes. Never delete remote branches unless explicitly asked.
+Execute the canonical `/GitCleanup` command only when the user explicitly invoked this command skill. Preview candidates by default; delete only when the explicit command includes `--apply` and every safety condition still passes. Never delete remote branches unless explicitly asked. Reply in the language selected by `--lang` (Chinese when absent); never translate commands, options, branch names, paths, SHAs, or status codes. Remove `--lang` and its value from the arguments before parsing the rest.

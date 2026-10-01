@@ -62,9 +62,11 @@ Dispositions: **adopted** (contract changed), **modified** (adopted in a differe
 
 ## Judgment call left for the user
 
-`--apply` with no earlier preview in the conversation **runs on the plan it prints itself** rather than refusing until a
-preview exists. That matches "preview by default, `--apply` executes", and the printed tips are the acceptance. The stricter
-alternative (refuse until a preview is visible) is a one-line change in section 6 step 1 and in `SKILL.md`. Say if you want it.
+`--apply` with no earlier preview in the conversation **runs on the plan it records itself and reports at the end**, rather
+than refusing until a preview exists or printing the plan before the first merge. That matches "preview by default, `--apply`
+executes". The user chose this (option 2) after two rounds of real-CLI runs showed that agents report the plan but do not
+print it first. The stricter alternative (print the plan and stop until a second `--apply`) is a small change in section 6
+step 1 and in `SKILL.md`.
 
 # Code review of the implementation (max effort)
 

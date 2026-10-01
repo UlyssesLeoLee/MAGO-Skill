@@ -8,7 +8,7 @@ Test design, scripts, evidence, and the tuning log for the GitConverge command
 | [`test-design.md`](test-design.md) | What is tested, the seven test layers, the oracles, the scenario matrix, known gaps |
 | [`review-findings.md`](review-findings.md) | The design review and the max-effort code review: every finding and what was done about it |
 | [`TUNING.md`](TUNING.md) | Each tuning round: symptom, cause, what was changed, and the result |
-| [`contracts/cases.json`](contracts/cases.json) | 17 source-contract cases for the shipped files |
+| [`contracts/cases.json`](contracts/cases.json) | 18 source-contract cases for the shipped files |
 | [`scripts/`](scripts) | Fixtures, probes, reference executor, scenarios, runners, mutation checks, policy |
 | [`results/`](results) | Evidence from the latest runs (summary in `results/summary.md`) |
 
@@ -32,7 +32,7 @@ Individual layers:
 ```powershell
 python -X utf8 tests/claude/scripts/git_behavior_probes.py      # Git behaviors the contract relies on
 python -X utf8 tests/claude/scripts/run_claude_contracts.py     # source contracts
-python -X utf8 tests/claude/scripts/run_reference_cases.py      # reference executor, 45 scenarios
+python -X utf8 tests/claude/scripts/run_reference_cases.py      # reference executor, 46 scenarios
 python -X utf8 tests/claude/scripts/run_mutation_checks.py      # do the scenarios notice broken rules?
 python -X utf8 tests/claude/scripts/test_command_policy.py      # forbidden-command policy
 python -X utf8 tests/claude/scripts/run_claude_cases.py --fixture-check --case '*'   # harness self-check, no model
@@ -57,5 +57,7 @@ project and local settings (none of the user's hooks), and caps spend per case.
 and `SKIPPED` (platform) are never passes. The reference executor proves the procedure and the oracles; only `results/claude/runtime/`
 shows what a real agent did.
 
-Committed evidence is deterministic (fixed commit dates, fixture paths replaced by `<root>`), except the model transcripts in
-`results/claude/runtime/`, which record one real run each.
+Committed evidence is deterministic (fixed commit dates, fixture paths replaced by `<root>`), except `results/claude/runtime/`,
+which records one real run per case. Its raw transcripts (`transcript.jsonl`) and `stderr.txt` stay local: they list the account's
+connected tools and local paths. The committed `result.json` keeps the prompt, the final answer, the git commands, the
+snapshots, and the verdict.

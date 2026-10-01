@@ -24,7 +24,7 @@
         "contains": [
           "Handle `--help` first",
           "## Inline help",
-          "Usage: `/GitConverge <branch> [--apply] [--discard-ignored] [--help]`",
+          "Usage: `/GitConverge <branch> [--apply] [--discard-ignored] [--lang <language>] [--help]`",
           "- `--help`: Show this help and stop without inspecting or changing the repository.",
           "Examples: `/GitConverge agent/release`"
         ]
@@ -32,8 +32,8 @@
       {
         "file": "skills/git-converge/SKILL.md",
         "contains": [
-          "- Codex: `$git-converge <branch> [--apply] [--discard-ignored] [--help]`",
-          "- Hermes: `/git-converge <branch> [--apply] [--discard-ignored] [--help]`",
+          "- Codex: `$git-converge <branch> [--apply] [--discard-ignored] [--lang <language>] [--help]`",
+          "- Hermes: `/git-converge <branch> [--apply] [--discard-ignored] [--lang <language>] [--help]`",
           "If `--help` is present, even with other arguments, answer from the inline Usage section above and stop before any tool call"
         ]
       },
@@ -382,7 +382,7 @@
       {
         "file": "SKILL.md",
         "contains": [
-          "`/GitConverge <branch> --apply` is the user's explicit acceptance of the source tips in the plan printed by that run",
+          "`/GitConverge <branch> --apply` is the user's explicit acceptance of the source tips in the plan that run records and reports",
           "it is not permission to write any branch other than `<branch>`, to move, reset, or delete `main`"
         ]
       },
@@ -392,7 +392,9 @@
           "### Acceptance rule",
           "Stop and show a new preview when any source tip or `main` differs from it",
           "merge commits whose second parent is a source tip recorded in that plan",
-          "print the whole plan as a message before running any command that changes the repository",
+          "record the whole plan before running any command that changes the repository",
+          "The plan goes into the final report (step 7); it need not be printed before the first write",
+          "the plan it acted on (as recorded in step 1)",
           "appeared after preview, untouched",
           "A rerun after an interruption starts from a fresh survey"
         ]
@@ -454,7 +456,8 @@
         "file": "commands/GitConverge.md",
         "contains": [
           "disable-model-invocation: true",
-          "if the skill could not be loaded, preview only"
+          "if the skill could not be loaded, preview only",
+          "record the full plan first"
         ]
       },
       {
@@ -589,6 +592,193 @@
         "contains": [
           "BLOCKED_UPSTREAM_OF_KEPT      a branch that will remain tracks this branch",
           "Re-evaluate `BLOCKED_UPSTREAM_OF_KEPT` until nothing changes"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "commands/lang-option",
+    "skill": "git-converge",
+    "feature": "Every command accepts --lang <language>; the reply is Chinese when it is absent",
+    "invocations": {
+      "claude": "/GitRecon --lang English",
+      "codex": "$git-recon --lang English",
+      "hermes": "/git-recon --lang English"
+    },
+    "test_object": {
+      "commands": [
+        "GitRecon",
+        "GitAnalyze",
+        "GitRecommend",
+        "GitIntegrate",
+        "GitCleanup",
+        "GitConverge"
+      ],
+      "default": "Chinese"
+    },
+    "expected": [
+      "All six Claude wrappers list --lang in the argument hint, the usage line, the options, and the execution step.",
+      "All six adapters list --lang in both host usage lines and in the execution section.",
+      "The canonical contract defines the option once and every command's argument table repeats it."
+    ],
+    "checks": [
+      {
+        "file": "commands/GitRecon.md",
+        "contains": [
+          "[--lang <language>] [--help]",
+          "Read `--lang <language>` first",
+          "- `--lang <language>`: Language of the reply",
+          "--lang English`",
+          "Write every reply in the language selected by `--lang` (Chinese when absent).",
+          "Reply language: Chinese unless `--lang` selects another one; this includes the final report, however long the run was.",
+          "4. Before you write the final report, check the reply language again"
+        ]
+      },
+      {
+        "file": "commands/GitAnalyze.md",
+        "contains": [
+          "[--lang <language>] [--help]",
+          "Read `--lang <language>` first",
+          "- `--lang <language>`: Language of the reply",
+          "--lang English`",
+          "Write every reply in the language selected by `--lang` (Chinese when absent).",
+          "Reply language: Chinese unless `--lang` selects another one; this includes the final report, however long the run was.",
+          "4. Before you write the final report, check the reply language again"
+        ]
+      },
+      {
+        "file": "commands/GitRecommend.md",
+        "contains": [
+          "[--lang <language>] [--help]",
+          "Read `--lang <language>` first",
+          "- `--lang <language>`: Language of the reply",
+          "--lang English`",
+          "Write every reply in the language selected by `--lang` (Chinese when absent).",
+          "Reply language: Chinese unless `--lang` selects another one; this includes the final report, however long the run was.",
+          "4. Before you write the final report, check the reply language again"
+        ]
+      },
+      {
+        "file": "commands/GitIntegrate.md",
+        "contains": [
+          "[--lang <language>] [--help]",
+          "Read `--lang <language>` first",
+          "- `--lang <language>`: Language of the reply",
+          "--lang English`",
+          "Write every reply in the language selected by `--lang` (Chinese when absent).",
+          "Reply language: Chinese unless `--lang` selects another one; this includes the final report, however long the run was.",
+          "4. Before you write the final report, check the reply language again"
+        ]
+      },
+      {
+        "file": "commands/GitCleanup.md",
+        "contains": [
+          "[--lang <language>] [--help]",
+          "Read `--lang <language>` first",
+          "- `--lang <language>`: Language of the reply",
+          "--lang English`",
+          "Write every reply in the language selected by `--lang` (Chinese when absent).",
+          "Reply language: Chinese unless `--lang` selects another one; this includes the final report, however long the run was.",
+          "4. Before you write the final report, check the reply language again"
+        ]
+      },
+      {
+        "file": "commands/GitConverge.md",
+        "contains": [
+          "[--lang <language>] [--help]",
+          "Read `--lang <language>` first",
+          "- `--lang <language>`: Language of the reply",
+          "--lang English`",
+          "Write every reply in the language selected by `--lang` (Chinese when absent).",
+          "Reply language: Chinese unless `--lang` selects another one; this includes the final report, however long the run was.",
+          "4. Before you write the final report, check the reply language again"
+        ]
+      },
+      {
+        "file": "skills/git-recon/SKILL.md",
+        "contains": [
+          "[--lang <language>] [--help]`",
+          "- `--lang <language>`: Language of the reply",
+          "Reply in the language selected by `--lang` (Chinese when absent)",
+          "Remove `--lang` and its value from the arguments before parsing the rest."
+        ]
+      },
+      {
+        "file": "skills/git-analyze/SKILL.md",
+        "contains": [
+          "[--lang <language>] [--help]`",
+          "- `--lang <language>`: Language of the reply",
+          "Reply in the language selected by `--lang` (Chinese when absent)",
+          "Remove `--lang` and its value from the arguments before parsing the rest."
+        ]
+      },
+      {
+        "file": "skills/git-recommend/SKILL.md",
+        "contains": [
+          "[--lang <language>] [--help]`",
+          "- `--lang <language>`: Language of the reply",
+          "Reply in the language selected by `--lang` (Chinese when absent)",
+          "Remove `--lang` and its value from the arguments before parsing the rest."
+        ]
+      },
+      {
+        "file": "skills/git-integrate/SKILL.md",
+        "contains": [
+          "[--lang <language>] [--help]`",
+          "- `--lang <language>`: Language of the reply",
+          "Reply in the language selected by `--lang` (Chinese when absent)",
+          "Remove `--lang` and its value from the arguments before parsing the rest."
+        ]
+      },
+      {
+        "file": "skills/git-cleanup/SKILL.md",
+        "contains": [
+          "[--lang <language>] [--help]`",
+          "- `--lang <language>`: Language of the reply",
+          "Reply in the language selected by `--lang` (Chinese when absent)",
+          "Remove `--lang` and its value from the arguments before parsing the rest."
+        ]
+      },
+      {
+        "file": "skills/git-converge/SKILL.md",
+        "contains": [
+          "[--lang <language>] [--help]`",
+          "- `--lang <language>`: Language of the reply",
+          "Reply in the language selected by `--lang` (Chinese when absent)",
+          "Remove `--lang` and its value from the arguments before parsing the rest."
+        ]
+      },
+      {
+        "file": "references/commands.md",
+        "contains": [
+          "**Reply language.** All six commands accept `--lang <language>`.",
+          "Chinese (简体中文)",
+          "including the final report of a write command after a long run",
+          "write it in the reply language, Chinese unless `--lang` selects another one, headings and tables included",
+          "put a multi-word name in quotes",
+          "may be combined with `--help`",
+          "Never translate command names, option names, branch or worktree names, paths, SHAs, Git commands, or status codes",
+          "so it never becomes part of a goal, target, or branch name",
+          "/GitRecon --lang English",
+          "/GitAnalyze <branch> --lang English",
+          "/GitIntegrate <lane-or-branch> --lang English",
+          "/GitConverge <branch> --lang English",
+          "| `--lang <language>` | No | Language of the reply"
+        ]
+      },
+      {
+        "file": "SKILL.md",
+        "contains": [
+          "All six commands accept `--lang <language>`",
+          "(Chinese when absent)"
+        ]
+      },
+      {
+        "file": "references/pressure-tests.md",
+        "contains": [
+          "## Reply language pressure tests (v3.4)",
+          "### Default language",
+          "### Language option mistakes"
         ]
       }
     ]

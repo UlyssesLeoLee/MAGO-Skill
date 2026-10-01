@@ -18,7 +18,7 @@
     {
       "file": "skills/git-cleanup/SKILL.md",
       "contains": [
-        "- Codex: `$git-cleanup [--apply] [--help]`",
+        "- Codex: `$git-cleanup [--apply] [--lang <language>] [--help]`",
         "`--help`:",
         "Examples:"
       ]

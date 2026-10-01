@@ -15,8 +15,8 @@ adapters (`commands/GitConverge.md`, `skills/git-converge/`). The tests therefor
 |---|---|---|---|
 | L0 headers | `cypher_header.py --check` | The Cypher block atop each script still matches the code | no |
 | L1 Git probes | `git_behavior_probes.py` | Each Git behavior the contract relies on holds on the installed Git (15 assertions plus 1 recorded observation) | no |
-| L2 source contracts | `run_claude_contracts.py` | The shipped files state every rule (17 cases, plus the 21 aggregate cases in `tests/codex`) | no |
-| L3 reference scenarios | `run_reference_cases.py` | A deterministic implementation of the contract reaches the right end state in 45 repository shapes | no |
+| L2 source contracts | `run_claude_contracts.py` | The shipped files state every rule (18 cases, plus the 21 aggregate cases in `tests/codex`) | no |
+| L3 reference scenarios | `run_reference_cases.py` | A deterministic implementation of the contract reaches the right end state in 46 repository shapes | no |
 | L4 mutation checks | `run_mutation_checks.py` | The scenarios notice when a rule is broken (27 mutations) | no |
 | L5 policy unit tests | `test_command_policy.py` | The forbidden-command policy classifies commands correctly | no |
 | L6 Claude runtime | `run_claude_cases.py` | The real Claude CLI, given `/GitConverge ...`, reaches the same end states without forbidden commands | yes |
@@ -48,9 +48,11 @@ them with `GIT_TRACE2_EVENT`, which logs every git process however it was starte
 (fixed `-c protocol.ext.allow=never -c core.hooksPath=...` prefix) are dropped before the policy runs. A PATH shim was tried
 first and failed: Git Bash puts `/mingw64/bin` ahead of it.
 
-The runtime runner adds two transcript checks: the final answer must name the words a scenario requires (every local
-branch for a preview; the exact branch name for `case-variant-target`; the worktree to run from for
-`target-checked-out-elsewhere`), and for an apply the plan must be printed before the first repository write.
+The runtime runner adds two transcript checks. The final report must name the words a scenario requires: every local
+branch (for GitConverge, where the plan lives in the report), the exact branch name for `case-variant-target`, and the
+worktree to run from for `target-checked-out-elsewhere`. The reply must also be in the requested language: Chinese when
+`--lang` is absent, English for `--lang English` (a share of CJK letters of at least 20% or at most 3%; other languages are
+not checked). The plan is no longer required to appear before the first write; it is recorded first and reported.
 
 ## Result semantics
 
@@ -102,6 +104,8 @@ runs against the MAGOS checkout. Commits use a fixed author and date so SHAs, an
 | `main-in-progress` | the main worktree is mid-merge on `main` | no crash; `main` not merged; others converge |
 | `worktree-appeared-after-preview` | a worktree is added for a previewed branch | branch merged but kept with its worktree (reference only) |
 | `rerun-after-interrupted-apply` | apply stops on a conflict; the user drops the loser; rerun with the earlier plan | not stale; converges (reference only) |
+| `preview-lang-english` | the happy-path repository, `--lang English` | read-only; the reply is English (Claude runtime only) |
+| `recon-default-chinese`, `recon-lang-english`, `analyze-lang-english`, `recommend-goal-lang` | read-only runs of the other commands, with and without `--lang`, and `--lang` inside GitRecommend's free-text goal | repository unchanged; the reply is in the right language (Claude runtime only) |
 | `stale-preview` | a source moves after the preview | stops; nothing changes (reference only) |
 | `appeared-after-preview` | a branch is created after the preview | left untouched (reference only) |
 | `tip-moves-mid-run` | a tip moves between merge and delete | that branch kept with its new commit (reference only) |
@@ -128,7 +132,7 @@ python -X utf8 tests/claude/scripts/run_claude_cases.py --case 'conflict-*'   # 
 ```
 
 Evidence: `results/git-probes/`, `results/contracts/`, `results/reference/<scenario>/`, `results/mutation/`,
-`results/claude/{fixture-check,runtime}/<scenario>/` (prompt, transcript, git trace, snapshots, verdict), and
+`results/claude/{fixture-check,runtime}/<scenario>/` (prompt, final answer, git trace, snapshots, verdict; the raw transcript stays local), and
 `results/summary.md`.
 
 ## Known gaps

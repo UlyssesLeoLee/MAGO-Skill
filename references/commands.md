@@ -8,6 +8,8 @@ These are **semantic command intents**. Canonical names use a leading `/`. A hos
 
 All six commands accept `--help`. When it is present, show that command's usage, argument descriptions, defaults, and examples, then stop before inspecting or changing a repository. `--help` takes precedence over other arguments.
 
+**Reply language.** All six commands accept `--lang <language>`. It selects the language of everything the command says to the user: help text, questions, errors, reports (including the final report of a write command after a long run), and recommendations. When it is absent the reply is in Chinese (简体中文). The value is the next token: a language name or a common code (`English`, `en`, `日本語`, `ja`, `Français`); put a multi-word name in quotes. The option may appear anywhere among the arguments and may be combined with `--help`; help is then shown in the requested language, with flags and examples left untouched. Never translate command names, option names, branch or worktree names, paths, SHAs, Git commands, or status codes such as `BLOCKED_DIRTY`; a short gloss in the reply language next to a code is fine. Remove `--lang` and its value from the arguments before any other parsing, so it never becomes part of a goal, target, or branch name. If `--lang` has no value, or the value is not a language, explain the problem (in Chinese) and show the usage without executing the command.
+
 Recognize only the options listed for each command. For an unknown option or a required option value that is missing or invalid, explain the issue and show the relevant usage without executing the command. If a required positional target is missing, ask the user for it. Host adapters should preserve the supplied argument text and route `--help` to this reference.
 
 Host entry points are Claude Code `/GitRecon`, Hermes `/git-recon`, and Codex `$git-recon` (use the corresponding command name for the other five). Append the same arguments after the host-specific entry point.
@@ -36,6 +38,7 @@ Rules for every adapter:
 ```text
 /GitRecon
 /GitRecon --remote
+/GitRecon --lang English
 /GitRecon --help
 ```
 
@@ -44,6 +47,7 @@ Rules for every adapter:
 | Argument | Required | Description |
 |---|---:|---|
 | `--remote` | No | Refresh remote-tracking refs before classification. It does not change branches, worktrees, or commit history. |
+| `--lang <language>` | No | Language of the reply, a name or code such as `English` or `ja`. Default: Chinese. See Argument and Help Behavior. |
 | `--help` | No | Show this command's usage and stop without inspecting the repository. |
 
 Examples: `/GitRecon --remote`, `/GitRecon --help`.
@@ -82,6 +86,7 @@ Repository Snapshot
 /GitAnalyze <branch>
 /GitAnalyze <worktree-path>
 /GitAnalyze <target> --remote
+/GitAnalyze <branch> --lang English
 /GitAnalyze --help
 ```
 
@@ -91,6 +96,7 @@ Repository Snapshot
 |---|---:|---|
 | `<target>` | Yes | Branch name or worktree path to analyze. |
 | `--remote` | No | Refresh remote-tracking refs before analysis. It does not change branches, worktrees, or commit history. |
+| `--lang <language>` | No | Language of the reply, a name or code such as `English` or `ja`. Default: Chinese. See Argument and Help Behavior. |
 | `--help` | No | Show this command's usage and stop without inspecting the repository. |
 
 Examples: `/GitAnalyze feature/auth`, `/GitAnalyze feature/auth --remote`, `/GitAnalyze --help`.
@@ -132,6 +138,7 @@ Recommendation
 /GitRecommend
 /GitRecommend <goal>
 /GitRecommend <goal> --remote
+/GitRecommend --lang English
 /GitRecommend --help
 ```
 
@@ -141,6 +148,7 @@ Recommendation
 |---|---:|---|
 | `[goal]` | No | Natural-language question or desired outcome. Omit it for general next-step recommendations. |
 | `--remote` | No | Refresh remote-tracking refs before making recommendations. It does not change branches, worktrees, or commit history. |
+| `--lang <language>` | No | Language of the reply, a name or code such as `English` or `ja`. Default: Chinese. See Argument and Help Behavior. |
 | `--help` | No | Show this command's usage and stop without inspecting the repository. |
 
 Examples: `/GitRecommend`, `/GitRecommend 哪些分支可以先集成`, `/GitRecommend --remote`, `/GitRecommend --help`.
@@ -185,6 +193,7 @@ Blocked/unknown items
 /GitIntegrate <lane-or-branch> --strategy merge
 /GitIntegrate <lane-or-branch> --strategy squash
 /GitIntegrate <lane-or-branch> --strategy cherry-pick
+/GitIntegrate <lane-or-branch> --lang English
 /GitIntegrate --help
 ```
 
@@ -194,6 +203,7 @@ Blocked/unknown items
 |---|---:|---|
 | `<lane-or-branch>` | Yes | Source lane or branch to integrate. |
 | `--strategy <value>` | No | Integration strategy: `auto`, `merge`, `squash`, or `cherry-pick`. Defaults to `auto`. |
+| `--lang <language>` | No | Language of the reply, a name or code such as `English` or `ja`. Default: Chinese. See Argument and Help Behavior. |
 | `--help` | No | Show this command's usage and stop without inspecting or changing the repository. |
 
 Examples: `/GitIntegrate agent/auth`, `/GitIntegrate agent/auth --strategy squash`, `/GitIntegrate --help`.
@@ -237,6 +247,7 @@ Never convert this command into force-push, destructive reset, or blind conflict
 ```text
 /GitCleanup
 /GitCleanup --apply
+/GitCleanup --lang English
 /GitCleanup --help
 ```
 
@@ -245,6 +256,7 @@ Never convert this command into force-push, destructive reset, or blind conflict
 | Argument | Required | Description |
 |---|---:|---|
 | `--apply` | No | Apply safe local cleanup candidates after rechecking their state. Without it, only show a preview. |
+| `--lang <language>` | No | Language of the reply, a name or code such as `English` or `ja`. Default: Chinese. See Argument and Help Behavior. |
 | `--help` | No | Show this command's usage and stop without inspecting or changing the repository. |
 
 Examples: `/GitCleanup`, `/GitCleanup --apply`, `/GitCleanup --help`.
@@ -308,6 +320,7 @@ Remaining risks
 /GitConverge <branch>
 /GitConverge <branch> --apply
 /GitConverge <branch> --apply --discard-ignored
+/GitConverge <branch> --lang English
 /GitConverge --help
 ```
 
@@ -318,6 +331,7 @@ Remaining risks
 | `<branch>` | Yes | Local branch that receives everything. Matched exactly and case-sensitively against `refs/heads/`; it must not be `main`. |
 | `--apply` | No | Merge the planned sources into `<branch>`, then delete the merged local branches and their clean worktrees. Without it, only show a preview. |
 | `--discard-ignored` | No | With `--apply`, allow removing a worktree that holds ignored files (for example `.env`, `node_modules/`). Without it such a worktree and its branch are kept. |
+| `--lang <language>` | No | Language of the reply, a name or code such as `English` or `ja`. Default: Chinese. See Argument and Help Behavior. |
 | `--help` | No | Show this command's usage and stop without inspecting or changing the repository. |
 
 Examples: `/GitConverge agent/release`, `/GitConverge agent/release --apply`, `/GitConverge --help`.
@@ -339,7 +353,7 @@ Examples: `/GitConverge agent/release`, `/GitConverge agent/release --apply`, `/
 
 ### Acceptance rule
 
-`/GitConverge <branch> --apply` is the user's explicit acceptance of the source tips listed in the plan printed by that run, or in a GitConverge preview earlier in the same conversation. It replaces per-lane review for exactly those tips and meets the freshness gate for them. It does not permit writing any branch other than `<branch>`, and it never moves, resets, or deletes `main`.
+`/GitConverge <branch> --apply` is the user's explicit acceptance of the source tips listed in the plan that run records and puts in its report, or in a GitConverge preview earlier in the same conversation. It replaces per-lane review for exactly those tips and meets the freshness gate for them. It does not permit writing any branch other than `<branch>`, and it never moves, resets, or deletes `main`.
 
 ### Classification
 
@@ -383,7 +397,7 @@ The preview does not merge, switch, delete, prune, or fetch. `git merge-tree --w
 
 ### Apply behavior (`--apply`)
 
-1. **Re-survey and print the plan.** Run the preview logic fresh and print the whole plan as a message before running any command that changes the repository. Compare it with the most recent GitConverge preview or apply plan printed earlier in this conversation, if any. Stop and show a new preview when any source tip or `main` differs from it, or when the target moved in any way other than through merge commits whose second parent is a source tip recorded in that plan (an earlier `--apply` that was interrupted). A branch that is not in that plan, and a worktree that appeared since it, are reported as "appeared after preview, untouched": such a branch is neither merged nor deleted, and a previewed branch that gained a worktree is still merged as planned but neither it nor its worktree is deleted. Stop on any gate failure or `UNKNOWN` needed for a write. Without an earlier plan the printed plan is the plan; the run acts on exactly that plan and nothing that appears later.
+1. **Re-survey and record the plan.** Run the preview logic fresh and record the whole plan before running any command that changes the repository: every local branch with its tip SHA, merge status, and delete blockers; the merge order; the expected final branches; and the worktrees to be removed. The plan goes into the final report (step 7); it need not be printed before the first write. Compare it with the most recent GitConverge preview or apply report earlier in this conversation, if any. Stop and show a new preview when any source tip or `main` differs from it, or when the target moved in any way other than through merge commits whose second parent is a source tip recorded in that plan (an earlier `--apply` that was interrupted). A branch that is not in that plan, and a worktree that appeared since it, are reported as "appeared after preview, untouched": such a branch is neither merged nor deleted, and a previewed branch that gained a worktree is still merged as planned but neither it nor its worktree is deleted. Stop on any gate failure or `UNKNOWN` needed for a write. Without an earlier plan the recorded plan is the plan; the run acts on exactly that plan and nothing that appears later.
 2. **Record** the target's start SHA and every source and delete-set tip.
 3. **Switch** the invoking worktree to target if it is on another branch, using `git switch --no-overwrite-ignore <target>`. A refusal stops the command before any merge. The command never switches any other worktree and never switches to `main`.
 4. **Merge every source whose merge status is `MERGE`, in order, whatever its delete blockers**, inside the invoking worktree:
@@ -397,7 +411,7 @@ The preview does not merge, switch, delete, prune, or fetch. `git merge-tree --w
    1. **Remove the worktree** (linked, not invoking): `git worktree remove <path>`, never `--force`, never retried with it. A prunable entry (directory missing) is removed the same way, for that entry only. Never run a repository-wide `git worktree prune`; it would also drop detached worktrees and orphan their commits. If the command exits non-zero, keep the branch, run `git worktree list --porcelain`, and report whether the entry is still listed; an entry that vanished while the directory remains is a partial removal that needs manual cleanup.
    2. **Unset a lagging upstream.** `git branch -d` judges a branch against its upstream when one exists. If the branch has an upstream that does not contain the branch tip, record it (`git for-each-ref --format='%(upstream)|%(upstream:short)' refs/heads/<name>`; empty means no upstream) and run `git branch --unset-upstream <name>` first.
    3. **Delete the branch** with `git -C <invoking-worktree> branch -d <name>`. On failure, restore the upstream (`git branch --set-upstream-to=<saved short name> <name>`), skip the branch, and report. Never use `git branch -D`, never `git worktree remove --force`, never `remove -f -f`.
-7. **Report**: applied operations, skipped items with reasons, the target's start and end SHA, the final local branch list, the validation result, and every deleted branch with its tip SHA (recreate with `git branch <name> <sha>`; the deleted branch's reflog is not kept). State that remote branches still exist and lack the commits that are now only in local `<branch>`; pushing is the user's decision.
+7. **Report** (write it in the reply language, Chinese unless `--lang` selects another one, headings and tables included): the plan it acted on (as recorded in step 1), applied operations, skipped items with reasons, the target's start and end SHA, the final local branch list, the validation result, and every deleted branch with its tip SHA (recreate with `git branch <name> <sha>`; the deleted branch's reflog is not kept). State that remote branches still exist and lack the commits that are now only in local `<branch>`; pushing is the user's decision.
 
 A rerun after an interruption starts from a fresh survey: merged sources are then `CONTAINED` and only get deleted, and the target movement caused by the interrupted run's merges does not make the earlier plan stale (step 1).
 
@@ -408,7 +422,7 @@ Never: move, reset, or delete `main`; push, force-push, or delete remote branche
 ### Output
 
 ```text
-Plan / Preview header
+Plan / Preview header (with --apply: the plan acted on)
 Gates
 Sources to merge (ordered)
 Contained sources

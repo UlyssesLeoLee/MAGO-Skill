@@ -1,0 +1,221 @@
+{
+  "after": {
+    "files": {},
+    "heads": {
+      "agent/a": "d96ccd6be1ca6232764db5f06f7de2bab631b36d",
+      "agent/b": "205b649fda4c74da5e3dbbca14c11cfebaf177cf",
+      "agent/c": "724a44b989c793e6aa434c0d4bedd9c523b591a4",
+      "agent/release": "724a44b989c793e6aa434c0d4bedd9c523b591a4",
+      "main": "61e6b74deaf451972a7bb3ee840417cc217765a2"
+    },
+    "invoking_head": "agent/release",
+    "merge_head": false,
+    "origin": [
+      "refs/heads/main a7865dbe7a31d2bb23b950e1254840cd742e243e"
+    ],
+    "remote_refs": [
+      "refs/remotes/origin/main a7865dbe7a31d2bb23b950e1254840cd742e243e"
+    ],
+    "tag_refs": [],
+    "tags": [],
+    "worktrees": [
+      {
+        "branch": "agent/release",
+        "detached": false,
+        "exists": true,
+        "head": "724a44b989c793e6aa434c0d4bedd9c523b591a4",
+        "locked": false,
+        "path": "repo",
+        "prunable": false,
+        "status": ""
+      },
+      {
+        "branch": "agent/b",
+        "detached": false,
+        "exists": true,
+        "head": "205b649fda4c74da5e3dbbca14c11cfebaf177cf",
+        "locked": false,
+        "path": "wt-b",
+        "prunable": false,
+        "status": ""
+      }
+    ]
+  },
+  "before": {
+    "files": {},
+    "heads": {
+      "agent/a": "d96ccd6be1ca6232764db5f06f7de2bab631b36d",
+      "agent/b": "205b649fda4c74da5e3dbbca14c11cfebaf177cf",
+      "agent/c": "724a44b989c793e6aa434c0d4bedd9c523b591a4",
+      "agent/release": "724a44b989c793e6aa434c0d4bedd9c523b591a4",
+      "main": "61e6b74deaf451972a7bb3ee840417cc217765a2"
+    },
+    "invoking_head": "agent/release",
+    "merge_head": false,
+    "origin": [
+      "refs/heads/main a7865dbe7a31d2bb23b950e1254840cd742e243e"
+    ],
+    "remote_refs": [
+      "refs/remotes/origin/main a7865dbe7a31d2bb23b950e1254840cd742e243e"
+    ],
+    "tag_refs": [],
+    "tags": [],
+    "worktrees": [
+      {
+        "branch": "agent/release",
+        "detached": false,
+        "exists": true,
+        "head": "724a44b989c793e6aa434c0d4bedd9c523b591a4",
+        "locked": false,
+        "path": "repo",
+        "prunable": false,
+        "status": ""
+      },
+      {
+        "branch": "agent/b",
+        "detached": false,
+        "exists": true,
+        "head": "205b649fda4c74da5e3dbbca14c11cfebaf177cf",
+        "locked": false,
+        "path": "wt-b",
+        "prunable": false,
+        "status": ""
+      }
+    ]
+  },
+  "checks": [
+    {
+      "name": "preview changes no ref, worktree, or file",
+      "passed": true
+    },
+    {
+      "name": "invariant: main did not move",
+      "passed": true
+    },
+    {
+      "name": "invariant: tags unchanged",
+      "passed": true
+    },
+    {
+      "name": "invariant: remote unchanged",
+      "passed": true
+    },
+    {
+      "name": "invariant: remote-tracking refs unchanged",
+      "passed": true
+    },
+    {
+      "name": "invariant: no merge left in progress",
+      "passed": true
+    },
+    {
+      "detail": "0% CJK letters (English allows at most 3%)",
+      "name": "the reply is in English",
+      "passed": true
+    },
+    {
+      "name": "command policy: no forbidden git command and read-only preview",
+      "passed": true
+    }
+  ],
+  "claude_returncode": 0,
+  "final_answer": "nd is the largest delivery.\n3. **`agent/b`:** Merge it second. It is also conflict-free and has a single commit. Its worktree `wt-b` is clean, so `agent/b` can be integrated now. Keep `wt-b` until the merge is done.\n4. **`main`:** Merge it last. It brings in the unpublished `61e6b74` and its tip is not in `origin/main`. Merge it only if you want that commit in the release line. Otherwise, hold off until `main` is pushed or reviewed.\n\n## Why\n- All three test merges report no conflicts, and the changed file sets are disjoint. So the order doesn't affect correctness, and I ranked by size and risk.\n- `main` goes last because it is the only branch carrying a commit outside the `agent/*` lanes.\n\n## Blocked or unknown\n- **Semantic dependencies:** I only checked file overlap and Git ancestry. That cannot prove the lanes are independent in meaning.\n- **Review and validation:** I found no lane records, review evidence or test results. I also did not identify a build or test command, so nothing has been validated.\n- **Pairwise conflicts:** The test merges were each against `agent/release` only. They can't show a clash between two branches once the first is merged, so re-check after each merge.\n- **Remote state:** I don't know whether `origin` has moved, because I didn't fetch. Run `/GitRecommend ... --remote` if that matters.\n\nWhen you're ready, `/GitIntegrate agent/a` is the next step. `/GitConverge agent/release` previews merging everything and keeping only `main` and `agent/release`.",
+  "git_commands": [
+    [
+      "--exec-path"
+    ],
+    [
+      "--exec-path"
+    ],
+    [
+      "rev-parse",
+      "--show-toplevel"
+    ],
+    [
+      "status",
+      "--porcelain=v1",
+      "--branch"
+    ],
+    [
+      "worktree",
+      "list",
+      "--porcelain"
+    ],
+    [
+      "for-each-ref",
+      "--sort=-committerdate",
+      "--format=%(refname:short)%09%(objectname:short)%09%(upstream:short)%09%(upstream:track)%09%(committerdate:iso8601)",
+      "refs/heads"
+    ],
+    [
+      "remote",
+      "-v"
+    ],
+    [
+      "symbolic-ref",
+      "--quiet",
+      "--short",
+      "refs/remotes/origin/HEAD"
+    ],
+    [
+      "log",
+      "--oneline",
+      "--graph",
+      "--all"
+    ],
+    [
+      "-C",
+      "../wt-b",
+      "status",
+      "--porcelain=v1",
+      "--untracked-files=all"
+    ],
+    [
+      "diff",
+      "--name-only",
+      "agent/release...agent/a"
+    ],
+    [
+      "diff",
+      "--name-only",
+      "agent/release...agent/b"
+    ],
+    [
+      "diff",
+      "--name-only",
+      "a7865db",
+      "main"
+    ],
+    [
+      "merge-tree",
+      "--write-tree",
+      "agent/release",
+      "agent/a"
+    ],
+    [
+      "merge-tree",
+      "--write-tree",
+      "agent/release",
+      "agent/b"
+    ],
+    [
+      "merge-tree",
+      "--write-tree",
+      "agent/release",
+      "main"
+    ],
+    [
+      "-C",
+      "../wt-b",
+      "status",
+      "--porcelain=v1",
+      "--untracked-files=all"
+    ]
+  ],
+  "id": "recommend-goal-lang",
+  "mode": "preview",
+  "prompt": "/GitRecommend which branches should merge first --lang English",
+  "result_subtype": "success",
+  "status": "PASS",
+  "title": "--lang inside GitRecommend's free-text goal is removed and honored"
+}

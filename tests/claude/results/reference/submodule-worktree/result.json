@@ -145,26 +145,26 @@
         [
           "merge-base",
           "refs/heads/agent/release",
-          "8143f638541d4ce0a88f15ca9403401cc51fd640"
+          "91ceed9054f3b197c54ee59aa7837468e3065a55"
         ],
         [
           "rev-list",
           "--count",
-          "refs/heads/agent/release..8143f638541d4ce0a88f15ca9403401cc51fd640"
+          "refs/heads/agent/release..91ceed9054f3b197c54ee59aa7837468e3065a55"
         ],
         [
           "log",
           "--oneline",
           "--no-decorate",
           "--max-count=20",
-          "refs/heads/agent/release..8143f638541d4ce0a88f15ca9403401cc51fd640"
+          "refs/heads/agent/release..91ceed9054f3b197c54ee59aa7837468e3065a55"
         ],
         [
           "merge-tree",
           "--write-tree",
           "--no-messages",
           "refs/heads/agent/release",
-          "8143f638541d4ce0a88f15ca9403401cc51fd640"
+          "91ceed9054f3b197c54ee59aa7837468e3065a55"
         ],
         [
           "for-each-ref",
@@ -205,19 +205,19 @@
         [
           "merge-base",
           "--is-ancestor",
-          "8143f638541d4ce0a88f15ca9403401cc51fd640",
+          "91ceed9054f3b197c54ee59aa7837468e3065a55",
           "refs/heads/agent/release"
         ],
         [
           "merge-base",
           "refs/heads/agent/release",
-          "8143f638541d4ce0a88f15ca9403401cc51fd640"
+          "91ceed9054f3b197c54ee59aa7837468e3065a55"
         ],
         [
           "diff",
           "--name-only",
           "724a44b989c793e6aa434c0d4bedd9c523b591a4",
-          "8143f638541d4ce0a88f15ca9403401cc51fd640"
+          "91ceed9054f3b197c54ee59aa7837468e3065a55"
         ],
         [
           "config",
@@ -237,7 +237,7 @@
           "--no-ff",
           "-m",
           "Merge branch 'agent/sub' into agent/release",
-          "8143f638541d4ce0a88f15ca9403401cc51fd640"
+          "91ceed9054f3b197c54ee59aa7837468e3065a55"
         ],
         [
           "rev-parse",
@@ -250,7 +250,7 @@
         ]
       ],
       "deleted": {},
-      "end_sha": "061a91540a71ec0af0f1e6c977200f2650300b91",
+      "end_sha": "6fbdb384a48a5d3502700812a8324fce4fcfa3c7",
       "final_branches": [
         "agent/release",
         "agent/sub",
@@ -310,14 +310,14 @@
               "BLOCKED_SUBMODULE"
             ],
             "commits": [
-              "8143f63 agent/sub: add submodule",
+              "91ceed9 agent/sub: add submodule",
               "bc48587 agent/sub: sub.txt"
             ],
             "delete": false,
             "more": 0,
             "name": "agent/sub",
             "predicted_conflict": false,
-            "sha": "8143f638541d4ce0a88f15ca9403401cc51fd640",
+            "sha": "91ceed9054f3b197c54ee59aa7837468e3065a55",
             "status": "MERGE",
             "unique": 2,
             "worktree": "<root>/wt-sub"
@@ -326,7 +326,7 @@
         "target": "agent/release",
         "tips": {
           "agent/release": "724a44b989c793e6aa434c0d4bedd9c523b591a4",
-          "agent/sub": "8143f638541d4ce0a88f15ca9403401cc51fd640",
+          "agent/sub": "91ceed9054f3b197c54ee59aa7837468e3065a55",
           "main": "a7865dbe7a31d2bb23b950e1254840cd742e243e"
         },
         "unknown_owner_removals": []

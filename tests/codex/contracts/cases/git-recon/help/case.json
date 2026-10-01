@@ -19,7 +19,7 @@
     {
       "file": "skills/git-recon/SKILL.md",
       "contains": [
-        "- Codex: `$git-recon [--remote] [--help]`",
+        "- Codex: `$git-recon [--remote] [--lang <language>] [--help]`",
         "`--help`:",
         "Examples:"
       ]

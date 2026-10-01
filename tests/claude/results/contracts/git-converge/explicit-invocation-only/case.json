@@ -19,7 +19,8 @@
       "file": "commands/GitConverge.md",
       "contains": [
         "disable-model-invocation: true",
-        "if the skill could not be loaded, preview only"
+        "if the skill could not be loaded, preview only",
+        "record the full plan first"
       ]
     },
     {

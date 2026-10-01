@@ -18,7 +18,7 @@
     {
       "file": "skills/git-analyze/SKILL.md",
       "contains": [
-        "- Codex: `$git-analyze <branch|worktree> [--remote] [--help]`",
+        "- Codex: `$git-analyze <branch|worktree> [--remote] [--lang <language>] [--help]`",
         "`--help`:",
         "Examples:"
       ]
