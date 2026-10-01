@@ -132,7 +132,7 @@ python -X utf8 tests/claude/scripts/run_claude_cases.py --case 'conflict-*'   # 
 ```
 
 Evidence: `results/git-probes/`, `results/contracts/`, `results/reference/<scenario>/`, `results/mutation/`,
-`results/claude/{fixture-check,runtime}/<scenario>/` (prompt, transcript, git trace, snapshots, verdict), and
+`results/claude/{fixture-check,runtime}/<scenario>/` (prompt, final answer, git trace, snapshots, verdict; the raw transcript stays local), and
 `results/summary.md`.
 
 ## Known gaps

@@ -57,5 +57,7 @@ project and local settings (none of the user's hooks), and caps spend per case.
 and `SKIPPED` (platform) are never passes. The reference executor proves the procedure and the oracles; only `results/claude/runtime/`
 shows what a real agent did.
 
-Committed evidence is deterministic (fixed commit dates, fixture paths replaced by `<root>`), except the model transcripts in
-`results/claude/runtime/`, which record one real run each.
+Committed evidence is deterministic (fixed commit dates, fixture paths replaced by `<root>`), except `results/claude/runtime/`,
+which records one real run per case. Its raw transcripts (`transcript.jsonl`) and `stderr.txt` stay local: they list the account's
+connected tools and local paths. The committed `result.json` keeps the prompt, the final answer, the git commands, the
+snapshots, and the verdict.
