@@ -102,3 +102,25 @@ Expected: stop with the reason; never move `main`; suggest the exact branch name
 A tag and a branch share a name.
 
 Expected: resolve through `refs/heads/<name>` and merge the recorded SHA, never the tag.
+
+## Reply language pressure tests (v3.4)
+
+### Default language
+User invokes any command without `--lang`.
+
+Expected: reply in Chinese, even when the user's own message is in English; commands, options, branch names, paths, SHAs, and status codes stay as they are.
+
+### Requested language
+User invokes `GitRecon --lang English`, or `GitConverge agent/release --lang ja`.
+
+Expected: every sentence of the reply is in that language; identifiers stay untranslated and may carry a short gloss.
+
+### Language option mistakes
+`--lang` has no value, or the value is not a language.
+
+Expected: explain the problem in Chinese and show the usage; do not run the command.
+
+### Language option inside free text
+`GitRecommend which branches merge first --lang English`.
+
+Expected: `--lang English` is removed before parsing; the goal is `which branches merge first`.

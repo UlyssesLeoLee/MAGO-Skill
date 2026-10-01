@@ -241,7 +241,7 @@
         "entry_still_listed": false,
         "directory_exists": true,
         "partial_state": true,
-        "stderr": "error: failed to delete 'C:/Users/leo19/AppData/Local/Temp/mgc-yx2d3yo9/wt-inner': Permission denied"
+        "stderr": "error: failed to delete 'C:/Users/leo19/AppData/Local/Temp/mgc-991s69tr/wt-inner': Permission denied"
       },
       "note": "observation only (not counted): on Windows this can exit non-zero AFTER dropping the metadata"
     }

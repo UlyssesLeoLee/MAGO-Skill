@@ -18,7 +18,7 @@
     {
       "file": "skills/git-recommend/SKILL.md",
       "contains": [
-        "- Codex: `$git-recommend [goal] [--remote] [--help]`",
+        "- Codex: `$git-recommend [goal] [--remote] [--lang <language>] [--help]`",
         "`--help`:",
         "Examples:"
       ]

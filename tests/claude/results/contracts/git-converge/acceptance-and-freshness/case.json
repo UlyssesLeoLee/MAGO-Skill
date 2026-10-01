@@ -16,7 +16,7 @@
     {
       "file": "SKILL.md",
       "contains": [
-        "`/GitConverge <branch> --apply` is the user's explicit acceptance of the source tips in the plan printed by that run",
+        "`/GitConverge <branch> --apply` is the user's explicit acceptance of the source tips in the plan that run records and reports",
         "it is not permission to write any branch other than `<branch>`, to move, reset, or delete `main`"
       ]
     },
@@ -26,7 +26,9 @@
         "### Acceptance rule",
         "Stop and show a new preview when any source tip or `main` differs from it",
         "merge commits whose second parent is a source tip recorded in that plan",
-        "print the whole plan as a message before running any command that changes the repository",
+        "record the whole plan before running any command that changes the repository",
+        "The plan goes into the final report (step 7); it need not be printed before the first write",
+        "the plan it acted on (as recorded in step 1)",
         "appeared after preview, untouched",
         "A rerun after an interruption starts from a fresh survey"
       ]

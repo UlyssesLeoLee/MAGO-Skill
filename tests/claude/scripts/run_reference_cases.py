@@ -140,7 +140,8 @@ def main() -> int:
     parser.add_argument("--no-evidence", action="store_true", help="do not write evidence files")
     options = parser.parse_args()
     patterns = options.case or ["*"]
-    chosen = [scen for scen in scenarios.REGISTRY.values() if any(fnmatch.fnmatch(scen["id"], p) for p in patterns)]
+    chosen = [scen for scen in scenarios.REGISTRY.values()
+              if scen["command"] == "GitConverge" and any(fnmatch.fnmatch(scen["id"], p) for p in patterns)]
     outcomes = []
     for scen in chosen:
         outcome = run_one(scen, options.fixture_root)

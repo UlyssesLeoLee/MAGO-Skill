@@ -18,7 +18,7 @@
     {
       "file": "skills/git-integrate/SKILL.md",
       "contains": [
-        "- Codex: `$git-integrate <lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]`",
+        "- Codex: `$git-integrate <lane|branch> [--strategy auto|merge|squash|cherry-pick] [--lang <language>] [--help]`",
         "`--help`:",
         "Examples:"
       ]

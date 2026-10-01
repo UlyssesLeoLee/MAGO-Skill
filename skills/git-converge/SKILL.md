@@ -15,15 +15,16 @@ Command adapter for the canonical `/GitConverge` command of the MAGOS (Multi-Age
 
 ## Usage
 
-- Hermes: `/git-converge <branch> [--apply] [--discard-ignored] [--help]`
-- Codex: `$git-converge <branch> [--apply] [--discard-ignored] [--help]`
+- Hermes: `/git-converge <branch> [--apply] [--discard-ignored] [--lang <language>] [--help]`
+- Codex: `$git-converge <branch> [--apply] [--discard-ignored] [--lang <language>] [--help]`
 - `<branch>`: Required local branch that receives everything. Matched exactly (case-sensitive); it must not be `main`.
 - `--apply`: Merge every local branch's unique commits (`main` first) into `<branch>`, then delete the merged local branches and their clean worktrees so only `main` and `<branch>` remain. A conflict stops the command and deletes nothing. It never moves or deletes `main` and never touches remote branches.
 - `--discard-ignored`: With `--apply`, also allow removing worktrees that hold ignored files (for example `.env`). Without it those worktrees and their branches are kept.
+- `--lang <language>`: Language of the reply, as a name or code (for example `English`, `ja`); Chinese when absent. Command names, options, branch names, paths, SHAs, and status codes stay untranslated.
 - `--help`: Show this inline usage and argument description, then stop without inspecting or changing the repository.
 - Default: Preview the merge plan, blocked items, and the expected final branch list; nothing is changed.
 
-Examples: `/git-converge agent/release`, `$git-converge agent/release --apply`, `$git-converge --help`.
+Examples: `/git-converge agent/release`, `$git-converge agent/release --apply`, `$git-converge <branch> --lang English`, `$git-converge --help`.
 
 ## Arguments
 
@@ -56,4 +57,4 @@ If `../../SKILL.md` or `../../references/commands.md` cannot be read, name the m
 
 ## Execution
 
-Execute the canonical `/GitConverge` command only when the user explicitly invoked this command skill. Preview by default; merge and delete only when the explicit command includes `--apply` and every gate still passes. Stop on a conflict and delete nothing. Never push, force-push, or delete remote branches; never use `git branch -D` or `git worktree remove --force`; never run a repository-wide `git worktree prune`. Ask for a branch if none is provided.
+Execute the canonical `/GitConverge` command only when the user explicitly invoked this command skill. Preview by default; merge and delete only when the explicit command includes `--apply` and every gate still passes, and record the full plan first (every local branch with its tip, merge status and blockers, the merge order, and the expected final branches) and include it in the final report. Stop on a conflict and delete nothing. Never push, force-push, or delete remote branches; never use `git branch -D` or `git worktree remove --force`; never run a repository-wide `git worktree prune`. Ask for a branch if none is provided. Reply in the language selected by `--lang` (Chinese when absent); never translate commands, options, branch names, paths, SHAs, or status codes. Remove `--lang` and its value from the arguments before parsing the rest.

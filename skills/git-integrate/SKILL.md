@@ -15,14 +15,15 @@ Command adapter for the canonical `/GitIntegrate` command of the MAGOS (Multi-Ag
 
 ## Usage
 
-- Hermes: `/git-integrate <lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]`
-- Codex: `$git-integrate <lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]`
+- Hermes: `/git-integrate <lane|branch> [--strategy auto|merge|squash|cherry-pick] [--lang <language>] [--help]`
+- Codex: `$git-integrate <lane|branch> [--strategy auto|merge|squash|cherry-pick] [--lang <language>] [--help]`
 - `<lane|branch>`: Required source lane or branch to integrate.
 - `--strategy <value>`: Optional integration strategy. `auto` follows repository policy and reviewed acceptance shape (default); `merge` preserves accepted lane commits; `squash` delivers the lane as one commit when allowed; `cherry-pick` uses only accepted, dependency-safe commits.
+- `--lang <language>`: Language of the reply, as a name or code (for example `English`, `ja`); Chinese when absent. Command names, options, branch names, paths, SHAs, and status codes stay untranslated.
 - `--help`: Show this inline usage and argument description, then stop without inspecting or changing the repository.
 - Default: Strategy `auto`; integration proceeds only after review, dependency, freshness, protection, and repository-policy gates pass.
 
-Examples: `/git-integrate agent/auth`, `$git-integrate agent/auth --strategy squash`, `$git-integrate --help`.
+Examples: `/git-integrate agent/auth`, `$git-integrate agent/auth --strategy squash`, `$git-integrate <lane-or-branch> --lang English`, `$git-integrate --help`.
 
 ## Arguments
 
@@ -56,4 +57,4 @@ If `../../SKILL.md` or `../../references/commands.md` cannot be read, name the m
 
 ## Execution
 
-Execute the canonical `/GitIntegrate` command only when the user explicitly invoked this command skill. Check review, dependency, freshness, target protection, and repository policy before integration; stop if any gate fails. Never force-push or rewrite shared history. Ask for a target if none is provided.
+Execute the canonical `/GitIntegrate` command only when the user explicitly invoked this command skill. Check review, dependency, freshness, target protection, and repository policy before integration; stop if any gate fails. Never force-push or rewrite shared history. Ask for a target if none is provided. Reply in the language selected by `--lang` (Chinese when absent); never translate commands, options, branch names, paths, SHAs, or status codes. Remove `--lang` and its value from the arguments before parsing the rest.

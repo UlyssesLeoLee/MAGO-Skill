@@ -24,7 +24,7 @@
     {
       "file": "skills/git-recon/SKILL.md",
       "contains": [
-        "- Codex: `$git-recon [--remote] [--help]`",
+        "- Codex: `$git-recon [--remote] [--lang <language>] [--help]`",
         "`--help`:",
         "Examples:"
       ]
@@ -44,7 +44,7 @@
     {
       "file": "skills/git-analyze/SKILL.md",
       "contains": [
-        "- Codex: `$git-analyze <branch|worktree> [--remote] [--help]`",
+        "- Codex: `$git-analyze <branch|worktree> [--remote] [--lang <language>] [--help]`",
         "`--help`:",
         "Examples:"
       ]
@@ -64,7 +64,7 @@
     {
       "file": "skills/git-recommend/SKILL.md",
       "contains": [
-        "- Codex: `$git-recommend [goal] [--remote] [--help]`",
+        "- Codex: `$git-recommend [goal] [--remote] [--lang <language>] [--help]`",
         "`--help`:",
         "Examples:"
       ]
@@ -84,7 +84,7 @@
     {
       "file": "skills/git-integrate/SKILL.md",
       "contains": [
-        "- Codex: `$git-integrate <lane|branch> [--strategy auto|merge|squash|cherry-pick] [--help]`",
+        "- Codex: `$git-integrate <lane|branch> [--strategy auto|merge|squash|cherry-pick] [--lang <language>] [--help]`",
         "`--help`:",
         "Examples:"
       ]
@@ -104,7 +104,7 @@
     {
       "file": "skills/git-cleanup/SKILL.md",
       "contains": [
-        "- Codex: `$git-cleanup [--apply] [--help]`",
+        "- Codex: `$git-cleanup [--apply] [--lang <language>] [--help]`",
         "`--help`:",
         "Examples:"
       ]
@@ -124,7 +124,7 @@
     {
       "file": "skills/git-converge/SKILL.md",
       "contains": [
-        "- Codex: `$git-converge <branch> [--apply] [--discard-ignored] [--help]`",
+        "- Codex: `$git-converge <branch> [--apply] [--discard-ignored] [--lang <language>] [--help]`",
         "`--help`:",
         "Examples:"
       ]

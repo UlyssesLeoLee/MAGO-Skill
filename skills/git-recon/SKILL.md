@@ -15,13 +15,14 @@ Command adapter for the canonical `/GitRecon` command of the MAGOS (Multi-Agent 
 
 ## Usage
 
-- Hermes: `/git-recon [--remote] [--help]`
-- Codex: `$git-recon [--remote] [--help]`
+- Hermes: `/git-recon [--remote] [--lang <language>] [--help]`
+- Codex: `$git-recon [--remote] [--lang <language>] [--help]`
 - `--remote`: Refresh remote-tracking refs before classifying the repository; it does not change branches, worktrees, or commit history.
+- `--lang <language>`: Language of the reply, as a name or code (for example `English`, `ja`); Chinese when absent. Command names, options, branch names, paths, SHAs, and status codes stay untranslated.
 - `--help`: Show this inline usage and argument description, then stop without inspecting the repository.
 - Default: Read-only snapshot using existing local refs; no remote refresh.
 
-Examples: `/git-recon --remote`, `$git-recon --remote`, `$git-recon --help`.
+Examples: `/git-recon --remote`, `$git-recon --remote`, `$git-recon --lang English`, `$git-recon --help`.
 
 ## Arguments
 
@@ -50,4 +51,4 @@ If a shared file cannot be read, name the missing path, report that the MAGOS in
 
 ## Execution
 
-Execute the canonical `/GitRecon` command with the supplied arguments. Inspect the current repository before reporting state-dependent findings. Default to read-only; `--remote` only permits refreshing remote-tracking refs. Never change branches, worktrees, or commit history.
+Execute the canonical `/GitRecon` command with the supplied arguments. Inspect the current repository before reporting state-dependent findings. Default to read-only; `--remote` only permits refreshing remote-tracking refs. Never change branches, worktrees, or commit history. Reply in the language selected by `--lang` (Chinese when absent); never translate commands, options, branch names, paths, SHAs, or status codes. Remove `--lang` and its value from the arguments before parsing the rest.

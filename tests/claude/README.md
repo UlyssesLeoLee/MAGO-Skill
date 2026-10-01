@@ -8,7 +8,7 @@ Test design, scripts, evidence, and the tuning log for the GitConverge command
 | [`test-design.md`](test-design.md) | What is tested, the seven test layers, the oracles, the scenario matrix, known gaps |
 | [`review-findings.md`](review-findings.md) | The design review and the max-effort code review: every finding and what was done about it |
 | [`TUNING.md`](TUNING.md) | Each tuning round: symptom, cause, what was changed, and the result |
-| [`contracts/cases.json`](contracts/cases.json) | 17 source-contract cases for the shipped files |
+| [`contracts/cases.json`](contracts/cases.json) | 18 source-contract cases for the shipped files |
 | [`scripts/`](scripts) | Fixtures, probes, reference executor, scenarios, runners, mutation checks, policy |
 | [`results/`](results) | Evidence from the latest runs (summary in `results/summary.md`) |
 
@@ -32,7 +32,7 @@ Individual layers:
 ```powershell
 python -X utf8 tests/claude/scripts/git_behavior_probes.py      # Git behaviors the contract relies on
 python -X utf8 tests/claude/scripts/run_claude_contracts.py     # source contracts
-python -X utf8 tests/claude/scripts/run_reference_cases.py      # reference executor, 45 scenarios
+python -X utf8 tests/claude/scripts/run_reference_cases.py      # reference executor, 46 scenarios
 python -X utf8 tests/claude/scripts/run_mutation_checks.py      # do the scenarios notice broken rules?
 python -X utf8 tests/claude/scripts/test_command_policy.py      # forbidden-command policy
 python -X utf8 tests/claude/scripts/run_claude_cases.py --fixture-check --case '*'   # harness self-check, no model
