@@ -15,11 +15,12 @@ adapters (`commands/GitConverge.md`, `skills/git-converge/`). The tests therefor
 |---|---|---|---|
 | L0 headers | `cypher_header.py --check` | The Cypher block atop each script still matches the code | no |
 | L1 Git probes | `git_behavior_probes.py` | Each Git behavior the contract relies on holds on the installed Git (15 assertions plus 1 recorded observation) | no |
-| L2 source contracts | `run_claude_contracts.py` | The shipped files state every rule (18 cases, plus the 21 aggregate cases in `tests/codex`) | no |
+| L2 source contracts | `run_claude_contracts.py` | The shipped files state every rule (18 cases, plus the aggregate cases in `tests/codex`) | no |
 | L3 reference scenarios | `run_reference_cases.py` | A deterministic implementation of the contract reaches the right end state in 46 repository shapes | no |
 | L4 mutation checks | `run_mutation_checks.py` | The scenarios notice when a rule is broken (27 mutations) | no |
 | L5 policy unit tests | `test_command_policy.py` | The forbidden-command policy classifies commands correctly | no |
 | L6 Claude runtime | `run_claude_cases.py` | The real Claude CLI, given `/GitConverge ...`, reaches the same end states without forbidden commands | yes |
+| L7 Agent Plugins checks | `tests/codex/contracts/test_agent_plugin.py` | The checks behind the `package/agent-plugin` and `package/install-layout` cases (plugin manifest, Agent Skills frontmatter, git-clone layout) turn red for each planted defect | no |
 
 L3 is an **executable reading of the contract** (`converge_ref.py`). It is not shipped. It exists so that every scenario
 oracle is proven satisfiable, every rule has a fixture that exercises it, and L4 can measure whether the oracles have teeth.
