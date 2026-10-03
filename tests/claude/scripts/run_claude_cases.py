@@ -59,6 +59,7 @@
 #   (file)-[:CONTAINS]->(f_run_case),
 #   (file)-[:CONTAINS]->(f_write_evidence),
 #   (file)-[:CONTAINS]->(f_main),
+#   (f_cjk_share)-[:USES]->(v_CJK),
 #   (f_cli_internal)-[:USES]->(v_CLI_INTERNAL_MARKERS),
 #   (f_fixture_checks)-[:CALLS]->(f_git_bash),
 #   (f_fixture_checks)-[:CALLS]->(f_read_log),
